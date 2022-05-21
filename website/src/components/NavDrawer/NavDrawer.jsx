@@ -1,7 +1,6 @@
 import React from 'react';
 import {
 	Box,
-	Divider,
 	Drawer,
 	List,
 	ListItem,
@@ -10,35 +9,33 @@ import {
 	ListItemText,
 	Toolbar,
 } from '@mui/material';
-import MapIcon from '@mui/icons-material/Map';
-import SettingsIcon from '@mui/icons-material/Settings';
+import { useNavigate } from 'react-router-dom';
+import { pages } from '../../pages';
 
-export default function ModdedDrawer(props) {
+export default function NavDrawer(props) {
 	const { drawerWidth, mobileOpen, handleDrawerToggle } = props;
+
+	const navigate = useNavigate();
 
 	const drawer = (
 		<>
 			<Toolbar />
 			<List>
-				<ListItem key={'roadmap'} disablePadding>
-					<ListItemButton>
-						<ListItemIcon>
-							<MapIcon />
-						</ListItemIcon>
-						<ListItemText primary="Roadmap" />
-					</ListItemButton>
-				</ListItem>
-			</List>
-			<Divider />
-			<List>
-				<ListItem key={'settings'} disablePadding>
-					<ListItemButton>
-						<ListItemIcon>
-							<SettingsIcon />
-						</ListItemIcon>
-						<ListItemText primary="Settings" />
-					</ListItemButton>
-				</ListItem>
+				{pages.map((page) => {
+					if (page.isDivider) {
+						return page.content;
+					} else {
+						return (
+							<ListItem key={page.key} disablePadding>
+								<ListItemButton
+									onClick={() => navigate(page.path)}>
+									<ListItemIcon>{page.icon}</ListItemIcon>
+									<ListItemText primary={page.title} />
+								</ListItemButton>
+							</ListItem>
+						);
+					}
+				})}
 			</List>
 		</>
 	);

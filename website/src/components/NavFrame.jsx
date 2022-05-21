@@ -1,8 +1,8 @@
 import React from 'react';
 import { CssBaseline, Toolbar } from '@mui/material';
 import { Box } from '@mui/system';
-import ModdedAppBar from './ModdedAppBar';
-import ModdedDrawer from './ModdedDrawer';
+import AppBar from './AppBar';
+import NavDrawer from './NavDrawer';
 
 const DRAWER_WIDTH = 240;
 
@@ -16,9 +16,8 @@ export default function NavFrame(props) {
 
 	return (
 		<Box sx={{ display: 'flex' }}>
-			<CssBaseline />
-			<ModdedAppBar handleDrawerToggle={handleDrawerToggle} />
-			<ModdedDrawer
+			<AppBar handleDrawerToggle={handleDrawerToggle} />
+			<NavDrawer
 				drawerWidth={DRAWER_WIDTH}
 				mobileOpen={mobileOpen}
 				handleDrawerToggle={handleDrawerToggle}
