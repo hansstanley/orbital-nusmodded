@@ -7,6 +7,7 @@ import { NavFrame, Router } from './components';
 import { LightModeContext } from './contexts';
 
 function App() {
+	/**	Handles toggling between light and dark modes. */
 	const [lightMode, setLightMode] = React.useState(true);
 
 	const toggleColorMode = React.useCallback(() => {

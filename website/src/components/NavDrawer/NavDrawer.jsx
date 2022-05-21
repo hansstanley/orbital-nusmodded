@@ -11,6 +11,11 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { pages } from '../../pages';
 
+/**
+ * A navigation drawer that goes into the navigation frame.
+ * @param {object} props Props from the parent container.
+ * @returns A navigation drawer.
+ */
 export default function NavDrawer(props) {
 	const { drawerWidth, mobileOpen, handleDrawerToggle } = props;
 

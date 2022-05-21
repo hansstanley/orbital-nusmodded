@@ -1,6 +1,11 @@
 import { Route, Routes } from 'react-router-dom';
 import { pages } from '../../pages';
 
+/**
+ * A router component for page navigation.
+ *
+ * @returns A router component.
+ */
 export default function Router() {
 	return (
 		<Routes>

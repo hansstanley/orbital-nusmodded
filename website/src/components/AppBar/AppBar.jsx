@@ -12,6 +12,12 @@ import AppTitle from './AppTitle';
 import MenuIcon from '@mui/icons-material/Menu';
 import LightModeButton from './LightModeButton';
 
+/**
+ * An application bar that goes into the navigation frame.
+ *
+ * @param {object} props Props from the parent container.
+ * @returns An application bar.
+ */
 export default function AppBar(props) {
 	const { handleDrawerToggle } = props;
 
