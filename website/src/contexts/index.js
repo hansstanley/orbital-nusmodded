@@ -1,3 +1,3 @@
-import LightModeContext from './LightModeContext';
+import LightModeContext from "./LightModeContext";
 
 export { LightModeContext };
