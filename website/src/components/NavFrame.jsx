@@ -1,5 +1,5 @@
 import React from 'react';
-import { CssBaseline, Toolbar } from '@mui/material';
+import { Toolbar } from '@mui/material';
 import { Box } from '@mui/system';
 import AppBar from './AppBar';
 import NavDrawer from './NavDrawer';
@@ -7,7 +7,7 @@ import NavDrawer from './NavDrawer';
 const DRAWER_WIDTH = 240;
 
 export default function NavFrame(props) {
-	const { content } = props;
+	const { toggleColorMode, children } = props;
 	const [mobileOpen, setMobileOpen] = React.useState(false);
 
 	const handleDrawerToggle = () => {
@@ -16,20 +16,24 @@ export default function NavFrame(props) {
 
 	return (
 		<Box sx={{ display: 'flex' }}>
-			<AppBar handleDrawerToggle={handleDrawerToggle} />
+			<AppBar
+				handleDrawerToggle={handleDrawerToggle}
+				toggleColorMode={toggleColorMode}
+			/>
 			<NavDrawer
 				drawerWidth={DRAWER_WIDTH}
 				mobileOpen={mobileOpen}
 				handleDrawerToggle={handleDrawerToggle}
 			/>
 			<Box
+				component="main"
 				sx={{
 					flexGrow: 1,
-					p: 3,
-					width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+					p: 2,
+					width: { xs: '100%', sm: `calc(100% - ${DRAWER_WIDTH}px)` },
 				}}>
 				<Toolbar />
-				{content}
+				{children}
 			</Box>
 		</Box>
 	);

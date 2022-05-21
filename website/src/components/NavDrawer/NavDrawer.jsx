@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-	Box,
 	Drawer,
 	List,
 	ListItem,
@@ -22,40 +21,60 @@ export default function NavDrawer(props) {
 			<Toolbar />
 			<List>
 				{pages.map((page) => {
-					if (page.isDivider) {
+					if (page.isDrawerAccessory) {
 						return page.content;
-					} else {
+					} else if (page.isDrawerItem) {
 						return (
 							<ListItem key={page.key} disablePadding>
 								<ListItemButton
-									onClick={() => navigate(page.path)}>
+									onClick={() => {
+										navigate(page.path);
+										handleDrawerToggle();
+									}}>
 									<ListItemIcon>{page.icon}</ListItemIcon>
 									<ListItemText primary={page.title} />
 								</ListItemButton>
 							</ListItem>
 						);
 					}
+					return null;
 				})}
 			</List>
 		</>
 	);
 
 	return (
-		<Box sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
+		<>
 			<Drawer
 				variant="temporary"
 				open={mobileOpen}
 				onClose={handleDrawerToggle}
 				ModalProps={{ keepMounted: true }}
-				sx={{ display: { xs: 'block', sm: 'none' } }}>
+				sx={{
+					display: { xs: 'block', sm: 'none' },
+					width: drawerWidth,
+					flexShrink: 0,
+					[`& .MuiDrawer-paper`]: {
+						width: drawerWidth,
+						boxSizing: 'border-box',
+					},
+				}}>
 				{drawer}
 			</Drawer>
 			<Drawer
 				variant="permanent"
-				sx={{ display: { xs: 'none', sm: 'block' } }}
+				sx={{
+					display: { xs: 'none', sm: 'block' },
+					width: drawerWidth,
+					flexShrink: 0,
+					[`& .MuiDrawer-paper`]: {
+						width: drawerWidth,
+						boxSizing: 'border-box',
+					},
+				}}
 				open>
 				{drawer}
 			</Drawer>
-		</Box>
+		</>
 	);
 }

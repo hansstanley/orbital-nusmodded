@@ -5,9 +5,10 @@ export default function Router() {
 	return (
 		<Routes>
 			{pages.map((page) => {
-				if (!page.isDivider) {
+				if (page.path && page.content) {
 					return <Route path={page.path} element={page.content} />;
 				}
+				return null;
 			})}
 		</Routes>
 	);
