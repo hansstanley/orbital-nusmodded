@@ -7,7 +7,7 @@ import NavDrawer from './NavDrawer';
 const DRAWER_WIDTH = 240;
 
 export default function NavFrame(props) {
-	const { toggleColorMode, children } = props;
+	const { children } = props;
 	const [mobileOpen, setMobileOpen] = React.useState(false);
 
 	const handleDrawerToggle = () => {
@@ -16,10 +16,7 @@ export default function NavFrame(props) {
 
 	return (
 		<Box sx={{ display: 'flex' }}>
-			<AppBar
-				handleDrawerToggle={handleDrawerToggle}
-				toggleColorMode={toggleColorMode}
-			/>
+			<AppBar handleDrawerToggle={handleDrawerToggle} />
 			<NavDrawer
 				drawerWidth={DRAWER_WIDTH}
 				mobileOpen={mobileOpen}

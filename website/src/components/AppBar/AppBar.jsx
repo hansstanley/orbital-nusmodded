@@ -9,11 +9,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchBox from './SearchBox';
 import AppTitle from './AppTitle';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
 import MenuIcon from '@mui/icons-material/Menu';
+import LightModeButton from './LightModeButton';
 
 export default function AppBar(props) {
-	const { handleDrawerToggle, toggleColorMode } = props;
+	const { handleDrawerToggle } = props;
 
 	const navigate = useNavigate();
 
@@ -39,9 +39,7 @@ export default function AppBar(props) {
 					onClick={() => navigate('/login')}>
 					LOGIN
 				</Button>
-				<IconButton onClick={toggleColorMode} sx={{ ml: 1 }}>
-					<Brightness4Icon />
-				</IconButton>
+				<LightModeButton />
 			</Toolbar>
 		</MuiAppBar>
 	);
