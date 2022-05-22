@@ -16,6 +16,6 @@ const themeOptions = {
   },
 };
 
-const darkTheme = createTheme(themeOptions);
+const defaultDarkTheme = createTheme(themeOptions);
 
-export default darkTheme;
+export default defaultDarkTheme;

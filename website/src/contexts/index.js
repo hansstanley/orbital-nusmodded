@@ -1,3 +1,3 @@
-import LightModeContext from "./LightModeContext";
+import ThemeContext from "./Theme.context";
 
-export { LightModeContext };
+export { ThemeContext };
