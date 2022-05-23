@@ -1,10 +1,9 @@
 import React from "react";
 import { ThemeProvider } from "@mui/material";
-import defaultLightTheme from "./defaultLight";
-import defaultDarkTheme from "./defaultDark";
+import { defaultLightTheme, defaultDarkTheme } from "../themes";
 import { ThemeContext } from "../contexts";
 
-export default function Themer(props) {
+export default function ThemeContextProvider(props) {
   const { children } = props;
 
   const [colorMode, setColorMode] = React.useState("light");

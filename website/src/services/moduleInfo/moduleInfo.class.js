@@ -1,4 +1,4 @@
-export default class Module {
+export default class ModuleInfo {
   acadYear;
 
   // Basic info
