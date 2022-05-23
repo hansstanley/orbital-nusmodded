@@ -1,33 +1,28 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import FormLabel from '@mui/material/FormLabel';
+import { DurationContext } from "../../contexts";
 
-export default function BasicSelect() {
-  const [age, setAge] = React.useState('');
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
-
+export default function RadioButtonsGroup() {
   return (
-    <Box sx={{ minWidth: 120 }}>
-      <FormControl fullWidth>
-        <InputLabel id="demo-select-small">Age</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={age}
-          label="Age"
-          onChange={handleChange}
+    <DurationContext.Consumer>
+      {({ duration, toggleDuration }) => (
+      <FormControl>
+        <FormLabel>Duration of Study</FormLabel>
+        <RadioGroup
+          value={duration}
+          name="controlled-radio-buttons-group"
+          onChange={(e) => toggleDuration(e)}
         >
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
-        </Select>
+          <FormControlLabel value="threeYears" control={<Radio />} label="3 Years" />
+          <FormControlLabel value="fourYears" control={<Radio />} label="4 Years" />
+        </RadioGroup>
       </FormControl>
-    </Box>
+      )}
+    </DurationContext.Consumer>
   );
 }
