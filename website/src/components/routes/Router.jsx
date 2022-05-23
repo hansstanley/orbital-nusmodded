@@ -11,7 +11,9 @@ export default function Router() {
     <Routes>
       {pages.map((page) => {
         if (page.path && page.content) {
-          return <Route path={page.path} element={page.content} />;
+          return (
+            <Route key={page.key} path={page.path} element={page.content} />
+          );
         }
         return null;
       })}

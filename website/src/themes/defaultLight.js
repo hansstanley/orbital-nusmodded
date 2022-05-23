@@ -16,6 +16,6 @@ const themeOptions = {
   },
 };
 
-const lightTheme = createTheme(themeOptions);
+const defaultLightTheme = createTheme(themeOptions);
 
-export default lightTheme;
+export default defaultLightTheme;

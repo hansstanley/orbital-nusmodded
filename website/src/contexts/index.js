@@ -1,3 +1,4 @@
-import LightModeContext from "./LightModeContext";
+import ThemeContext from "./theme.context";
+import ModuleInfoContext from "./moduleInfo.context";
 
-export { LightModeContext };
+export { ModuleInfoContext, ThemeContext };

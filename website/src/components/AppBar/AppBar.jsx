@@ -7,10 +7,9 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import SearchBox from "./SearchBox";
 import AppTitle from "./AppTitle";
 import MenuIcon from "@mui/icons-material/Menu";
-import LightModeButton from "./LightModeButton";
+import ColorModeButton from "./ColorModeButton";
 
 /**
  * An application bar that goes into the navigation frame.
@@ -40,7 +39,6 @@ export default function AppBar(props) {
         </IconButton>
         <AppTitle />
         <Box sx={{ flex: 1 }} />
-        <SearchBox />
         <Button
           variant="contained"
           color="primary"
@@ -48,7 +46,7 @@ export default function AppBar(props) {
         >
           LOGIN
         </Button>
-        <LightModeButton />
+        <ColorModeButton />
       </Toolbar>
     </MuiAppBar>
   );

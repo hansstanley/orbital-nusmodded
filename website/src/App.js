@@ -3,33 +3,20 @@ import "./App.css";
 import React from "react";
 import { ThemeProvider } from "@mui/material";
 import { darkTheme, lightTheme } from "./themes";
+import { Paper } from "@mui/material";
+import { ThemeContextProvider } from "./providers";
 import { NavFrame, Router } from "./components";
-import { LightModeContext } from "./contexts";
+import { ModuleInfoProvider } from "./providers";
 
 function App() {
-  /**	Handles toggling between light and dark modes. */
-  const [lightMode, setLightMode] = React.useState(true);
-
-  const toggleColorMode = React.useCallback(() => {
-    setLightMode(!lightMode);
-  }, [lightMode]);
-
-  const colorMode = React.useMemo(
-    () => ({
-      isLightMode: lightMode,
-      toggleLightMode: toggleColorMode,
-    }),
-    [lightMode, toggleColorMode]
-  );
-
   return (
-    <LightModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={lightMode ? lightTheme : darkTheme}>
+    <ModuleInfoProvider>
+      <ThemeContextProvider>
         <NavFrame>
             <Router />
         </NavFrame>
-      </ThemeProvider>
-    </LightModeContext.Provider>
+      </ThemeContextProvider>
+    </ModuleInfoProvider>
   );
 }
 
