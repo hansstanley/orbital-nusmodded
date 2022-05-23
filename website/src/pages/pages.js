@@ -37,6 +37,7 @@ const pages = [
     content: <Settings />,
   },
   {
+    key: "login",
     path: "/login",
     content: <Login />,
   },
