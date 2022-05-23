@@ -32,7 +32,7 @@ export default function ThemeContextProvider(props) {
 
   return (
     <ThemeContext.Provider value={themeContext}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+      <ThemeProvider theme={theme}>{children}</ThemeProvider>
     </ThemeContext.Provider>
   );
 }

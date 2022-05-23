@@ -1,6 +1,8 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
-import {Paper, Grid, Box } from "@mui/material";
+import { Paper, Grid, Stack, Typography, Divider } from "@mui/material";
+import { RoadmapperService } from "../../services";
+import ModuleBox from "./ModuleBox";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -9,13 +11,14 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: "center",
   color: theme.palette.text.secondary,
 }));
-const filler = "Placeholder Module";
+
+const roadmapperService = new RoadmapperService();
 
 function Module(props) {
   return (
-      <Grid item xs={4}>
-        <Item>{props.info}</Item>
-      </Grid>
+    <Grid item xs={4}>
+      <Item>{props.info}</Item>
+    </Grid>
   );
 }
 
@@ -26,39 +29,31 @@ function toYear(num) {
 }
 
 function Semester(props) {
+  const { modules, year, semester } = props;
+
   return (
-    <Box elevation={0} sx={{ flexGrow: 1, p: 1 }}>
-      <Grid container direction = "column" item spacing={3} justifyContent="center" alignItems="center">
-      <Box>
-        {toYear(props.semester)}
-      </Box>
-      <Module info = {filler}/>
-      <Module info = {filler}/>
-      <Module info = {filler}/>
-      <Module info = {filler}/>
-      <Module info = {filler}/>
-      </Grid>
-    </Box>
+    <Stack spacing={1}>
+      <Typography variant="h6" sx={{ alignSelf: "center" }}>
+        Y{year}S{semester}
+      </Typography>
+      <Divider />
+      {modules.map((moduleCode) => (
+        <ModuleBox moduleCode={moduleCode} />
+      ))}
+    </Stack>
   );
 }
 
 export default function NestedGrid() {
   return (
-    <Grid
-      container
-      direction="row"
-      justifyContent="space-evenly"
-      alignItems="center"
-    >
-      <Semester semester = {1}/>
-      <Semester semester = {2}/>
-      <Semester semester = {3}/>
-      <Semester semester = {4}/>
-      <Semester semester = {5}/>
-      <Semester semester = {6}/>
-      <Semester semester = {7}/>
-      <Semester semester = {8}/>
-
-    </Grid>
+    <Stack direction="row" spacing={2}>
+      {roadmapperService.getRoadmap().map((sem) => (
+        <Semester
+          modules={sem.modules}
+          year={sem.year}
+          semester={sem.semester}
+        />
+      ))}
+    </Stack>
   );
 }

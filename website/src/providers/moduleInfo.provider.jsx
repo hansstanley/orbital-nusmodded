@@ -11,21 +11,28 @@ import { ModuleInfoService } from "../services/moduleInfo";
  */
 export default function ModuleInfoProvider(props) {
   const { children } = props;
+  const [moduleInfoService, setModuleInfoService] = useState(
+    new ModuleInfoService()
+  );
   const [isModuleLoaded, setIsModuleLoaded] = useState(false);
   const [moduleList, setModuleList] = useState([]);
+  const [moduleMap, setModuleMap] = useState([]);
 
   useEffect(() => {
     const foo = async () => {
-      const moduleInfoService = await new ModuleInfoService().buildModules();
+      const loadedService = await moduleInfoService.buildModules();
+      setModuleInfoService(loadedService);
       setModuleList(moduleInfoService.getModuleList());
+      setModuleMap(moduleInfoService.getModuleMap());
       setIsModuleLoaded(true);
     };
     foo();
-  }, []);
+  }, [moduleInfoService]);
 
   return (
     <ModuleInfoContext.Provider
       value={{
+        moduleMap: moduleMap,
         modules: moduleList,
         isLoaded: isModuleLoaded,
       }}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Toolbar } from "@mui/material";
+import { Paper, Toolbar } from "@mui/material";
 import { Box } from "@mui/system";
 import AppBar from "./AppBar";
 import NavDrawer from "./NavDrawer";
@@ -37,13 +37,15 @@ export default function NavFrame(props) {
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
+          flex: 1,
           p: 2,
-          width: { xs: "100%", sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          minWidth: { xs: "100%", sm: `calc(100% - ${DRAWER_WIDTH}px)` },
         }}
       >
         <Toolbar />
-        {children}
+        <Paper elevation={5} sx={{ p: 2 }}>
+          {children}
+        </Paper>
       </Box>
     </Box>
   );

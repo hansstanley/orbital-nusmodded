@@ -45,4 +45,8 @@ export default class ModuleInfoService {
   getModuleList = () => {
     return Array.from(this.#modules.values());
   };
+
+  getModuleMap = () => {
+    return this.#modules;
+  };
 }
