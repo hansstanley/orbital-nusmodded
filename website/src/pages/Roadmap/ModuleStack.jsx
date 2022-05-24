@@ -16,9 +16,9 @@ const roadmapperService = new RoadmapperService();
 
 function Module(props) {
   return (
-      <Grid item xs={4}>
-        <Item>{props.info}</Item>
-      </Grid>
+    <Grid item xs={4}>
+      <Item>{props.info}</Item>
+    </Grid>
   );
 }
 
@@ -28,29 +28,31 @@ function toYear(num) {
   return "Y" + year + "S" + semester;
 }
 
-function Semester(props) {  const { modules, year, semester } = props;
+function Semester(props) {
+  const { modules, year, semester } = props;
 
-return (
-  <Stack spacing={1}>
-    <Typography variant="h6" sx={{ alignSelf: "center" }}>
-      Y{year}S{semester}
-    </Typography>
-    <Divider />
-    {modules.map((moduleCode) => (
-      <ModuleBox moduleCode={moduleCode} />
-    ))}
-  </Stack>
+  return (
+    <Stack spacing={1}>
+      <Typography variant="h6" sx={{ alignSelf: "center" }}>
+        Y{year}S{semester}
+      </Typography>
+      <Divider />
+      {modules.map((moduleCode, index) => (
+        <ModuleBox moduleCode={moduleCode} key={index} />
+      ))}
+    </Stack>
   );
 }
 
 export default function NestedGrid() {
   return (
     <Stack direction="row" spacing={2}>
-      {roadmapperService.getRoadmap().map((sem) => (
+      {roadmapperService.getRoadmap().map((sem, index) => (
         <Semester
           modules={sem.modules}
           year={sem.year}
           semester={sem.semester}
+          key={index}
         />
       ))}
     </Stack>
