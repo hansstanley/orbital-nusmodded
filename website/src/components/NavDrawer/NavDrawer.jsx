@@ -1,5 +1,6 @@
-import React from "react";
+import { useContext } from "react";
 import {
+  Box,
   Drawer,
   List,
   ListItem,
@@ -9,7 +10,11 @@ import {
   Toolbar,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useSpring, animated } from "@react-spring/web";
 import { pages } from "../../pages";
+import { LandingContext } from "../../contexts";
+
+const AnimatedDrawer = animated(Drawer);
 
 /**
  * A navigation drawer that goes into the navigation frame.
@@ -20,9 +25,13 @@ export default function NavDrawer(props) {
   const { drawerWidth, mobileOpen, handleDrawerToggle } = props;
 
   const navigate = useNavigate();
+  const { isLanding } = useContext(LandingContext);
+  const { drawerX } = useSpring({
+    drawerX: isLanding ? -drawerWidth : 0,
+  });
 
   const drawer = (
-    <>
+    <Box sx={{ width: drawerWidth }}>
       <Toolbar />
       <List>
         {pages.map((page) => {
@@ -46,43 +55,53 @@ export default function NavDrawer(props) {
           return null;
         })}
       </List>
-    </>
+    </Box>
   );
 
   return (
-    <>
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
-        sx={{
-          display: { xs: "block", sm: "none" },
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-      >
-        {drawer}
-      </Drawer>
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: "none", sm: "block" },
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-        open
-      >
-        {drawer}
-      </Drawer>
-    </>
+    <AnimatedDrawer
+      variant="temporary"
+      open={mobileOpen}
+      onClose={handleDrawerToggle}
+      style={{ x: drawerX }}
+    >
+      {drawer}
+    </AnimatedDrawer>
   );
+
+  // return (
+  //   <>
+  //     <Drawer
+  //       variant="temporary"
+  //       open={mobileOpen}
+  //       onClose={handleDrawerToggle}
+  //       ModalProps={{ keepMounted: true }}
+  //       sx={{
+  //         display: { xs: "block", sm: "none" },
+  //         width: drawerWidth,
+  //         [`& .MuiDrawer-paper`]: {
+  //           width: drawerWidth,
+  //           boxSizing: "border-box",
+  //         },
+  //       }}
+  //     >
+  //       {drawer}
+  //     </Drawer>
+  //     <AnimatedDrawer
+  //       variant="permanent"
+  //       ModalProps={{ keepMounted: true }}
+  //       sx={{
+  //         display: { xs: "none", sm: "block" },
+  //         width: drawerWidth,
+  //         [`& .MuiDrawer-paper`]: {
+  //           width: drawerWidth,
+  //           boxSizing: "border-box",
+  //         },
+  //       }}
+  //       style={{ x: drawerX }}
+  //     >
+  //       {drawer}
+  //     </AnimatedDrawer>
+  //   </>
+  // );
 }

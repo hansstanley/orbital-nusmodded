@@ -5,11 +5,15 @@ import {
   IconButton,
   Toolbar,
 } from "@mui/material";
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSpring, animated } from "@react-spring/web";
 import AppTitle from "./AppTitle";
 import MenuIcon from "@mui/icons-material/Menu";
 import ColorModeButton from "./ColorModeButton";
+import { LandingContext } from "../../contexts";
+
+const AnimatedAppBar = animated(MuiAppBar);
 
 /**
  * An application bar that goes into the navigation frame.
@@ -22,19 +26,21 @@ export default function AppBar(props) {
 
   const navigate = useNavigate();
 
+  const { isLanding } = useContext(LandingContext);
+
+  const { barY } = useSpring({
+    barY: isLanding ? -64 : 0,
+  });
+
   return (
-    <MuiAppBar
+    <AnimatedAppBar
       position="fixed"
       color="background"
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      style={{ y: barY }}
     >
       <Toolbar>
-        <IconButton
-          color="primary"
-          edge="start"
-          onClick={handleDrawerToggle}
-          sx={{ mr: 2, display: { sm: "none" } }}
-        >
+        <IconButton color="primary" edge="start" onClick={handleDrawerToggle}>
           <MenuIcon />
         </IconButton>
         <AppTitle />
@@ -48,6 +54,6 @@ export default function AppBar(props) {
         </Button>
         <ColorModeButton />
       </Toolbar>
-    </MuiAppBar>
+    </AnimatedAppBar>
   );
 }

@@ -7,6 +7,8 @@
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.8.0",
     "@mui/material": "^5.8.0",
+    "@react-spring/web": "^9.4.5",
+    "@supabase/supabase-js": "^1.35.3",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
     "@testing-library/user-event": "^13.5.0",
@@ -18,6 +20,7 @@
     "react-dom": "^18.1.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
+    "react-use-measure": "^2.1.1",
     "reflect-metadata": "^0.1.13",
     "web-vitals": "^2.1.4"
   },

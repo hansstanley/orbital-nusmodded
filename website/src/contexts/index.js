@@ -1,5 +1,6 @@
-import ThemeContext from "./theme.context";
-import ModuleInfoContext from "./moduleInfo.context";
 import DurationContext from "./duration.context";
+import LandingContext from "./landing.context";
+import ModuleInfoContext from "./moduleInfo.context";
+import ThemeContext from "./theme.context";
 
-export { ModuleInfoContext, ThemeContext , DurationContext};
+export { ModuleInfoContext, ThemeContext, DurationContext, LandingContext };

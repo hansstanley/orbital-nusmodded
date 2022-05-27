@@ -1,8 +1,8 @@
 import React from "react";
-import { Paper, Toolbar } from "@mui/material";
-import { Box } from "@mui/system";
+import { Box } from "@mui/material";
 import AppBar from "./AppBar";
 import NavDrawer from "./NavDrawer";
+import MainFrame from "./MainFrame";
 
 const DRAWER_WIDTH = 240;
 
@@ -34,19 +34,7 @@ export default function NavFrame(props) {
         mobileOpen={mobileOpen}
         handleDrawerToggle={handleDrawerToggle}
       />
-      <Box
-        component="main"
-        sx={{
-          flex: 1,
-          p: 2,
-          minWidth: { xs: "100%", sm: `calc(100% - ${DRAWER_WIDTH}px)` },
-        }}
-      >
-        <Toolbar />
-        <Paper elevation={5} sx={{ p: 2 }}>
-          {children}
-        </Paper>
-      </Box>
+      <MainFrame>{children}</MainFrame>
     </Box>
   );
 }

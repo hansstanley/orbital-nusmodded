@@ -1,6 +1,6 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
-import { Paper, Grid, Stack, Typography, Divider } from "@mui/material";
+import { Paper, Stack, Typography, Divider } from "@mui/material";
 import { RoadmapperService } from "../../services";
 import ModuleBox from "./ModuleBox";
 
@@ -14,19 +14,19 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const roadmapperService = new RoadmapperService();
 
-function Module(props) {
-  return (
-    <Grid item xs={4}>
-      <Item>{props.info}</Item>
-    </Grid>
-  );
-}
+// function Module(props) {
+//   return (
+//     <Grid item xs={4}>
+//       <Item>{props.info}</Item>
+//     </Grid>
+//   );
+// }
 
-function toYear(num) {
-  const year = num % 2 === 0 ? num / 2 : num / 2 + 0.5;
-  const semester = num % 2 === 0 ? 2 : num % 2;
-  return "Y" + year + "S" + semester;
-}
+// function toYear(num) {
+//   const year = num % 2 === 0 ? num / 2 : num / 2 + 0.5;
+//   const semester = num % 2 === 0 ? 2 : num % 2;
+//   return "Y" + year + "S" + semester;
+// }
 
 function Semester(props) {
   const { modules, year, semester } = props;

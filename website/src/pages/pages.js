@@ -4,8 +4,9 @@ import MapIcon from "@mui/icons-material/Map";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Roadmap from "./Roadmap";
 import Settings from "./Settings";
-import Login from "./Login";
 import ModuleInfo from "./ModuleInfo";
+import Landing from "./Landing";
+import Auth from "./Auth";
 
 const pages = [
   {
@@ -39,7 +40,12 @@ const pages = [
   {
     key: "login",
     path: "/login",
-    content: <Login />,
+    content: <Auth />,
+  },
+  {
+    key: "landing",
+    path: "/",
+    content: <Landing />,
   },
 ];
 
