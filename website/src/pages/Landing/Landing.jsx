@@ -14,16 +14,8 @@ export default function Landing() {
   };
 
   return (
-    <Stack
-      spacing={2}
-      sx={{
-        display: "flex",
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Typography variant="h2" sx={{ fontWeight: "bold" }} color="primary">
+    <Stack spacing={2} sx={sx.main}>
+      <Typography variant="h1" sx={sx.title} color="primary">
         NUSMODDED
       </Typography>
       <Button variant="contained" onClick={handleStart}>
@@ -32,3 +24,15 @@ export default function Landing() {
     </Stack>
   );
 }
+
+const sx = {
+  main: {
+    display: "flex",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontWeight: "bold",
+  },
+};

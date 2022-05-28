@@ -1,5 +1,13 @@
-import { Button, Stack, TextField, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
+import {
+  Avatar,
+  Button,
+  Divider,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AuthSessionContext } from "../contexts";
 import { supabase } from "../services";
 
@@ -65,24 +73,43 @@ export default function Account() {
   };
 
   return signedIn ? (
-    <Stack spacing={2}>
-      <TextField
-        id="email"
-        label="Email"
-        variant="outlined"
-        value={session.user.email}
-        disabled
+    <Stack
+      direction="row"
+      divider={<Divider orientation="vertical" />}
+      spacing={2}
+      sx={{ display: "flex", flex: 1 }}
+    >
+      <Avatar
+        alt={username || session.user.email}
+        src={avatarUrl}
+        sx={{ height: 240, width: 240, bgcolor: "primary.main" }}
       />
-      <TextField
-        id="username"
-        label="Username"
-        variant="outlined"
-        value={username || ""}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <Button variant="contained" onClick={updateProfile} disabled={loading}>
-        Update profile
-      </Button>
+      <Stack spacing={2}>
+        <TextField
+          id="email"
+          label="Email"
+          variant="outlined"
+          value={session.user.email}
+          disabled
+        />
+        <TextField
+          id="username"
+          label="Username"
+          variant="outlined"
+          value={username || ""}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <TextField
+          id="avatar"
+          label="Avatar URL"
+          variant="outlined"
+          value={avatarUrl || ""}
+          onChange={(e) => setAvatarUrl(e.target.value)}
+        />
+        <Button variant="contained" onClick={updateProfile} disabled={loading}>
+          Update profile
+        </Button>
+      </Stack>
     </Stack>
   ) : (
     <Typography variant="h6">Please log in.</Typography>

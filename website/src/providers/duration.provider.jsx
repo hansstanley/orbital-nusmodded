@@ -2,7 +2,6 @@ import React from "react";
 import { DurationContext } from "../contexts";
 
 export default function DurationContextProvider(props) {
-  
   const [duration, setDuration] = React.useState("threeYears");
 
   const toggleDuration = (event) => {
@@ -17,7 +16,6 @@ export default function DurationContextProvider(props) {
         duration: duration,
         toggleDuration: toggleDuration,
       }}
-    >
-    </DurationContext.Provider>
+    ></DurationContext.Provider>
   );
 }

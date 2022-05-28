@@ -10,25 +10,17 @@ import {
   Toolbar,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useSpring, animated } from "@react-spring/web";
 import { pages } from "../../pages";
-import { LandingContext } from "../../contexts";
-
-const AnimatedDrawer = animated(Drawer);
+import { DrawerContext } from "../../contexts";
 
 /**
  * A navigation drawer that goes into the navigation frame.
  * @param {object} props Props from the parent container.
  * @returns A navigation drawer.
  */
-export default function NavDrawer(props) {
-  const { drawerWidth, mobileOpen, handleDrawerToggle } = props;
-
+export default function NavDrawer({ drawerWidth }) {
   const navigate = useNavigate();
-  const { isLanding } = useContext(LandingContext);
-  const { drawerX } = useSpring({
-    drawerX: isLanding ? -drawerWidth : 0,
-  });
+  const { drawerOpen, handleDrawerToggle } = useContext(DrawerContext);
 
   const drawer = (
     <Box sx={{ width: drawerWidth }}>
@@ -59,49 +51,8 @@ export default function NavDrawer(props) {
   );
 
   return (
-    <AnimatedDrawer
-      variant="temporary"
-      open={mobileOpen}
-      onClose={handleDrawerToggle}
-      style={{ x: drawerX }}
-    >
+    <Drawer variant="temporary" open={drawerOpen} onClose={handleDrawerToggle}>
       {drawer}
-    </AnimatedDrawer>
+    </Drawer>
   );
-
-  // return (
-  //   <>
-  //     <Drawer
-  //       variant="temporary"
-  //       open={mobileOpen}
-  //       onClose={handleDrawerToggle}
-  //       ModalProps={{ keepMounted: true }}
-  //       sx={{
-  //         display: { xs: "block", sm: "none" },
-  //         width: drawerWidth,
-  //         [`& .MuiDrawer-paper`]: {
-  //           width: drawerWidth,
-  //           boxSizing: "border-box",
-  //         },
-  //       }}
-  //     >
-  //       {drawer}
-  //     </Drawer>
-  //     <AnimatedDrawer
-  //       variant="permanent"
-  //       ModalProps={{ keepMounted: true }}
-  //       sx={{
-  //         display: { xs: "none", sm: "block" },
-  //         width: drawerWidth,
-  //         [`& .MuiDrawer-paper`]: {
-  //           width: drawerWidth,
-  //           boxSizing: "border-box",
-  //         },
-  //       }}
-  //       style={{ x: drawerX }}
-  //     >
-  //       {drawer}
-  //     </AnimatedDrawer>
-  //   </>
-  // );
 }

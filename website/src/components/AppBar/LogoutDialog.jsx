@@ -9,9 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../services";
 
-export default function LogoutDialog(props) {
-  const { open, handleClose } = props;
-
+export default function LogoutDialog({ open, handleClose }) {
   const navigate = useNavigate();
 
   const handleLogout = async () => {

@@ -19,18 +19,23 @@ export default function MainFrame(props) {
   });
 
   return (
-    <AnimatedBox sx={{ display: "flex", p: 2 }} style={styles}>
-      <Paper
-        elevation={5}
-        sx={{
-          display: "flex",
-          flex: 1,
-          p: 2,
-          overflow: "auto",
-        }}
-      >
+    <AnimatedBox sx={sx.container} style={styles}>
+      <Paper elevation={5} sx={sx.paperContainer}>
         {children}
       </Paper>
     </AnimatedBox>
   );
 }
+
+const sx = {
+  container: {
+    display: "flex",
+    p: 2,
+  },
+  paperContainer: {
+    display: "flex",
+    flex: 1,
+    p: 2,
+    overflow: "auto",
+  },
+};
