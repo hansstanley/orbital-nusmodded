@@ -20,7 +20,15 @@ export default function MainFrame(props) {
 
   return (
     <AnimatedBox sx={{ display: "flex", p: 2 }} style={styles}>
-      <Paper elevation={5} sx={{ p: 2, minHeight: "100%", minWidth: "100%" }}>
+      <Paper
+        elevation={5}
+        sx={{
+          display: "flex",
+          flex: 1,
+          p: 2,
+          scrollBehavior: "smooth",
+        }}
+      >
         {children}
       </Paper>
     </AnimatedBox>

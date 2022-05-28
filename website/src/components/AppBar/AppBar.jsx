@@ -11,7 +11,8 @@ import { useSpring, animated } from "@react-spring/web";
 import AppTitle from "./AppTitle";
 import MenuIcon from "@mui/icons-material/Menu";
 import ColorModeButton from "./ColorModeButton";
-import { LandingContext } from "../../contexts";
+import { AuthSessionContext, LandingContext } from "../../contexts";
+import { supabase } from "../../services";
 
 const AnimatedAppBar = animated(MuiAppBar);
 
@@ -27,6 +28,7 @@ export default function AppBar(props) {
   const navigate = useNavigate();
 
   const { isLanding } = useContext(LandingContext);
+  const { signedIn } = useContext(AuthSessionContext);
 
   const { barY } = useSpring({
     barY: isLanding ? -64 : 0,
@@ -45,13 +47,19 @@ export default function AppBar(props) {
         </IconButton>
         <AppTitle />
         <Box sx={{ flex: 1 }} />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate("/login")}
-        >
-          LOGIN
-        </Button>
+        {signedIn ? (
+          <Button variant="outlined" onClick={() => supabase.auth.signOut()}>
+            LOGOUT
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/login")}
+          >
+            LOGIN
+          </Button>
+        )}
         <ColorModeButton />
       </Toolbar>
     </AnimatedAppBar>

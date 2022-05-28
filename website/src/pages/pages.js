@@ -1,4 +1,5 @@
 import { Divider } from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import MapIcon from "@mui/icons-material/Map";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -7,6 +8,7 @@ import Settings from "./Settings";
 import ModuleInfo from "./ModuleInfo";
 import Landing from "./Landing";
 import Auth from "./Auth";
+import Account from "./Account";
 
 const pages = [
   {
@@ -36,6 +38,14 @@ const pages = [
     icon: <SettingsIcon />,
     title: "Settings",
     content: <Settings />,
+  },
+  {
+    isDrawerItem: true,
+    key: "account",
+    path: "/me",
+    icon: <AccountCircleIcon />,
+    title: "Account",
+    content: <Account />,
   },
   {
     key: "login",
