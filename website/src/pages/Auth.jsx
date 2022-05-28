@@ -1,7 +1,6 @@
 import {
   Button,
   CircularProgress,
-  Divider,
   IconButton,
   Snackbar,
   Stack,
@@ -11,6 +10,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 import { supabase } from "../services";
+import { ResponsiveStack } from "../components";
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
@@ -40,12 +40,7 @@ export default function Auth() {
 
   return (
     <>
-      <Stack
-        direction="row"
-        divider={<Divider orientation="vertical" />}
-        spacing={2}
-        sx={{ display: "flex", flex: 1 }}
-      >
+      <ResponsiveStack>
         <Stack spacing={2} sx={{ display: "flex", flex: 1 }}>
           <Typography variant="body1">
             Sign in via magic link with your email
@@ -74,7 +69,7 @@ export default function Auth() {
           <Typography variant="h6">Other login options:</Typography>
           <Typography variant="body1">To be added...</Typography>
         </Stack>
-      </Stack>
+      </ResponsiveStack>
       <Snackbar
         open={sent}
         autoHideDuration={5000}

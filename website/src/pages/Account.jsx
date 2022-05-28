@@ -1,14 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import {
   Avatar,
+  Box,
   Button,
-  Divider,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { AuthSessionContext } from "../contexts";
 import { supabase } from "../services";
+import { ResponsiveStack } from "../components";
 
 export default function Account() {
   const [loading, setLoading] = useState(false);
@@ -72,17 +73,14 @@ export default function Account() {
   };
 
   return signedIn ? (
-    <Stack
-      direction="row"
-      divider={<Divider orientation="vertical" />}
-      spacing={2}
-      sx={{ display: "flex", flex: 1 }}
-    >
-      <Avatar
-        alt={username || session.user.email}
-        src={avatarUrl}
-        sx={{ height: 240, width: 240, bgcolor: "primary.main" }}
-      />
+    <ResponsiveStack>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Avatar
+          alt={username || session.user.email}
+          src={avatarUrl}
+          sx={{ height: 240, width: 240, bgcolor: "primary.main" }}
+        />
+      </Box>
       <Stack spacing={2}>
         <TextField
           id="email"
@@ -109,7 +107,7 @@ export default function Account() {
           Update profile
         </Button>
       </Stack>
-    </Stack>
+    </ResponsiveStack>
   ) : (
     <Typography variant="h6">Please log in.</Typography>
   );
