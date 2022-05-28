@@ -7,7 +7,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AuthSessionContext } from "../contexts";
 import { supabase } from "../services";
 
