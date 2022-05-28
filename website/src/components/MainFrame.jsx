@@ -26,7 +26,7 @@ export default function MainFrame(props) {
           display: "flex",
           flex: 1,
           p: 2,
-          scrollBehavior: "smooth",
+          overflow: "auto",
         }}
       >
         {children}

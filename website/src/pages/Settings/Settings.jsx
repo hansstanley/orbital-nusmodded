@@ -36,7 +36,7 @@ export default function Settings() {
   };
 
   return (
-    <Stack spacing={1}>
+    <Stack spacing={1} sx={{ display: "flex", flex: 1 }}>
       <Typography variant="h6">Year of study</Typography>
       <Card sx={{ p: 2, pl: 5 }}>
         <Slider

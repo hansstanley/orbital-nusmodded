@@ -1,15 +1,16 @@
 import { Button, Stack, Typography } from "@mui/material";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { LandingContext } from "../../contexts";
+import { AuthSessionContext, LandingContext } from "../../contexts";
 
 export default function Landing() {
   const navigate = useNavigate();
   const { toggleLanding } = useContext(LandingContext);
+  const { signedIn } = useContext(AuthSessionContext);
 
   const handleStart = () => {
     toggleLanding();
-    navigate("/login");
+    navigate(signedIn ? "/roadmap" : "/login");
   };
 
   return (
@@ -26,7 +27,7 @@ export default function Landing() {
         NUSMODDED
       </Typography>
       <Button variant="contained" onClick={handleStart}>
-        Get started
+        {signedIn ? "Continue" : "Get started"}
       </Button>
     </Stack>
   );

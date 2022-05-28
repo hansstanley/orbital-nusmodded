@@ -5,14 +5,14 @@ import {
   IconButton,
   Toolbar,
 } from "@mui/material";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSpring, animated } from "@react-spring/web";
 import AppTitle from "./AppTitle";
 import MenuIcon from "@mui/icons-material/Menu";
 import ColorModeButton from "./ColorModeButton";
 import { AuthSessionContext, LandingContext } from "../../contexts";
-import { supabase } from "../../services";
+import LogoutDialog from "./LogoutDialog";
 
 const AnimatedAppBar = animated(MuiAppBar);
 
@@ -30,6 +30,16 @@ export default function AppBar(props) {
   const { isLanding } = useContext(LandingContext);
   const { signedIn } = useContext(AuthSessionContext);
 
+  const [logoutOpen, setLogoutOpen] = useState(false);
+
+  const handleLogoutClose = () => {
+    setLogoutOpen(false);
+  };
+
+  const handleLogoutOpen = () => {
+    setLogoutOpen(true);
+  };
+
   const { barY } = useSpring({
     barY: isLanding ? -64 : 0,
   });
@@ -41,6 +51,7 @@ export default function AppBar(props) {
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       style={{ y: barY }}
     >
+      <LogoutDialog open={logoutOpen} handleClose={handleLogoutClose} />
       <Toolbar>
         <IconButton color="primary" edge="start" onClick={handleDrawerToggle}>
           <MenuIcon />
@@ -48,7 +59,7 @@ export default function AppBar(props) {
         <AppTitle />
         <Box sx={{ flex: 1 }} />
         {signedIn ? (
-          <Button variant="outlined" onClick={() => supabase.auth.signOut()}>
+          <Button variant="outlined" onClick={handleLogoutOpen}>
             LOGOUT
           </Button>
         ) : (

@@ -1,4 +1,4 @@
-import { Button, Stack, TextField } from "@mui/material";
+import { Button, Stack, TextField, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { AuthSessionContext } from "../contexts";
 import { supabase } from "../services";
@@ -7,11 +7,11 @@ export default function Account() {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
-  const { session } = useContext(AuthSessionContext);
+  const { session, signedIn } = useContext(AuthSessionContext);
 
   useEffect(() => {
-    getProfile();
-  }, [session]);
+    if (signedIn) getProfile();
+  }, [signedIn]);
 
   const getProfile = async () => {
     try {
@@ -64,9 +64,15 @@ export default function Account() {
     }
   };
 
-  return (
+  return signedIn ? (
     <Stack spacing={2}>
-      <TextField id="email" label="Email" variant="outlined" disabled />
+      <TextField
+        id="email"
+        label="Email"
+        variant="outlined"
+        value={session.user.email}
+        disabled
+      />
       <TextField
         id="username"
         label="Username"
@@ -78,5 +84,7 @@ export default function Account() {
         Update profile
       </Button>
     </Stack>
+  ) : (
+    <Typography variant="h6">Please log in.</Typography>
   );
 }
