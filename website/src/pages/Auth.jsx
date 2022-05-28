@@ -63,7 +63,11 @@ export default function Auth() {
             disabled={email ? false : true}
             onClick={handleLogin}
           >
-            {loading ? <CircularProgress color="inherit" /> : "Send magic link"}
+            {loading ? (
+              <CircularProgress color="inherit" size={20} />
+            ) : (
+              "Send magic link"
+            )}
           </Button>
         </Stack>
         <Stack spacing={2} sx={{ display: "flex", flex: 2 }}>
