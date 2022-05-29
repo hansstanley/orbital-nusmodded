@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { AuthSessionContext } from "../contexts";
+import { AuthSessionContext, SnackbarContext } from "../contexts";
 import { supabase } from "../services";
 import { ResponsiveStack } from "../components";
 
@@ -16,12 +16,9 @@ export default function Account() {
   const [username, setUsername] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const { session, signedIn } = useContext(AuthSessionContext);
+  const { pushSnack } = useContext(SnackbarContext);
 
-  useEffect(() => {
-    if (signedIn) getProfile();
-  }, [signedIn]);
-
-  const getProfile = async () => {
+  const getProfile = useCallback(async () => {
     try {
       setLoading(true);
       const user = supabase.auth.user();
@@ -39,11 +36,14 @@ export default function Account() {
         setAvatarUrl(data.avatar_url);
       }
     } catch (error) {
-      alert(error.message);
+      pushSnack({
+        message: error.message,
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }, [pushSnack]);
 
   const updateProfile = async (e) => {
     e.preventDefault();
@@ -64,13 +64,24 @@ export default function Account() {
         .upsert(updates, { returning: "minimal" });
 
       if (error) throw error;
-      alert("Updated profile!");
+
+      pushSnack({
+        message: "Profile updated!",
+        severity: "success",
+      });
     } catch (error) {
-      alert(error.message);
+      pushSnack({
+        message: error.message,
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (signedIn) getProfile();
+  }, [signedIn, getProfile]);
 
   return signedIn ? (
     <ResponsiveStack>

@@ -3,6 +3,7 @@ import AuthSessionProvider from "./authSession.provider";
 import DrawerContextProvider from "./drawer.provider";
 import LandingProvider from "./landing.provider";
 import ModuleInfoProvider from "./moduleInfo.provider";
+import SnackbarProvider from "./snackbar.provider";
 import ThemeContextProvider from "./themeContext.provider";
 
 function combineComponents(...components) {
@@ -25,6 +26,7 @@ const providers = [
   ModuleInfoProvider,
   LandingProvider,
   DrawerContextProvider,
+  SnackbarProvider,
 ];
 
 export const AppContextProvider = combineComponents(...providers);

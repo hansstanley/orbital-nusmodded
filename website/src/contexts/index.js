@@ -3,6 +3,7 @@ import DrawerContext from "./drawer.context";
 import DurationContext from "./duration.context";
 import LandingContext from "./landing.context";
 import ModuleInfoContext from "./moduleInfo.context";
+import SnackbarContext from "./snackbar.context";
 import ThemeContext from "./appTheme.context";
 
 export {
@@ -11,5 +12,6 @@ export {
   DurationContext,
   LandingContext,
   ModuleInfoContext,
+  SnackbarContext,
   ThemeContext,
 };

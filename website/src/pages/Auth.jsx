@@ -1,21 +1,19 @@
 import {
   Button,
   CircularProgress,
-  IconButton,
-  Snackbar,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { supabase } from "../services";
 import { ResponsiveStack } from "../components";
+import { SnackbarContext } from "../contexts";
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+  const { pushSnack } = useContext(SnackbarContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -24,18 +22,18 @@ export default function Auth() {
       setLoading(true);
       const { error } = await supabase.auth.signIn({ email: email });
       if (error) throw error;
-      setSent(true);
+      pushSnack({
+        message: "Check your email for the login link!",
+        severity: "success",
+      });
     } catch (error) {
-      alert(error.error_description || error.message);
+      pushSnack({
+        message: error.error_description || error.message,
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCloseSent = (event, reason) => {
-    if (reason === "clickaway") return;
-
-    setSent(false);
   };
 
   return (
@@ -70,17 +68,6 @@ export default function Auth() {
           <Typography variant="body1">To be added...</Typography>
         </Stack>
       </ResponsiveStack>
-      <Snackbar
-        open={sent}
-        autoHideDuration={5000}
-        onClose={handleCloseSent}
-        message="Check your email for the login link!"
-        action={
-          <IconButton size="small" onClick={handleCloseSent} color="inherit">
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        }
-      />
     </>
   );
 }
