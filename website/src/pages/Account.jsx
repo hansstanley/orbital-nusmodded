@@ -87,7 +87,6 @@ export default function Account() {
     <ResponsiveStack>
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Avatar
-          alt={username || session.user.email}
           src={avatarUrl}
           sx={{ height: 240, width: 240, bgcolor: "primary.main" }}
         />
@@ -97,7 +96,7 @@ export default function Account() {
           id="email"
           label="Email"
           variant="outlined"
-          value={session.user.email}
+          value={session?.user?.email || "No email found"}
           disabled
         />
         <TextField

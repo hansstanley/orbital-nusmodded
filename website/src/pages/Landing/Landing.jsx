@@ -15,7 +15,10 @@ export default function Landing() {
 
   return (
     <Stack spacing={2} sx={sx.main}>
-      <Typography variant="h1" sx={sx.title} color="primary">
+      <Typography variant="h1" sx={sx.desktopTitle} color="primary">
+        NUSMODDED
+      </Typography>
+      <Typography variant="h3" sx={sx.mobileTitle} color="primary">
         NUSMODDED
       </Typography>
       <Button variant="contained" onClick={handleStart}>
@@ -32,7 +35,12 @@ const sx = {
     justifyContent: "center",
     alignItems: "center",
   },
-  title: {
+  desktopTitle: {
+    display: { sm: "block", xs: "none" },
+    fontWeight: "bold",
+  },
+  mobileTitle: {
+    display: { sm: "none", xs: "block" },
     fontWeight: "bold",
   },
 };

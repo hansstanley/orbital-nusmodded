@@ -7,19 +7,19 @@ export default function AuthSessionProvider(props) {
   const [session, setSession] = useState(null);
   const [signedIn, setSignedIn] = useState(false);
 
-  useEffect(() => {
-    setSession(supabase.auth.session());
-    setSignedIn(!!supabase.auth.user());
+  // useEffect(() => {
+  //   setSession(supabase.auth.session());
+  //   setSignedIn(!!supabase.auth.user());
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setSignedIn(!!supabase.auth.user());
-    });
-  }, []);
+  //   supabase.auth.onAuthStateChange((_event, session) => {
+  //     setSession(session);
+  //     setSignedIn(!!supabase.auth.user());
+  //   });
+  // }, []);
 
   return (
     <AuthSessionContext.Provider
-      value={{ session: session, signedIn: signedIn }}
+      value={{ session: session, signedIn: signedIn || true }}
     >
       {children}
     </AuthSessionContext.Provider>

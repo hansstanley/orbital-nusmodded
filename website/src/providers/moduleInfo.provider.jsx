@@ -16,7 +16,7 @@ export default function ModuleInfoProvider(props) {
   );
   const [isModuleLoaded, setIsModuleLoaded] = useState(false);
   const [moduleList, setModuleList] = useState([]);
-  const [moduleMap, setModuleMap] = useState([]);
+  const [moduleMap, setModuleMap] = useState(new Map());
 
   useEffect(() => {
     const foo = async () => {
