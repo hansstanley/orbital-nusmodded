@@ -3,7 +3,6 @@ import ModuleInfo from "./moduleInfo.class.js";
 import { plainToInstance } from "class-transformer";
 
 const ACAD_YEAR = "2021-2022";
-// 'proxy' property in package.json as a temporary workaround to CORS
 const DETAILED_INFO_API = `https://api.nusmods.com/v2/${ACAD_YEAR}/moduleInfo.json`;
 
 export default class ModuleInfoService {

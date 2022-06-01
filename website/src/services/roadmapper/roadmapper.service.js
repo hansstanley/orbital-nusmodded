@@ -23,7 +23,7 @@ export default class RoadmapperService {
     {
       year: 3,
       semester: 1,
-      modules: ["CS110S", "CS2106", "GEC1000", "GEQ1000H", "CS3244"],
+      modules: ["CS1101S", "CS2106", "GEC1000", "GEQ1000H", "CS3244"],
     },
     {
       year: 3,
@@ -33,7 +33,18 @@ export default class RoadmapperService {
     {
       year: 4,
       semester: 1,
-      modules: ["CP3880", "CP4101"],
+      modules: [
+        "CP3880",
+        "CP4101",
+        "CP3880",
+        "CP4101",
+        "CP3880",
+        "CP4101",
+        "CP3880",
+        "CP4101",
+        "CP3880",
+        "CP4101",
+      ],
     },
     {
       year: 4,
