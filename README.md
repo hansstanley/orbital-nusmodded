@@ -18,4 +18,4 @@ The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
 ## Website
-You can alternatively view the work-in-progress project [here](https://orbital-nusmodded.vercel.app/)
+You can alternatively view the work-in-progress project [here](https://orbital-nusmodded.vercel.app/).
