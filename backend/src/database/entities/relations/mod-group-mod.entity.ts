@@ -1,19 +1,26 @@
-import { Column, DataType, Model, PrimaryKey, Table } from "sequelize-typescript";
+import {
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table
+} from "sequelize-typescript";
+import { ModGroup } from "src/mod-group/mod-group.entity";
+import { Mod } from "src/mod/mod.entity";
 
 @Table({
-  tableName: 'mod_group_mod'
+  tableName: 'mod_group_mod',
+  underscored: true
 })
 export class ModGroupMod extends Model {
   @PrimaryKey
-  @Column({
-    type: DataType.UUID,
-    field: 'mod_group_id'
-  })
+  @ForeignKey(() => ModGroup)
+  @Column(DataType.UUID)
   modGroupId: string;
 
   @PrimaryKey
-  @Column({
-    field: 'module_code'
-  })
+  @ForeignKey(() => Mod)
+  @Column
   moduleCode: string;
 }

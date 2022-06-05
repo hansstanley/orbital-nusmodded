@@ -1,4 +1,13 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table
+} from "sequelize-typescript";
+import { Course } from "src/course/course.entity";
+import { ModGroup } from "src/mod-group/mod-group.entity";
 
 export enum CourseModGroupType {
   PRECLUSION = 'preclusion',
@@ -6,20 +15,18 @@ export enum CourseModGroupType {
 }
 
 @Table({
-  tableName: 'course_mod_group'
+  tableName: 'course_mod_group',
+  underscored: true
 })
 export class CourseModGroup extends Model {
-  @Column({
-    field: 'course_id',
-    primaryKey: true
-  })
+  @PrimaryKey
+  @ForeignKey(() => Course)
+  @Column
   courseId: string;
 
-  @Column({
-    type: DataType.UUID,
-    field: 'mod_group_id',
-    primaryKey: true
-  })
+  @PrimaryKey
+  @ForeignKey(() => ModGroup)
+  @Column(DataType.UUID)
   modGroupId: string;
 
   @Column

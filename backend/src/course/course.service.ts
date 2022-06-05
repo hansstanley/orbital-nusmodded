@@ -1,4 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { ModGroup } from 'src/mod-group/mod-group.entity';
+import { Mod } from 'src/mod/mod.entity';
+import { REPO } from 'src/utils/constants';
 import { v4 as uuidv4 } from 'uuid';
 import { Course } from './course.entity';
 import { CreateCourseDto } from './dto';
@@ -8,7 +11,7 @@ export class CourseService {
   private readonly logger = new Logger(CourseService.name);
 
   constructor(
-    @Inject('COURSE_REPOSITORY')
+    @Inject(REPO.COURSE)
     private courseRepository: typeof Course
   ) { }
 
@@ -17,7 +20,9 @@ export class CourseService {
   }
 
   async find(id: string): Promise<Course> {
-    const course = await this.courseRepository.findByPk<Course>(id);
+    const course = await this.courseRepository.findByPk<Course>(id, {
+      include: [Mod, ModGroup]
+    });
 
     if (!course) {
       throw new HttpException(

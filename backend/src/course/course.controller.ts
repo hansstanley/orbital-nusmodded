@@ -19,6 +19,12 @@ export class CourseController {
     return this.courseService.find(id);
   }
 
+  @Get(':id/modules')
+  async getMods(@Param('id') id: string): Promise<any> {
+    const course = await this.courseService.find(id);
+    return course.mods;
+  }
+
   @Post('new')
   create(@Body() createDto: CreateCourseDto): Promise<CourseDto> {
     return this.courseService.create(createDto);

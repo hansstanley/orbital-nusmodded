@@ -1,4 +1,15 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {
+  Column,
+  DataType,
+  Default,
+  ForeignKey,
+  Model,
+  NotNull,
+  PrimaryKey,
+  Table
+} from "sequelize-typescript";
+import { Course } from "src/course/course.entity";
+import { Mod } from "src/mod/mod.entity";
 
 export enum CourseModType {
   CORE = 'core',
@@ -7,20 +18,18 @@ export enum CourseModType {
 }
 
 @Table({
-  tableName: 'course_mod'
+  tableName: 'course_mod',
+  underscored: true
 })
 export class CourseMod extends Model {
-  @Column({
-    type: DataType.UUID,
-    field: 'course_id',
-    primaryKey: true
-  })
+  @PrimaryKey
+  @ForeignKey(() => Course)
+  @Column(DataType.UUID)
   courseId: string;
 
-  @Column({
-    field: 'module_code',
-    primaryKey: true
-  })
+  @PrimaryKey
+  @ForeignKey(() => Mod)
+  @Column
   moduleCode: string;
 
   @Column

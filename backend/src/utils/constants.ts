@@ -1,0 +1,11 @@
+export const REPO = {
+  COURSE: 'COURSE_REPOSITORY',
+  MOD: 'MOD_REPOSITORY',
+  MOD_GROUP: 'MOD_GROUP_REPOSITORY'
+};
+
+export const CONFIG = {
+  DATABASE_URL: 'DATABASE_URL'
+};
+
+export const SEQUELIZE = 'SEQUELIZE';
