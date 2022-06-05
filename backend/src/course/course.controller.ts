@@ -11,7 +11,6 @@ export class CourseController {
 
   @Get()
   findAll(): Promise<CourseDto[]> {
-    console.log('what')
     return this.courseService.findAll();
   }
 
