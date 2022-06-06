@@ -4,12 +4,18 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { CourseModule } from './course/course.module';
+import { NusmodsModule } from './nusmods/nusmods.module';
+import { ModModule } from './mod/mod.module';
+import { ModGroupModule } from './mod-group/mod-group.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
-    CourseModule
+    CourseModule,
+    NusmodsModule,
+    ModModule,
+    ModGroupModule
   ],
   controllers: [AppController],
   providers: [AppService],

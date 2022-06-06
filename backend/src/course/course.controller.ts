@@ -11,13 +11,18 @@ export class CourseController {
 
   @Get()
   findAll(): Promise<CourseDto[]> {
-    console.log('what')
     return this.courseService.findAll();
   }
 
   @Get(':id')
   find(@Param('id') id: string): Promise<CourseDto> {
     return this.courseService.find(id);
+  }
+
+  @Get(':id/modules')
+  async getMods(@Param('id') id: string): Promise<any> {
+    const course = await this.courseService.find(id);
+    return course.mods;
   }
 
   @Post('new')

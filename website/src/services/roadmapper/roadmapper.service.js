@@ -18,7 +18,7 @@ export default class RoadmapperService {
     {
       year: 2,
       semester: 2,
-      modules: ["CS3230", "CS1231S", "MA1521", "GEA1000", "IS1103"],
+      modules: ["CS3230", "AC5001", "MA1521", "GEA1000", "IS1103"],
     },
     {
       year: 3,

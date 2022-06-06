@@ -1,13 +1,19 @@
 import {
+  BelongsToMany,
   Column,
   DataType,
+  HasMany,
   Model,
   PrimaryKey,
   Table
 } from "sequelize-typescript";
+import { CourseMod, CourseModGroup } from "src/database/entities/relations";
+import { ModGroup } from "src/mod-group/mod-group.entity";
+import { Mod } from "src/mod/mod.entity";
 
 @Table({
-  tableName: 'courses'
+  tableName: 'courses',
+  underscored: true
 })
 export class Course extends Model {
   @PrimaryKey
@@ -19,4 +25,10 @@ export class Course extends Model {
 
   @Column
   description: string;
+
+  @BelongsToMany(() => Mod, () => CourseMod)
+  mods: Mod[];
+
+  @BelongsToMany(() => ModGroup, () => CourseModGroup)
+  modGroups: ModGroup[];
 }

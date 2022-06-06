@@ -14,25 +14,11 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const roadmapperService = new RoadmapperService();
 
-// function Module(props) {
-//   return (
-//     <Grid item xs={4}>
-//       <Item>{props.info}</Item>
-//     </Grid>
-//   );
-// }
-
-// function toYear(num) {
-//   const year = num % 2 === 0 ? num / 2 : num / 2 + 0.5;
-//   const semester = num % 2 === 0 ? 2 : num % 2;
-//   return "Y" + year + "S" + semester;
-// }
-
 function Semester(props) {
   const { modules, year, semester } = props;
 
   return (
-    <Stack spacing={1}>
+    <Stack spacing={1} direction = "row">
       <Typography variant="h6" sx={{ alignSelf: "center" }}>
         Y{year}S{semester}
       </Typography>
@@ -46,7 +32,7 @@ function Semester(props) {
 
 export default function NestedGrid() {
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack spacing={1.5}>
       {roadmapperService.getRoadmap().map((sem, index) => (
         <Semester
           modules={sem.modules}
