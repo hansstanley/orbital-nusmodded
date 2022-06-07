@@ -6,7 +6,7 @@ import { NusmodsController } from './nusmods.controller';
 @Module({
   imports: [HttpModule],
   providers: [NusmodsService],
-  exports: [NusmodsService],
-  controllers: [NusmodsController]
+  controllers: [NusmodsController],
+  exports: [NusmodsService]
 })
 export class NusmodsModule { }

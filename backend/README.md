@@ -74,7 +74,7 @@ Returns an array of courses.
 GET /course
 ```
 
-`200 OK` returns `Course[]`.
+Response `200 OK`: `Course[]`.
 
 #### Add course
 
@@ -92,7 +92,7 @@ type body = {
 };
 ```
 
-`201 CREATED` returns `Course`.
+Response `201 CREATED`: `Course`.
 
 #### Get course info
 
@@ -106,7 +106,7 @@ GET /course/{courseId}
 type courseId = string; // UUID V4
 ```
 
-`200 OK` returns `Course`.
+Response `200 OK`: `Course`.
 
 #### Delete course
 
@@ -120,7 +120,7 @@ DELETE /course/{courseId}
 type courseId = string; // UUID V4
 ```
 
-`200 OK` returns `Course`.
+Response `200 OK`: `Course`.
 
 #### Get course modules
 
@@ -136,7 +136,7 @@ GET /course/{courseId}/modules
 type courseId = string; // UUID V4
 ```
 
-`200 OK` returns `Mod[]`.
+Repsonse `200 OK`: `Mod[]`.
 
 #### Get course module groups
 
@@ -152,7 +152,56 @@ GET /course/{courseId}/module-groups
 type courseId = string; // UUID V4
 ```
 
-`200 OK` returns `ModGroup[]`.
+Response `200 OK`: `ModGroup[]`.
+
+#### Add modules to course
+
+> :white_check_mark: Implemented
+
+```
+POST /course/{courseId}/add-modules
+```
+
+```typescript
+type courseId = string; // UUID V4
+type body = {
+  type: string; // Type of module to the course
+  moduleCodes: string[]; // Module codes to add
+};
+```
+
+Response `200 OK`:
+
+```typescript
+type body = {
+  bound: ModuleCode[];
+};
+
+type ModuleCode = string;
+```
+
+#### Remove modules from course
+
+> :white_check_mark: Implemented
+
+```
+POST /course/{courseId}/remove-modules
+```
+
+```typescript
+type courseId = string; // UUID V4
+type body = {
+  moduleCodes: string[]; // Module codes to remove
+};
+```
+
+Response `200 OK`:
+
+```typescript
+type body = {
+  count: number; // Number of modules removed
+};
+```
 
 </details>
 
@@ -169,6 +218,8 @@ GET /module/{moduleCode}
 ```typescript
 type moduleCode = string;
 ```
+
+Response `200 OK`: `Mod`.
 
 </details>
 
