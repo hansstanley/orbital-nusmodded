@@ -65,28 +65,126 @@ The backend that supports this API has not yet been deployed.
 ### Courses
 
 **Get all courses**
+
+- [x] Implemented
+
 Returns an array of courses.
 
 ```
 GET /course
 ```
 
+`200 OK` returns `Course[]`.
+
 **Add course**
+
+- [x] Implemented
 
 ```
 POST /course/new
 ```
 
+```typescript
+type body = {
+  name: string; // Name of the course
+  department: string; // E.g. faculty, school, college
+  description: string;
+};
+```
+
+`201 CREATED` returns `Course`.
+
 **Get course info**
+
+- [x] Implemented
 
 ```
 GET /course/{courseId}
 ```
 
+```typescript
+type courseId = string; // UUID V4
+```
+
+`200 OK` returns `Course`.
+
 **Delete course**
+
+- [x] Implemented
 
 ```
 DELETE /course/{courseId}
+```
+
+```typescript
+type courseId = string; // UUID V4
+```
+
+`200 OK` returns `Course`.
+
+**Get course modules**
+
+- [x] Implemented
+
+Returns an array of modules associated to the course.
+
+```
+GET /course/{courseId}/modules
+```
+
+```typescript
+type courseId = string; // UUID V4
+```
+
+`200 OK` returns `Mod[]`.
+
+**Get course module groups**
+
+- [x] Implemented
+
+Returns an array of module groups associated to the course.
+
+```
+GET /course/{courseId}/module-groups
+```
+
+```typescript
+type courseId = string; // UUID V4
+```
+
+`200 OK` returns `ModGroup[]`.
+
+## Schemas
+
+### Course
+
+```typescript
+type Course = {
+  id: string; // UUID V4
+  name: string;
+  department: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+```
+
+### Mod (module)
+
+```
+{}
+```
+
+### ModGroup (module group)
+
+```typescript
+type ModGroup = {
+  id: string; // UUID V4
+  name: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 ```
 
 ## Support
