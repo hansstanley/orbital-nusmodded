@@ -62,11 +62,11 @@ $ npm run test:cov
 
 The backend that supports this API has not yet been deployed.
 
-### Courses
+<details><summary>Courses</summary>
 
-**Get all courses**
+#### Get all courses
 
-- [x] Implemented
+> :white_check_mark: Implemented
 
 Returns an array of courses.
 
@@ -76,9 +76,9 @@ GET /course
 
 `200 OK` returns `Course[]`.
 
-**Add course**
+#### Add course
 
-- [x] Implemented
+> :white_check_mark: Implemented
 
 ```
 POST /course/new
@@ -94,9 +94,9 @@ type body = {
 
 `201 CREATED` returns `Course`.
 
-**Get course info**
+#### Get course info
 
-- [x] Implemented
+> :white_check_mark: Implemented
 
 ```
 GET /course/{courseId}
@@ -108,9 +108,9 @@ type courseId = string; // UUID V4
 
 `200 OK` returns `Course`.
 
-**Delete course**
+#### Delete course
 
-- [x] Implemented
+> :white_check_mark: Implemented
 
 ```
 DELETE /course/{courseId}
@@ -122,9 +122,9 @@ type courseId = string; // UUID V4
 
 `200 OK` returns `Course`.
 
-**Get course modules**
+#### Get course modules
 
-- [x] Implemented
+> :white_check_mark: Implemented
 
 Returns an array of modules associated to the course.
 
@@ -138,9 +138,9 @@ type courseId = string; // UUID V4
 
 `200 OK` returns `Mod[]`.
 
-**Get course module groups**
+#### Get course module groups
 
-- [x] Implemented
+> :white_check_mark: Implemented
 
 Returns an array of module groups associated to the course.
 
@@ -153,6 +153,24 @@ type courseId = string; // UUID V4
 ```
 
 `200 OK` returns `ModGroup[]`.
+
+</details>
+
+<details><summary>Modules</summary>
+
+#### Get module information
+
+> :white_check_mark: Implemented
+
+```
+GET /module/{moduleCode}
+```
+
+```typescript
+type moduleCode = string;
+```
+
+</details>
 
 ## Schemas
 
