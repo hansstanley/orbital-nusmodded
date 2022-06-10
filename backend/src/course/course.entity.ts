@@ -20,7 +20,7 @@ export class Course extends Model {
   id: string;
 
   @Column
-  name: string
+  title: string
 
   @Column
   department: string;

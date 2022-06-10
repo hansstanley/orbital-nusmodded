@@ -62,6 +62,26 @@ $ npm run test:cov
 
 The backend that supports this API has not yet been deployed.
 
+<details><summary>Roadmap</summary>
+
+#### Validate roadmap
+
+> :x: Not implemented
+
+Checks the roadmap for potential errors.
+
+```
+POST /roadmap/validate
+```
+
+```typescript
+type body = Roadmap; // Refer to schema below
+```
+
+Response `200 OK`: `RoadmapError[]`.
+
+</details>
+
 <details><summary>Courses</summary>
 
 #### Get all courses
@@ -86,13 +106,33 @@ POST /course/new
 
 ```typescript
 type body = {
-  name: string; // Name of the course
+  title: string; // Title of the course
   department: string; // E.g. faculty, school, college
   description: string;
 };
 ```
 
 Response `201 CREATED`: `Course`.
+
+#### Edit course
+
+> :white_check_mark: Implemented
+
+```
+POST /course/{courseId}/edit
+```
+
+```typescript
+type courseId = string; // UUID V4
+
+type body = {
+  title?: string; // Title of the course
+  department?: string; // E.g. faculty, school, college
+  description?: string;
+};
+```
+
+Response `200 OK`: `Course`.
 
 #### Get course info
 
@@ -207,6 +247,8 @@ type body = {
 
 <details><summary>Modules</summary>
 
+#### Get all modules
+
 #### Get module information
 
 > :white_check_mark: Implemented
@@ -219,7 +261,7 @@ GET /module/{moduleCode}
 type moduleCode = string;
 ```
 
-Response `200 OK`: `Mod`.
+Response `200 OK`: [Module schema from NUSMods](https://api.nusmods.com/v2/#/Modules/get__acadYear__modules__moduleCode__json).
 
 </details>
 
@@ -230,7 +272,7 @@ Response `200 OK`: `Mod`.
 ```typescript
 type Course = {
   id: string; // UUID V4
-  name: string;
+  title: string;
   department: string;
   description: string;
   createdAt: Date;
@@ -240,8 +282,11 @@ type Course = {
 
 ### Mod (module)
 
-```
-{}
+```typescript
+type Mod = {
+  moduleCode: string;
+  title: string;
+};
 ```
 
 ### ModGroup (module group)
@@ -253,6 +298,42 @@ type ModGroup = {
   description: string;
   createdAt: Date;
   updatedAt: Date;
+};
+```
+
+### Roadmap
+
+```typescript
+type Roadmap = {
+  years: Year[];
+};
+```
+
+### RoadmapError (roadmap issues)
+
+```typescript
+type RoadmapError = {
+  mods?: Mod[]; // Affected modules
+  modGroups?: ModGroup[]; // Affected module groups
+  message: string; // Message to describe the issue
+};
+```
+
+### Year
+
+```typescript
+type Year = {
+  id: number;
+  semesters: Semester[];
+};
+```
+
+### Semester
+
+```typescript
+type Semester = {
+  id: 1 | 2 | 3 | 4;
+  mods: Mod[];
 };
 ```
 

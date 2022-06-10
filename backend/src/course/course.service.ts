@@ -14,7 +14,8 @@ import { Course } from './course.entity';
 import {
   BindModsDto,
   CreateCourseDto,
-  UnbindModsDto
+  UnbindModsDto,
+  UpdateCourseDto
 } from './dto';
 
 @Injectable()
@@ -63,10 +64,43 @@ export class CourseService {
    * @returns The created Course.
    */
   async create(createDto: CreateCourseDto): Promise<Course> {
+    const existing = await this.courseRepository.findOne({
+      where: { title: createDto.title }
+    });
+
+    if (existing) {
+      throw new HttpException(
+        `Course with title '${createDto.title}' already exists`,
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
     const course = new Course();
     course.id = uuidv4();
-    course.name = createDto.name;
-    course.description = createDto.description;
+
+    for (let key in createDto) {
+      if ((createDto[key] ?? false) && key in course) {
+        course[key] = createDto[key];
+      }
+    }
+
+    return course.save();
+  }
+
+  /**
+   * Updates a course.
+   * 
+   * @param updateDto DTO to update a Course.
+   * @returns The updated Course.
+   */
+  async update(id: string, updateDto: UpdateCourseDto): Promise<Course> {
+    const course: Course = await this.find(id);
+
+    for (let key in updateDto) {
+      if ((updateDto[key] ?? false) && key in course) {
+        course[key] = updateDto[key];
+      }
+    }
 
     return course.save();
   }

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { Course } from 'src/course/course.entity';
+import { ModInfoDto } from 'src/nusmods/dto';
 import { NusmodsService } from 'src/nusmods/nusmods.service';
 import { REPO } from 'src/utils/constants';
 import { Mod } from './mod.entity';
@@ -17,41 +18,18 @@ export class ModService {
   }
 
   async build(): Promise<void> {
-    const fieldsOnUpdate = [
-      'moduleCredit',
-      'title',
-      'department',
-      'faculty',
-      'prerequisite',
-      'preclusion'
-    ];
+    const fieldsOnUpdate = ['title'];
 
-    const modDetails = await this.nusmodsService.getDetails();
+    const modDetails = await this.nusmodsService.getSummaries();
     const mods = modDetails
-      .map((mod) => ({ ...mod }));
+      .map((mod) => ({
+        moduleCode: mod.moduleCode,
+        title: mod.title
+      }));
 
-    /**
-     * TODO:
-     * Finalise database shape of Mod
-     * Build sync
-     */
-
-    // for (let mod of mods) {
-    //   this.logger.debug(`Upserting ${mod.moduleCode}...`);
-    //   try { await this.modRepository.upsert(mod); }
-    //   catch (err) {
-    //     console.log(mod.moduleCode, mod);
-    //     console.error(err);
-    //   }
-    // }
-
-    // const chunkSize = 100;
-    // for (let i = 0; i < mods.length; i += chunkSize) {
-    //   const chunk = mods.slice(i, i + chunkSize);
-    //   await this.modRepository.bulkCreate(chunk, {
-    //     updateOnDuplicate: fieldsOnUpdate
-    //   });
-    // }
+    await this.modRepository.bulkCreate(mods, {
+      updateOnDuplicate: fieldsOnUpdate
+    });
   }
 
   async find(moduleCode: string): Promise<Mod> {
@@ -66,5 +44,11 @@ export class ModService {
     }
 
     return mod;
+  }
+
+  async findAll(): Promise<Mod[]> {
+    const mods = await this.modRepository.findAll();
+
+    return mods
   }
 }

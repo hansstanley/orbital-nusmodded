@@ -10,8 +10,9 @@ import {
 } from '@nestjs/common';
 import { ModGroup } from 'src/mod-group/mod-group.entity';
 import { Mod } from 'src/mod/mod.entity';
+import { Course } from './course.entity';
 import { CourseService } from './course.service';
-import { BindModsDto, CreateCourseDto, UnbindModsDto } from './dto';
+import { BindModsDto, CreateCourseDto, UnbindModsDto, UpdateCourseDto } from './dto';
 import { CourseDto } from './dto/course.dto';
 
 @Controller('course')
@@ -21,12 +22,12 @@ export class CourseController {
   ) { }
 
   @Get()
-  findAll(): Promise<CourseDto[]> {
+  async findAll(): Promise<CourseDto[]> {
     return this.courseService.findAll();
   }
 
   @Get(':id')
-  find(@Param('id') id: string): Promise<CourseDto> {
+  async find(@Param('id') id: string): Promise<CourseDto> {
     return this.courseService.find(id);
   }
 
@@ -43,8 +44,19 @@ export class CourseController {
   }
 
   @Post('new')
-  create(@Body() createDto: CreateCourseDto): Promise<CourseDto> {
+  async create(@Body() createDto: CreateCourseDto): Promise<CourseDto> {
     return this.courseService.create(createDto);
+  }
+
+  @Post(':id/edit')
+  @HttpCode(HttpStatus.OK)
+  async update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateCourseDto
+  ): Promise<Course> {
+    const course = await this.courseService.update(id, updateDto);
+
+    return course;
   }
 
   @Post(':id/add-modules')
@@ -77,7 +89,7 @@ export class CourseController {
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<CourseDto> {
+  async delete(@Param('id') id: string): Promise<CourseDto> {
     return this.courseService.delete(id);
   }
 }
