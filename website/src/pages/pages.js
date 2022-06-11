@@ -1,6 +1,7 @@
 import { Divider } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 import MapIcon from "@mui/icons-material/Map";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Roadmap from "./Roadmap";
@@ -9,6 +10,7 @@ import ModuleInfo from "./ModuleInfo";
 import Landing from "./Landing";
 import Auth from "./Auth";
 import Account from "./Account";
+import Courses from "./Courses";
 
 const pages = [
   {
@@ -26,6 +28,14 @@ const pages = [
     icon: <AutoStoriesIcon />,
     title: "Modules",
     content: <ModuleInfo />,
+  },
+  {
+    isDrawerItem: true,
+    key: "courses",
+    path: "/courses",
+    icon: <MenuBookIcon />,
+    title: "Courses",
+    content: <Courses />,
   },
   {
     isDrawerAccessory: true,
