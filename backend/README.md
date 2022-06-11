@@ -24,7 +24,9 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Backend API repository for NUSModded.
+
+Deployed to <https://nusmodded.herokuapp.com/>
 
 ## Installation
 
@@ -59,8 +61,6 @@ $ npm run test:cov
 ```
 
 ## API
-
-The backend that supports this API has not yet been deployed.
 
 <details><summary>Roadmap</summary>
 
