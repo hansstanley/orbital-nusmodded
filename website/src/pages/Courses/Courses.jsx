@@ -50,7 +50,6 @@ export default function ModuleInfo() {
                 {courses
                 .map( course => 
                   <MenuItem value = {course.name}>{course.name}</MenuItem>
-
                 )}
               </Select>
             </FormControl>
