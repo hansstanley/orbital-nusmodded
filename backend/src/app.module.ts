@@ -7,6 +7,7 @@ import { CourseModule } from './course/course.module';
 import { NusmodsModule } from './nusmods/nusmods.module';
 import { ModModule } from './mod/mod.module';
 import { ModGroupModule } from './mod-group/mod-group.module';
+import { RoadmapModule } from './roadmap/roadmap.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { ModGroupModule } from './mod-group/mod-group.module';
     CourseModule,
     NusmodsModule,
     ModModule,
-    ModGroupModule
+    ModGroupModule,
+    RoadmapModule
   ],
   controllers: [AppController],
   providers: [AppService],

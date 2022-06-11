@@ -19,23 +19,8 @@ export class Mod extends Model {
   @Column
   moduleCode: string;
 
-  @Column(DataType.SMALLINT)
-  moduleCredit: number;
-
   @Column
   title: string;
-
-  @Column
-  department: string;
-
-  @Column
-  faculty: string;
-
-  @Column
-  prerequisite: string;
-
-  @Column
-  preclusion: string
 
   @BelongsToMany(() => Course, () => CourseMod)
   courses: Course[];

@@ -24,7 +24,9 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Backend API repository for NUSModded.
+
+Deployed to <https://nusmodded.herokuapp.com/>
 
 ## Installation
 
@@ -60,33 +62,279 @@ $ npm run test:cov
 
 ## API
 
-The backend that supports this API has not yet been deployed.
+<details><summary>Roadmap</summary>
 
-### Courses
+#### Validate roadmap
 
-**Get all courses**
+> :x: Not implemented
+
+Checks the roadmap for potential errors.
+
+```
+POST /roadmap/validate
+```
+
+```typescript
+type body = Roadmap; // Refer to schema below
+```
+
+Response `200 OK`: `RoadmapError[]`.
+
+</details>
+
+<details><summary>Courses</summary>
+
+#### Get all courses
+
+> :white_check_mark: Implemented
+
 Returns an array of courses.
 
 ```
 GET /course
 ```
 
-**Add course**
+Response `200 OK`: `Course[]`.
+
+#### Add course
+
+> :white_check_mark: Implemented
 
 ```
 POST /course/new
 ```
 
-**Get course info**
+```typescript
+type body = {
+  title: string; // Title of the course
+  department: string; // E.g. faculty, school, college
+  description: string;
+};
+```
+
+Response `201 CREATED`: `Course`.
+
+#### Edit course
+
+> :white_check_mark: Implemented
+
+```
+POST /course/{courseId}/edit
+```
+
+```typescript
+type courseId = string; // UUID V4
+
+type body = {
+  title?: string; // Title of the course
+  department?: string; // E.g. faculty, school, college
+  description?: string;
+};
+```
+
+Response `200 OK`: `Course`.
+
+#### Get course info
+
+> :white_check_mark: Implemented
 
 ```
 GET /course/{courseId}
 ```
 
-**Delete course**
+```typescript
+type courseId = string; // UUID V4
+```
+
+Response `200 OK`: `Course`.
+
+#### Delete course
+
+> :white_check_mark: Implemented
 
 ```
 DELETE /course/{courseId}
+```
+
+```typescript
+type courseId = string; // UUID V4
+```
+
+Response `200 OK`: `Course`.
+
+#### Get course modules
+
+> :white_check_mark: Implemented
+
+Returns an array of modules associated to the course.
+
+```
+GET /course/{courseId}/modules
+```
+
+```typescript
+type courseId = string; // UUID V4
+```
+
+Repsonse `200 OK`: `Mod[]`.
+
+#### Get course module groups
+
+> :white_check_mark: Implemented
+
+Returns an array of module groups associated to the course.
+
+```
+GET /course/{courseId}/module-groups
+```
+
+```typescript
+type courseId = string; // UUID V4
+```
+
+Response `200 OK`: `ModGroup[]`.
+
+#### Add modules to course
+
+> :white_check_mark: Implemented
+
+```
+POST /course/{courseId}/add-modules
+```
+
+```typescript
+type courseId = string; // UUID V4
+type body = {
+  type: string; // Type of module to the course
+  moduleCodes: string[]; // Module codes to add
+};
+```
+
+Response `200 OK`:
+
+```typescript
+type body = {
+  bound: ModuleCode[];
+};
+
+type ModuleCode = string;
+```
+
+#### Remove modules from course
+
+> :white_check_mark: Implemented
+
+```
+POST /course/{courseId}/remove-modules
+```
+
+```typescript
+type courseId = string; // UUID V4
+type body = {
+  moduleCodes: string[]; // Module codes to remove
+};
+```
+
+Response `200 OK`:
+
+```typescript
+type body = {
+  count: number; // Number of modules removed
+};
+```
+
+</details>
+
+<details><summary>Modules</summary>
+
+#### Get all modules
+
+#### Get module information
+
+> :white_check_mark: Implemented
+
+```
+GET /module/{moduleCode}
+```
+
+```typescript
+type moduleCode = string;
+```
+
+Response `200 OK`: [Module schema from NUSMods](https://api.nusmods.com/v2/#/Modules/get__acadYear__modules__moduleCode__json).
+
+</details>
+
+## Schemas
+
+### Course
+
+```typescript
+type Course = {
+  id: string; // UUID V4
+  title: string;
+  department: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+```
+
+### Mod (module)
+
+```typescript
+type Mod = {
+  moduleCode: string;
+  title: string;
+};
+```
+
+### ModGroup (module group)
+
+```typescript
+type ModGroup = {
+  id: string; // UUID V4
+  name: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+```
+
+### Roadmap
+
+```typescript
+type Roadmap = {
+  years: Year[];
+};
+```
+
+### RoadmapError (roadmap issues)
+
+```typescript
+type RoadmapError = {
+  mods?: Mod[]; // Affected modules
+  modGroups?: ModGroup[]; // Affected module groups
+  message: string; // Message to describe the issue
+};
+```
+
+### Year
+
+```typescript
+type Year = {
+  id: number;
+  semesters: Semester[];
+};
+```
+
+### Semester
+
+```typescript
+type Semester = {
+  id: 1 | 2 | 3 | 4;
+  mods: Mod[];
+};
 ```
 
 ## Support

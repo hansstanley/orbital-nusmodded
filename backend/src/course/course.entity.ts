@@ -2,7 +2,6 @@ import {
   BelongsToMany,
   Column,
   DataType,
-  HasMany,
   Model,
   PrimaryKey,
   Table
@@ -21,7 +20,10 @@ export class Course extends Model {
   id: string;
 
   @Column
-  name: string
+  title: string
+
+  @Column
+  department: string;
 
   @Column
   description: string;
