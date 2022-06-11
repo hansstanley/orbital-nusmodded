@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   IconButton,
   TextField,
@@ -6,7 +5,7 @@ import {
 } from '@mui/material';
 import SearchIcon from "@mui/icons-material/Search";
 
-const SearchBar = ({setSearchQuery}) => (
+const SearchBar = ({setSearchQuery, handleSearch }) => (
     <TextField
     id="search-bar"
     className="text"
@@ -21,7 +20,7 @@ const SearchBar = ({setSearchQuery}) => (
     endAdornment: (
       <InputAdornment>
         <IconButton>
-          <SearchIcon />
+          <SearchIcon onClick = {handleSearch}/>
         </IconButton>
       </InputAdornment>
       )
@@ -29,7 +28,7 @@ const SearchBar = ({setSearchQuery}) => (
     />
 );
 
-export default function search({ setSearchQuery }) {
+export default function search({ setSearchQuery, handleSearch }) {
   return (
     <div
       style={{
@@ -40,7 +39,7 @@ export default function search({ setSearchQuery }) {
         padding: 20
       }}
     >
-      <SearchBar setSearchQuery={setSearchQuery}/>
+      <SearchBar setSearchQuery={setSearchQuery} handleSearch = {handleSearch}/>
     </div>
   );
 }
