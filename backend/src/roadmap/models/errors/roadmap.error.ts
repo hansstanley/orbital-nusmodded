@@ -11,12 +11,12 @@ export class RoadmapError {
   }
 
   addMods(...mods: Mod[]) {
-    this.mods = this.mods.concat(mods);
+    this.mods = (this.mods ?? []).concat(mods);
     return this;
   }
 
   addModGroups(...modGroups: ModGroup[]) {
-    this.modGroups = this.modGroups.concat(modGroups);
+    this.modGroups = (this.modGroups ?? []).concat(modGroups);
     return this;
   }
 }

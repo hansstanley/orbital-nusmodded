@@ -7,6 +7,7 @@ import { DatabaseModule } from 'src/database/database.module';
 @Module({
   imports: [DatabaseModule],
   providers: [ModGroupService, ...modGroupProviders],
-  controllers: [ModGroupController]
+  controllers: [ModGroupController],
+  exports: [ModGroupService]
 })
 export class ModGroupModule { }
