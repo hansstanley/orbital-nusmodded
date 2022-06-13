@@ -62,6 +62,48 @@ $ npm run test:cov
 
 ## API
 
+<details><summary>Authentication</summary>
+
+Steps to authenticate with the backend server:
+
+1. Register/sign in with Supabase Auth.
+2. Generate an `authToken` with `randomBytes(16).toString('hex')` (`randomBytes` is from the built in `crypto` package).
+3. Save `authToken` into the user's profile on Supabase (under table `profiles`).
+4. Generate a hash with `bcrypt.hash(authToken, 8)`.
+5. POST the hash to `{domain}/auth/login` (refer to route description below).
+6. The request will return an `accessToken`, which are to be included in the headers as `Authorization: Bearer {accessToken}` for subsequent API calls.
+
+**Note:** API routes that do not require authentication are flagged as "PUBLIC", e.g.
+
+> PUBLIC
+
+---
+
+#### Login
+
+> :white_check_mark: Implemented
+
+Authenticates the backend session.
+
+```
+POST /auth/login
+```
+
+```typescript
+type body = {
+  username: string;
+  password: string; // Hash of authToken
+};
+```
+
+Response `200 OK`:
+
+```typescript
+type body = { accessToken: string };
+```
+
+</details>
+
 <details><summary>Roadmap</summary>
 
 #### Validate roadmap
@@ -78,7 +120,7 @@ POST /roadmap/validate
 type body = Roadmap; // Refer to schema below
 ```
 
-Response `200 OK`: `RoadmapError[]`.
+Response `200 OK`: `RoadmapError[]`
 
 </details>
 
@@ -94,7 +136,7 @@ Returns an array of courses.
 GET /course
 ```
 
-Response `200 OK`: `Course[]`.
+Response `200 OK`: `Course[]`
 
 #### Add course
 
@@ -112,7 +154,7 @@ type body = {
 };
 ```
 
-Response `201 CREATED`: `Course`.
+Response `201 CREATED`: `Course`
 
 #### Edit course
 
@@ -132,7 +174,7 @@ type body = {
 };
 ```
 
-Response `200 OK`: `Course`.
+Response `200 OK`: `Course`
 
 #### Get course info
 
@@ -160,7 +202,7 @@ DELETE /course/{courseId}
 type courseId = string; // UUID V4
 ```
 
-Response `200 OK`: `Course`.
+Response `200 OK`: `Course`
 
 #### Get course modules
 
@@ -192,7 +234,7 @@ GET /course/{courseId}/module-groups
 type courseId = string; // UUID V4
 ```
 
-Response `200 OK`: `ModGroup[]`.
+Response `200 OK`: `ModGroup[]`
 
 #### Add modules to course
 
@@ -245,12 +287,160 @@ type body = {
 
 </details>
 
+<details><summary>Module groups</summary>
+
+#### Get all module groups
+
+> :x: Not Implemented
+
+```
+GET /module-group
+```
+
+Response `200 OK`: `ModGroup[]`
+
+#### Add module group
+
+> :x: Not Implemented
+
+```
+POST /module-group/new
+```
+
+```typescript
+type body = {
+  // TBC
+};
+```
+
+Response `201 CREATED`: `ModGroup`
+
+#### Edit module group
+
+> :x: Not Implemented
+
+```
+POST /module-group/{groupId}/edit
+```
+
+```typescript
+type groupId = string; // UUID V4
+
+type body = {
+  // TBC
+};
+```
+
+Response `200 OK`: `ModGroup`
+
+#### Delete module group
+
+> :x: Not Implemented
+
+```
+DELETE /module-group/{groupId}
+```
+
+```typescript
+type groupId = string; // UUID V4
+```
+
+Response `200 OK`: `ModGroup`
+
+#### Get module group info
+
+> :x: Not Implemented
+
+```
+GET /module-group/{groupId}
+```
+
+```typescript
+type groupId = string; // UUID V4
+```
+
+Response `200 OK`: `ModGroup`
+
+#### Get modules belonging to a module group
+
+> :x: Not Implemented
+
+```
+GET /module-group/{groupId}/modules
+```
+
+```typescript
+type groupId = string; // UUID V4
+```
+
+Response `200 OK`: `Mod[]`
+
+#### Add modules to module group
+
+> :x: Not Implemented
+
+```
+POST /module-group/{groupId}/add-modules
+```
+
+```typescript
+type groupId = string; // UUID V4
+
+type body = {
+  // TBC
+};
+```
+
+Response `200 OK`:
+
+```typescript
+type body = {
+  bound: string[]; // Array of module codes added
+};
+```
+
+#### Remove modules from module group
+
+> :x: Not Implemented
+
+```
+POST /module-group/{groupId}/remove-modules
+```
+
+```typescript
+type groupId = string; // UUID V4
+
+type body = {
+  // TBC
+};
+```
+
+Response `200 OK`:
+
+```typescript
+type body = {
+  count: number; // Number of modules removed
+};
+```
+
+</details>
+
 <details><summary>Modules</summary>
 
 #### Get all modules
 
+> PUBLIC
+> :white_check_mark: Implemented
+
+```
+GET /module
+```
+
+Response `200 OK`: `Mod[]`
+
 #### Get module information
 
+> PUBLIC
 > :white_check_mark: Implemented
 
 ```
@@ -261,7 +451,7 @@ GET /module/{moduleCode}
 type moduleCode = string;
 ```
 
-Response `200 OK`: [Module schema from NUSMods](https://api.nusmods.com/v2/#/Modules/get__acadYear__modules__moduleCode__json).
+Response `200 OK`: [Module schema from NUSMods](https://api.nusmods.com/v2/#/Modules/get__acadYear__modules__moduleCode__json)
 
 </details>
 
