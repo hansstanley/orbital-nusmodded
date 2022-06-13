@@ -13,7 +13,6 @@ import { Mod } from 'src/mod/mod.entity';
 import { Course } from './course.entity';
 import { CourseService } from './course.service';
 import { BindModsDto, CreateCourseDto, UnbindModsDto, UpdateCourseDto } from './dto';
-import { CourseDto } from './dto/course.dto';
 
 @Controller('course')
 export class CourseController {
@@ -22,12 +21,12 @@ export class CourseController {
   ) { }
 
   @Get()
-  async findAll(): Promise<CourseDto[]> {
+  async findAll(): Promise<Course[]> {
     return this.courseService.findAll();
   }
 
   @Get(':id')
-  async find(@Param('id') id: string): Promise<CourseDto> {
+  async find(@Param('id') id: string): Promise<Course> {
     return this.courseService.find(id);
   }
 
@@ -44,7 +43,7 @@ export class CourseController {
   }
 
   @Post('new')
-  async create(@Body() createDto: CreateCourseDto): Promise<CourseDto> {
+  async create(@Body() createDto: CreateCourseDto): Promise<Course> {
     return this.courseService.create(createDto);
   }
 
@@ -89,7 +88,7 @@ export class CourseController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<CourseDto> {
+  async delete(@Param('id') id: string): Promise<Course> {
     return this.courseService.delete(id);
   }
 }

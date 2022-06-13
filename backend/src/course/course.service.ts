@@ -5,6 +5,7 @@ import {
   Injectable,
   Logger
 } from '@nestjs/common';
+import { randomBytes } from 'crypto';
 import { ModGroup } from 'src/mod-group/mod-group.entity';
 import { Mod } from 'src/mod/mod.entity';
 import { ModService } from 'src/mod/mod.service';
