@@ -27,7 +27,7 @@ function SimpleDialog(props) {
       }
     ];
     setCourses(newCourses);
-    console.log(newCourses);
+    handleClose();
   }
 
   return (

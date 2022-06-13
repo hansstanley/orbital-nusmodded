@@ -5,6 +5,7 @@ import LandingProvider from "./landing.provider";
 import ModuleInfoProvider from "./moduleInfo.provider";
 import SnackbarProvider from "./snackbar.provider";
 import ThemeContextProvider from "./themeContext.provider";
+import CourseInfoProvider from "./courseInfo.provider";
 
 function combineComponents(...components) {
   return components.reduce(
@@ -27,6 +28,7 @@ const providers = [
   LandingProvider,
   DrawerContextProvider,
   SnackbarProvider,
+  CourseInfoProvider,
 ];
 
 export const AppContextProvider = combineComponents(...providers);

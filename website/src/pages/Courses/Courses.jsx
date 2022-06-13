@@ -15,15 +15,17 @@ import {
   TableRow,
 } from "@mui/material";
 import { ModuleInfoContext } from "../../contexts";
+import { CourseInfoContext } from "../../contexts";
 import EditCourse from "./EditCourse";
 import AddCourse from "./AddCourse";
 
 export default function ModuleInfo() {
   const [selectedCourse, setSelectedCourse] = React.useState("");
   const { modules, isLoaded } = React.useContext(ModuleInfoContext);
-  const [courses, setCourses] = React.useState([{name: "Computer Science", modules: ["CS1101S", "CS1231S"]}]);
+  const { courseList, isCoursesLoaded } = React.useContext(CourseInfoContext);
+  // const [courses, setCourses] = React.useState([{name: "Computer Science", modules: ["CS1101S", "CS1231S"]}]);
+  const [courses, setCourses] = React.useState(courseList);
   const [totalMCs, setTotalMCs] = React.useState(0);
-
   const handleChange = (event) => {
     setSelectedCourse(event.target.value);
     updateMCs(event.target.value);
@@ -49,7 +51,7 @@ export default function ModuleInfo() {
               >
                 {courses
                 .map( course => 
-                  <MenuItem value = {course.name}>{course.name}</MenuItem>
+                  <MenuItem value = {course.title}>{course.title}</MenuItem>
                 )}
               </Select>
             </FormControl>

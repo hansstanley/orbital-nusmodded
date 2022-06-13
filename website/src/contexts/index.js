@@ -5,6 +5,7 @@ import LandingContext from "./landing.context";
 import ModuleInfoContext from "./moduleInfo.context";
 import SnackbarContext from "./snackbar.context";
 import ThemeContext from "./appTheme.context";
+import CourseInfoContext from "./courseInfo.context";
 
 export {
   AuthSessionContext,
@@ -14,4 +15,5 @@ export {
   ModuleInfoContext,
   SnackbarContext,
   ThemeContext,
+  CourseInfoContext,
 };

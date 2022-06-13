@@ -20,10 +20,12 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import { ModuleInfoContext } from "../../contexts";
+import { CourseInfoContext } from "../../contexts";
 
 function SimpleDialog(props) {
   const { onClose, selectedValue, open, course, courses, setCourses, updateMCs} = props;
   const { modules, isLoaded } = React.useContext(ModuleInfoContext);
+  const { courseList, isCoursesLoaded } = React.useContext(CourseInfoContext);
   const [addModule, setAddModule] = React.useState("");
 
   React.useEffect(() => {
@@ -51,66 +53,65 @@ function SimpleDialog(props) {
   }
 
   return (
-      <Dialog onClose={handleClose} open={open}>
+      <Dialog onClose={handleClose} open={open} maxWidth="sm" fullWidth={true}>
         <Card sx={{
               display: 'flex',
               flexDirection: 'column',
               m: 0,
-              width: 'fit-content',
               height: 'auto',
               padding: 2,
             }}>
-        <DialogTitle>Add Modules</DialogTitle>
-        <Autocomplete
-          freeSolo
-          selectOnFocus
-          clearOnBlur 
-          options={modules.map(mod => mod.moduleCode)}
-          sx={{ width: 300 }}
-          renderInput={(params) => 
-          <TextField {...params}
-            label="Modules" 
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <InputAdornment>
-                  <IconButton>
-                    <AddIcon onClick = {handleAdd}/>
-                  </IconButton>
-                </InputAdornment>
-              )
+          <DialogTitle>Add Modules</DialogTitle>
+          <Autocomplete
+            freeSolo
+            selectOnFocus
+            clearOnBlur 
+            options={modules.map(mod => mod.moduleCode)}
+            sx={{ width: 'auto' }}
+            renderInput={(params) => 
+            <TextField {...params}
+              label="Modules" 
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <InputAdornment>
+                    <IconButton>
+                      <AddIcon onClick = {handleAdd}/>
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />}
+            onChange={(event, newValue) => {
+              setAddModule(newValue);
             }}
-          />}
-          onChange={(event, newValue) => {
-            setAddModule(newValue);
-          }}
-        />
-        <List dense={true}>
-          {isLoaded ? (
-              !course ? null :
-              !course.modules ? null : course.modules
-                .map((modName) => modules.find(mod => mod.moduleCode === modName))
-                .map((mod) => (
-                  <ListItem
-                    secondaryAction={
-                      <IconButton edge="end" aria-label="delete">
-                        <DeleteIcon onClick = {() => handleDelete(mod.moduleCode)}/>
-                      </IconButton>
-                    }
-                  >
-                  <ListItemAvatar>
-                    <Avatar>
-                      <AutoStoriesIcon />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary = {mod.moduleCode} secondary={mod.title}>
-                  </ListItemText>
-                  </ListItem>
-                ))
-            ) : (
-              <CircularProgress sx={{ alignSelf: "center" }} />
-            )}
-        </List>
+          />
+          <List dense={true}>
+            {isLoaded ? (
+                !course ? null :
+                !course.modules ? null : course.modules
+                  .map((modName) => modules.find(mod => mod.moduleCode === modName))
+                  .map((mod) => (
+                    <ListItem
+                      secondaryAction={
+                        <IconButton edge="end" aria-label="delete">
+                          <DeleteIcon onClick = {() => handleDelete(mod.moduleCode)}/>
+                        </IconButton>
+                      }
+                    >
+                      <ListItemAvatar>
+                        <Avatar>
+                          <AutoStoriesIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText primary = {mod.moduleCode + " (" + mod.moduleCredit + " MCs)"} secondary={mod.title}>
+                      </ListItemText>
+                    </ListItem>
+                  ))
+              ) : (
+                <CircularProgress sx={{ alignSelf: "center" }} />
+              )}
+          </List>
         </Card>
       </Dialog>
   );

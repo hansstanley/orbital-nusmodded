@@ -1,6 +1,17 @@
-import { Card, Slider, Stack, Typography } from "@mui/material";
+import { 
+  Card, 
+  Slider, 
+  Stack, 
+  Typography,
+  FormControl,
+  InputLabel,
+  Select, 
+  MenuItem,
+} from "@mui/material";
 import { useState } from "react";
+import * as React from 'react';
 import { useCookies } from "react-cookie";
+import { CourseInfoContext } from "../../contexts";
 
 const minYearWidth = 1;
 const [minYear, maxYear] = [1, 6];
@@ -16,6 +27,12 @@ const yearMarks = [
 export default function Settings() {
   const [cookies, setCookies] = useCookies(["yearWidth"]);
   const [yearWidth, setYearWidth] = useState(cookies.yearWidth ?? [1, 4]);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const { courseList, isCoursesLoaded } = React.useContext(CourseInfoContext);
+
+  const handleChange = (event) => {
+    setSelectedCourse(event.target.value);
+  };
 
   const handleYearWidthChange = (event, newYearWidth, activeThumb) => {
     if (!Array.isArray(newYearWidth)) return;
@@ -51,6 +68,22 @@ export default function Settings() {
           disableSwap
         />
       </Card>
+      <Typography variant="h6">Course</Typography>
+      <Stack width = "17%">
+        <FormControl>
+          <InputLabel>Course</InputLabel>
+          <Select
+            value={selectedCourse}
+            label="Course"
+            onChange={handleChange}
+          >
+            {courseList
+            .map( course => 
+              <MenuItem value = {course.title}>{course.title}</MenuItem>
+            )}
+          </Select>
+        </FormControl>
+      </Stack>
     </Stack>
   );
 }
