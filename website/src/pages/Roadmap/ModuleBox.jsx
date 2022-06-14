@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Card, CardActionArea, CardContent, Dialog, Skeleton, Typography } from "@mui/material";
+import { Card, CardActionArea, CardContent, Dialog, Skeleton, Typography, IconButton, Stack } from "@mui/material";
 import { ModuleInfoContext } from "../../contexts";
-
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function ModuleBox(props) {
   const { moduleCode } = props;
@@ -48,7 +48,10 @@ export default function ModuleBox(props) {
               width: 'fit-content',
               padding: 2,
             }}>
-            <Typography variant="body2">
+            <IconButton sx={{ position: "absolute", top: 8, right: 8, zIndex: 2000}} onClick = {handleClose}>
+              <CloseIcon />
+            </IconButton>
+            <Typography position = "relative" bottom = '10%' variant="body2">
               {moduleInfo.department + ", " + moduleInfo.faculty}
             </Typography>
             <Typography variant="body">

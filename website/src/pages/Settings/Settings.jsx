@@ -7,6 +7,7 @@ import {
   InputLabel,
   Select, 
   MenuItem,
+  Box,
 } from "@mui/material";
 import { useState } from "react";
 import * as React from 'react';
@@ -28,10 +29,16 @@ export default function Settings() {
   const [cookies, setCookies] = useCookies(["yearWidth"]);
   const [yearWidth, setYearWidth] = useState(cookies.yearWidth ?? [1, 4]);
   const [selectedCourse, setSelectedCourse] = useState("");
+  const [maxMCs, setMaxMCs] = useState("20");
   const { courseList, isCoursesLoaded } = React.useContext(CourseInfoContext);
+  const arrMCs = [...Array(39).keys()].map(x => x += 12);
 
-  const handleChange = (event) => {
+  const handleChangeCourse = (event) => {
     setSelectedCourse(event.target.value);
+  };
+
+  const handleChangeMCs = (event) => {
+    setMaxMCs(event.target.value);
   };
 
   const handleYearWidthChange = (event, newYearWidth, activeThumb) => {
@@ -53,33 +60,52 @@ export default function Settings() {
   };
 
   return (
-    <Stack spacing={1} sx={{ display: "flex", flex: 1 }}>
-      <Typography variant="h6">Year of study</Typography>
-      <Card sx={{ p: 2, pl: 5 }}>
-        <Slider
-          value={yearWidth}
-          step={1}
-          min={minYear}
-          max={maxYear}
-          onChange={handleYearWidthChange}
-          sx={{ width: "50%" }}
-          valueLabelDisplay="off"
-          marks={yearMarks}
-          disableSwap
-        />
-      </Card>
-      <Typography variant="h6">Course</Typography>
-      <Stack width = "17%">
-        <FormControl>
+    <Stack spacing={3} sx={{ display: "flex", flex: 1 }}>
+      <Stack spacing={1}>
+        <Typography variant="h6">Year of study</Typography>
+        <Card sx={{ p: 2, pl: 5 }}>
+          <Slider
+            value={yearWidth}
+            step={1}
+            min={minYear}
+            max={maxYear}
+            onChange={handleYearWidthChange}
+            sx={{ width: "50%" }}
+            valueLabelDisplay="off"
+            marks={yearMarks}
+            disableSwap
+          />
+        </Card>
+      </Stack>
+      <Stack spacing={1}>
+        <Typography variant="h6">Course</Typography>
+        <FormControl fullWidth sx={{ width: 300 }}>
           <InputLabel>Course</InputLabel>
           <Select
             value={selectedCourse}
             label="Course"
-            onChange={handleChange}
+            onChange={handleChangeCourse}
           >
             {courseList
             .map( course => 
               <MenuItem value = {course.title}>{course.title}</MenuItem>
+            )}
+          </Select>
+        </FormControl>
+      </Stack>
+      <Stack spacing={1} >
+        <Typography variant="h6">Max MCs per Semester</Typography>
+        <FormControl sx={{ width: 120 }}>
+          <InputLabel>Max MCs</InputLabel>
+          <Select
+            value={maxMCs}
+            label="Max MCs"
+            onChange={handleChangeMCs}
+            MenuProps={{ PaperProps: { sx: { maxHeight: 500 } } }}
+          >
+            {arrMCs
+            .map( num => 
+              <MenuItem value = {num}>{num + " MCs"}</MenuItem>
             )}
           </Select>
         </FormControl>

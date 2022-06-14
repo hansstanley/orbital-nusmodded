@@ -2,15 +2,15 @@ import { Button } from "@mui/material";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthSessionContext } from "../../contexts";
-import LoginDialog from "./LoginDialog";
+import LogoutDialog from "./LogoutDialog";
 
-export default function LoginButton() {
+export default function SignUpButton() {
   const navigate = useNavigate();
   const { signedIn } = useContext(AuthSessionContext);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const handleLogin = () => {
-    navigate("/login");
+  const handleSignUp = () => {
+    navigate("/signup");
   };
 
   const handleOpenDialog = () => setDialogOpen(true);
@@ -19,14 +19,16 @@ export default function LoginButton() {
 
   return (
     <>
+      <LogoutDialog open={dialogOpen} handleClose={handleCloseDialog} />
       {signedIn ? (
-        <></>
+        <Button variant="outlined" onClick={handleOpenDialog}>
+          Logout
+        </Button>
       ) : (
-        <Button variant="contained" onClick={handleOpenDialog}>
-          Login
+        <Button variant="contained" onClick={handleSignUp}>
+          Sign Up
         </Button>
       )}
-      <LoginDialog open={dialogOpen} handleClose={handleCloseDialog} />
     </>
   );
 }

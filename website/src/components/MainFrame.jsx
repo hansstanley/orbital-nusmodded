@@ -12,10 +12,16 @@ export default function MainFrame(props) {
   const { isLanding } = useContext(LandingContext);
   const { height } = useWindowDimensions();
 
+  // const styles = useSpring({
+  //   height: isLanding ? height : height - 64,
+  //   minWidth: "100%",
+  //   y: isLanding ? 0 : 64,
+  // });
+
   const styles = useSpring({
-    height: isLanding ? height : height - 64,
+    height: height - 64,
     minWidth: "100%",
-    y: isLanding ? 0 : 64,
+    y: 64,
   });
 
   return (

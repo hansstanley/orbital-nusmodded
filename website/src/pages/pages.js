@@ -11,6 +11,8 @@ import Landing from "./Landing";
 import Auth from "./Auth";
 import Account from "./Account";
 import Courses from "./Courses";
+import SignUp from "./SignUp";
+
 
 const pages = [
   {
@@ -61,6 +63,11 @@ const pages = [
     key: "login",
     path: "/login",
     content: <Auth />,
+  },
+  {
+    key: "signup",
+    path: "/signup",
+    content: <SignUp />,
   },
   {
     key: "landing",
