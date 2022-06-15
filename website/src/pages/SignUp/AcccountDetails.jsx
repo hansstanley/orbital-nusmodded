@@ -22,47 +22,36 @@ export default function SignUp(props) {
     const data = new FormData(event.currentTarget);
 
     if (emailCheck.test(data.get('email'))) {
-      setValidateInput("");
-      console.log("yes");
+      if (data.get('password') === data.get('confirmPassword')) {
+        if (passwordCheck.test(data.get('password'))) {
+          const { user, session, error } = await supabase.auth.signUp({
+            email: data.get('email'),
+            password: data.get('password'),
+          },
+          {
+            data: { 
+              username: data.get('username'),
+            }
+          });
+          console.log("successfully signed up!");
+          setActiveStep(activeStep + 1);
+        } else if (data.get('password').length < 8) {
+          setValidateInput("Password is too short! (minimum 8 characters)");
+        } else if (data.get('password').toLowerCase() === data.get('password')){
+          setValidateInput("Password does not contain at least one uppercase letter");
+        } else if (data.get('password').toUpperCase() === data.get('password')){
+          setValidateInput("Password does not contain at least one lowercase letter");
+        } else{
+          setValidateInput("Password does not contain at least one number");
+        }
+      } else {
+        setValidateInput("Password does not match!");
+      }
     }
     else {
       setValidateInput("Email entered is invalid!");
       console.log("xxx");
     }
-
-    if (data.get('password') === data.get('confirmPassword')) {
-      if (passwordCheck.test(data.get('password'))) {
-        setValidateInput("");
-      } else if (data.get('password').length < 8) {
-        setValidateInput("Password is too short! (minimum 8 characters)");
-      } else if (data.get('password').toLowerCase() === data.get('password')){
-        setValidateInput("Password does not contain at least one uppercase letter");
-        console.log("xxx");
-      } else if (data.get('password').toUpperCase() === data.get('password')){
-        setValidateInput("Password does not contain at least one lowercase letter");
-        console.log("xxx1");
-      } else{
-        setValidateInput("Password does not contain at least one number");
-        console.log("xxx11");
-      }
-    } else {
-      setValidateInput("Password does not match!");
-    }
-    
-    if (validateInput === "") {
-      const { user, session, error } = await supabase.auth.signUp({
-        email: data.get('email'),
-        password: data.get('password'),
-      },
-      {
-        data: { 
-          username: data.get('username'),
-        }
-      });
-      console.log("signed up");
-      setActiveStep(activeStep + 1);
-    }
-
   };
 
   return (
@@ -84,10 +73,10 @@ export default function SignUp(props) {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  name="firstName"
+                  name="username"
                   required
                   fullWidth
-                  id="firstName"
+                  id="username"
                   label="Username"
                   autoFocus
                 />
