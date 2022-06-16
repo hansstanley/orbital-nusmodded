@@ -12,6 +12,7 @@ import { RoadmapModule } from './roadmap/roadmap.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { appProviders } from './app.providers';
+import { UserSettingsModule } from './user-settings/user-settings.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { appProviders } from './app.providers';
     ModGroupModule,
     RoadmapModule,
     AuthModule,
-    UserModule
+    UserModule,
+    UserSettingsModule
   ],
   controllers: [AppController],
   providers: [

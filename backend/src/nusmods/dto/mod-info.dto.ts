@@ -12,7 +12,7 @@ export class ModInfoDto {
   prerequisite?: string;
   moduleCredit: string;
   moduleCode: string;
-  semesterData: SemesterDataDto;
+  semesterData: SemesterDataDto[];
   prereqTree?: string | PrereqTree;
   fulfillRequirements?: string[];
 }

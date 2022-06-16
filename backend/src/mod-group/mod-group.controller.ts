@@ -9,6 +9,7 @@ import {
   Post
 } from '@nestjs/common';
 import { Mod } from 'src/mod/mod.entity';
+import { BindModsDto } from './dto';
 import { ModGroup } from './mod-group.entity';
 import { ModGroupService } from './mod-group.service';
 
@@ -20,40 +21,47 @@ export class ModGroupController {
 
   @Get()
   async findAll(): Promise<ModGroup[]> {
-    return
+    return this.modGroupService.findAll();
   }
 
   @Get(':id')
   async find(@Param('id') id: string): Promise<ModGroup> {
-    return
+    return this.modGroupService.find(id);
   }
 
   @Get(':id/modules')
   async getMods(@Param('id') id: string): Promise<Mod[]> {
-    return
+    const modGroup = await this.modGroupService.find(id);
+    return modGroup.$get('mods');
   }
 
   @Post('new')
   async create(@Body() createDto): Promise<ModGroup> {
-    return
+    return this.modGroupService.create(createDto);
   }
 
   @Post(':id/edit')
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
-    @Body() udpateDto
+    @Body() updateDto
   ): Promise<ModGroup> {
-    return
+    return this.modGroupService.update(id, updateDto);
   }
 
   @Post(':id/add-modules')
   @HttpCode(HttpStatus.OK)
   async bindMods(
     @Param('id') id: string,
-    @Body() bindModsDto
+    @Body() bindModsDto: BindModsDto
   ): Promise<{ bound: string[] }> {
-    return
+    const modGroup = await this.modGroupService.find(id);
+    const codes = await this.modGroupService.bindMods(
+      modGroup,
+      bindModsDto
+    );
+
+    return { bound: codes };
   }
 
   @Post(':id/remove-modules')
@@ -62,11 +70,17 @@ export class ModGroupController {
     @Param('id') id: string,
     @Body() unbindModsDto
   ): Promise<{ count: number }> {
-    return
+    const modGroup = await this.modGroupService.find(id);
+    const count = await this.modGroupService.unbindMods(
+      modGroup,
+      unbindModsDto
+    );
+
+    return { count };
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<ModGroup> {
-    return
+    return this.modGroupService.delete(id);
   }
 }

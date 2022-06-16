@@ -3,9 +3,11 @@ import { Course } from 'src/course/course.entity';
 import { CourseService } from 'src/course/course.service';
 import { ModGroup } from 'src/mod-group/mod-group.entity';
 import { Mod } from 'src/mod/mod.entity';
+import { ModService } from 'src/mod/mod.service';
+import { PrereqTree } from 'src/nusmods/dto';
 import { NusmodsService } from 'src/nusmods/nusmods.service';
 import { RoadmapDto, YearDto } from './dto';
-import { CourseReqError, RoadmapError } from './models/errors';
+import { CourseReqError, NotAvailableError, PrerequisiteError, RoadmapError } from './models/errors';
 
 @Injectable()
 export class RoadmapService {
@@ -13,6 +15,7 @@ export class RoadmapService {
 
   constructor(
     private readonly courseService: CourseService,
+    private readonly modService: ModService,
     private readonly nusmodsService: NusmodsService
   ) { }
 
@@ -22,6 +25,16 @@ export class RoadmapService {
       year.semesters?.sort((s1, s2) => s1.id - s2.id);
     }
     return roadmapDto;
+  }
+
+  private getRoadmapMods(roadmapDto: RoadmapDto): Mod[] {
+    let roadmapMods: Mod[] = [];
+    for (let year of roadmapDto.years ?? []) {
+      for (let semester of year.semesters ?? []) {
+        roadmapMods = roadmapMods.concat(semester?.mods ?? []);
+      }
+    }
+    return roadmapMods;
   }
 
   async validateAll(roadmapDto: RoadmapDto): Promise<RoadmapError[]> {
@@ -40,7 +53,25 @@ export class RoadmapService {
   }
 
   async validateAvailable(roadmapDto: RoadmapDto): Promise<RoadmapError[]> {
-    return [];
+    let errors: RoadmapError[] = [];
+
+    if (!(roadmapDto ?? false)) return errors;
+
+    for (let year of roadmapDto.years ?? []) {
+      for (let semester of year.semesters ?? []) {
+        for (let mod of semester.mods ?? []) {
+          const { semesterData } = await this.nusmodsService
+            .getModuleInfo(mod.moduleCode);
+          const isAvailable = semesterData
+            .map((sem) => sem.semester)
+            .includes(semester.id);
+
+          if (!isAvailable) errors.push(new NotAvailableError(mod, semester));
+        }
+      }
+    }
+
+    return errors;
   }
 
   async validateCourseReq(roadmapDto: RoadmapDto): Promise<RoadmapError[]> {
@@ -54,12 +85,7 @@ export class RoadmapService {
       course.$get('modGroups')
     ]);
 
-    let roadmapMods: Mod[] = [];
-    for (let year of roadmapDto.years ?? []) {
-      for (let semester of year.semesters ?? []) {
-        roadmapMods = roadmapMods.concat(semester?.mods);
-      }
-    }
+    const roadmapMods = this.getRoadmapMods(roadmapDto);
 
     for (let mod of course.mods ?? []) {
       const hasMod = roadmapMods
@@ -79,7 +105,30 @@ export class RoadmapService {
   }
 
   async validatePrereq(roadmapDto: RoadmapDto): Promise<RoadmapError[]> {
+    let errors: RoadmapError[] = [];
+
+    if (!(roadmapDto ?? false)) return errors;
+
     this.sortByTerm(roadmapDto);
+    const roadmapMods = this.getRoadmapMods(roadmapDto);
+    const checked: string[] = [];
+
+    for (let mod of roadmapMods) {
+      const { prereqTree } = await this.nusmodsService
+        .getModuleInfo(mod.moduleCode);
+
+      if (!prereqTree) continue;
+      if (typeof prereqTree === 'string') {
+        if (!checked.includes(prereqTree)) errors.push(new PrerequisiteError(
+          mod,
+          [(await this.modService.find(prereqTree))]
+        ));
+      }
+      if (prereqTree instanceof PrereqTree) {
+        // STOPPED HERE
+        prereqTree.and
+      }
+    }
 
     return [];
   }

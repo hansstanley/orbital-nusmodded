@@ -15,7 +15,6 @@ export class AuthService {
 
   async validateUser(username: string, hash: string): Promise<any> {
     const profile = await this.userService.findByUsername(username);
-    console.log('before', profile.authToken)
 
     if (profile && compareSync(profile.authToken, hash)) {
       profile.authToken = randomBytes(16).toString('hex');

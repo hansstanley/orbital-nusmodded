@@ -2,7 +2,8 @@ export const REPO = {
   COURSE: 'COURSE_REPOSITORY',
   MOD: 'MOD_REPOSITORY',
   MOD_GROUP: 'MOD_GROUP_REPOSITORY',
-  PROFILE: 'PROFILE_REPOSITORY'
+  PROFILE: 'PROFILE_REPOSITORY',
+  USER_SETTINGS: 'USER_SETTINGS_REPOSITORY'
 };
 
 export const CONFIG = {
@@ -13,4 +14,16 @@ export const SEQUELIZE = 'SEQUELIZE';
 
 export const JWT = {
   SECRET: 'JWT_SECRET'
+};
+
+export const USER_SETTINGS = [
+  'IS_HONORS',
+  'MC_LIMIT',
+  'COURSE_ID'
+] as const;
+
+export const USER_SETTINGS_DEFAULT = {
+  IS_HONORS: false,
+  MC_LIMIT: 23,
+  COURSE_ID: null
 };

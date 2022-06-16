@@ -152,6 +152,96 @@ type body = { accessToken: string };
 
 </details>
 
+<details><summary>Users</summary>
+
+#### Check if username is available
+
+> :white_check_mark: Implemented
+
+```
+GET /user/check-username?username={username}
+```
+
+```typescript
+type username = string;
+```
+
+Response `200 OK`:
+
+```typescript
+type body = {
+  isAvailable: boolean;
+};
+```
+
+#### Get user profile
+
+> :white_check_mark: Implemented
+
+```
+GET /user/profile
+```
+
+Response `200 OK`: `Profile`
+
+#### Edit user profile
+
+> :white_check_mark: Implemented
+
+```
+POST /user/profile/edit
+```
+
+```typescript
+type body = {
+  username: string;
+  avatarUrl: string; // URL
+};
+```
+
+Response `200 OK`: `Profile`
+
+</details>
+
+<details><summary>User settings</summary>
+
+#### Get all user settings
+
+> :white_check_mark: Implemented
+
+```
+GET /user-settings
+```
+
+Response `200 OK`:
+
+```typescript
+type body = {
+  IS_HONORS: boolean;
+  MC_LIMIT: number;
+  COURSE_ID: string; // UUID V4
+};
+```
+
+#### Set a user setting
+
+> :white_check_mark: Implemented
+
+```
+POST /user-settings/edit
+```
+
+```typescript
+type body = {
+  key: UserSettingsKey;
+  value: any; // Depends on key
+};
+```
+
+Response `200 OK`: `UserSettings`
+
+</details>
+
 <details><summary>Roadmap</summary>
 
 #### Validate roadmap
@@ -573,6 +663,28 @@ type Semester = {
   id: 1 | 2 | 3 | 4;
   mods: Mod[];
 };
+```
+
+### Profile
+
+```typescript
+type Profile = {
+  id: string; // UUID V4
+  username: string;
+  avatarUrl: string; // URL
+};
+```
+
+### UserSettings (user settings)
+
+```typescript
+type UserSettings = {
+  key: UserSettingsKey;
+  value: any; // Depends on key
+  profileId: string; // UUIDV V4
+};
+
+type UserSettingsKey = 'COURSE_ID' | 'IS_HONORS' | 'MC_LIMIT';
 ```
 
 ## Support

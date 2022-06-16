@@ -1,4 +1,5 @@
-import { Column, DataType, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { UserSettings } from "src/user-settings/user-settings.entity";
 
 @Table({
   tableName: 'profiles',
@@ -17,4 +18,7 @@ export class Profile extends Model {
 
   @Column(DataType.TEXT)
   authToken: string;
+
+  @HasMany(() => UserSettings)
+  settings: UserSettings[];
 }
