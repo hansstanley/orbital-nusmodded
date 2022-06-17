@@ -429,7 +429,7 @@ type body = {
 
 #### Get all module groups
 
-> :x: Not Implemented
+> :white_check_mark: Not Implemented
 
 ```
 GET /module-group
@@ -439,7 +439,7 @@ Response `200 OK`: `ModGroup[]`
 
 #### Add module group
 
-> :x: Not Implemented
+> :white_check_mark: Not Implemented
 
 ```
 POST /module-group/new
@@ -447,7 +447,10 @@ POST /module-group/new
 
 ```typescript
 type body = {
-  // TBC
+  name: string; // Name of module group
+  description: string;
+  minimum?: number; // Minimum number of modules a student needs to take in this module group
+  maximum?: number; // Maximum number of modules a student can take in this module group
 };
 ```
 
@@ -455,7 +458,7 @@ Response `201 CREATED`: `ModGroup`
 
 #### Edit module group
 
-> :x: Not Implemented
+> :white_check_mark: Not Implemented
 
 ```
 POST /module-group/{groupId}/edit
@@ -465,7 +468,10 @@ POST /module-group/{groupId}/edit
 type groupId = string; // UUID V4
 
 type body = {
-  // TBC
+  name?: string;
+  description?: string;
+  minimum?: number;
+  maximum?: number;
 };
 ```
 
@@ -473,7 +479,7 @@ Response `200 OK`: `ModGroup`
 
 #### Delete module group
 
-> :x: Not Implemented
+> :white_check_mark: Not Implemented
 
 ```
 DELETE /module-group/{groupId}
@@ -487,7 +493,7 @@ Response `200 OK`: `ModGroup`
 
 #### Get module group info
 
-> :x: Not Implemented
+> :white_check_mark: Not Implemented
 
 ```
 GET /module-group/{groupId}
@@ -501,7 +507,7 @@ Response `200 OK`: `ModGroup`
 
 #### Get modules belonging to a module group
 
-> :x: Not Implemented
+> :white_check_mark: Not Implemented
 
 ```
 GET /module-group/{groupId}/modules
@@ -515,7 +521,7 @@ Response `200 OK`: `Mod[]`
 
 #### Add modules to module group
 
-> :x: Not Implemented
+> :white_check_mark: Not Implemented
 
 ```
 POST /module-group/{groupId}/add-modules
@@ -525,7 +531,7 @@ POST /module-group/{groupId}/add-modules
 type groupId = string; // UUID V4
 
 type body = {
-  // TBC
+  moduleCodes: string[]; // Module codes to add
 };
 ```
 
@@ -539,7 +545,7 @@ type body = {
 
 #### Remove modules from module group
 
-> :x: Not Implemented
+> :white_check_mark: Not Implemented
 
 ```
 POST /module-group/{groupId}/remove-modules
@@ -549,7 +555,7 @@ POST /module-group/{groupId}/remove-modules
 type groupId = string; // UUID V4
 
 type body = {
-  // TBC
+  moduleCodes: string[]; // Modules codes to remove
 };
 ```
 

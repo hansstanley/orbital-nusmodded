@@ -9,7 +9,12 @@ import {
   Post
 } from '@nestjs/common';
 import { Mod } from 'src/mod/mod.entity';
-import { BindModsDto } from './dto';
+import {
+  BindModsDto,
+  CreateModGroupDto,
+  UnbindModsDto,
+  UpdateModGroupDto
+} from './dto';
 import { ModGroup } from './mod-group.entity';
 import { ModGroupService } from './mod-group.service';
 
@@ -36,7 +41,7 @@ export class ModGroupController {
   }
 
   @Post('new')
-  async create(@Body() createDto): Promise<ModGroup> {
+  async create(@Body() createDto: CreateModGroupDto): Promise<ModGroup> {
     return this.modGroupService.create(createDto);
   }
 
@@ -44,7 +49,7 @@ export class ModGroupController {
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
-    @Body() updateDto
+    @Body() updateDto: UpdateModGroupDto
   ): Promise<ModGroup> {
     return this.modGroupService.update(id, updateDto);
   }
@@ -68,7 +73,7 @@ export class ModGroupController {
   @HttpCode(HttpStatus.OK)
   async unbindMods(
     @Param('id') id: string,
-    @Body() unbindModsDto
+    @Body() unbindModsDto: UnbindModsDto
   ): Promise<{ count: number }> {
     const modGroup = await this.modGroupService.find(id);
     const count = await this.modGroupService.unbindMods(

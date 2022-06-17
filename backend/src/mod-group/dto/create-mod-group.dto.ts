@@ -4,8 +4,9 @@ export class CreateModGroupDto {
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsString()
-  description: string;
+  description?: string;
 
   @IsOptional()
   @IsInt()
