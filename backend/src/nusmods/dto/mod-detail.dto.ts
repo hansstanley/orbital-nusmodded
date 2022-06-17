@@ -1,3 +1,4 @@
+import { Type } from "class-transformer";
 import { SemesterDataDto } from "./semester-data.dto";
 
 export class ModDetailDto {
@@ -11,5 +12,7 @@ export class ModDetailDto {
   prerequisite?: string;
   preclusion?: string;
   corequisite?: string;
+
+  @Type(() => SemesterDataDto)
   semesterData: SemesterDataDto[];
 }
