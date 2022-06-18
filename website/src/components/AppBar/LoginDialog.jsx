@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -14,14 +14,16 @@ import {
   Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../services";
+import { useAuthSession, useSnackbar } from "../../providers";
 
 export default function LoginDialog({ open, handleClose }) {
   const navigate = useNavigate();
-  const [loading, setLoading] = React.useState(false);
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [validateInput, setValidateInput] = React.useState("");
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [validateInput, setValidateInput] = useState("");
+  const { handleSignin } = useAuthSession();
+  const { pushSnack } = useSnackbar();
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -44,19 +46,19 @@ export default function LoginDialog({ open, handleClose }) {
     setLoading(true);
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const { user, session, error } = await supabase.auth.signIn({
+    await handleSignin({
       email: data.get("email"),
       password: data.get("password"),
     });
-
-    if (error === null) {
-      setValidateInput("");
-      handleCloseReset();
-      navigate("/");
-    } else {
-      setValidateInput(error.message);
-    }
     setLoading(false);
+
+    pushSnack({
+      message: "Successfully logged in!",
+      severity: "success",
+    });
+    setValidateInput("");
+    handleCloseReset();
+    navigate("/");
   };
 
   return (

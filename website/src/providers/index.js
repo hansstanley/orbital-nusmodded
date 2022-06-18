@@ -1,10 +1,10 @@
 import { AppContextProvider } from "./AppContextProvider";
-import AuthSessionProvider from "./authSession.provider";
+import { AuthSessionProvider, useAuthSession } from "./auth-session.provider";
 import DrawerContextProvider from "./drawer.provider";
 import DurationContextProvider from "./duration.provider";
 import LandingProvider from "./landing.provider";
 import ModuleInfoProvider from "./moduleInfo.provider";
-import SnackbarProvider from "./snackbar.provider";
+import { SnackbarProvider, useSnackbar } from "./snackbar.provider";
 import ThemeContextProvider from "./themeContext.provider";
 
 export {
@@ -17,3 +17,5 @@ export {
   SnackbarProvider,
   ThemeContextProvider,
 };
+
+export { useAuthSession, useSnackbar };

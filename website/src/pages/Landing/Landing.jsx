@@ -1,12 +1,13 @@
 import { Button, Stack, Typography } from "@mui/material";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthSessionContext, LandingContext } from "../../contexts";
+import { LandingContext } from "../../contexts";
+import { useAuthSession } from "../../providers";
 
 export default function Landing() {
   const navigate = useNavigate();
   const { toggleLanding } = useContext(LandingContext);
-  const { signedIn } = useContext(AuthSessionContext);
+  const { signedIn } = useAuthSession();
 
   const handleStart = () => {
     toggleLanding();

@@ -7,11 +7,16 @@ import {
   Snackbar,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { SnackbarContext } from "../contexts";
+import { createContext } from "react";
+import { useContext } from "react";
 
 const severities = ["success", "info", "warning", "error"];
 
-export default function SnackbarProvider({ children }) {
+const SnackbarContext = createContext({
+  pushSnack: ({ message, severity, action }) => {},
+});
+
+function SnackbarProvider({ children }) {
   const [snackPack, setSnackPack] = useState([]);
   const [open, setOpen] = useState(false);
   const [snack, setSnack] = useState(undefined);
@@ -93,3 +98,14 @@ export default function SnackbarProvider({ children }) {
     </SnackbarContext.Provider>
   );
 }
+
+function useSnackbar() {
+  const context = useContext(SnackbarContext);
+  if (!(context ?? false)) {
+    throw new Error("useSnackbar must be used within an SnackbarProvider");
+  }
+
+  return context;
+}
+
+export { SnackbarProvider, useSnackbar };

@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState } from "react";
 import {
   Avatar,
   Button,
@@ -9,9 +9,12 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { supabase } from "../../services";
+import { useAuthSession } from "../../providers";
 
 export default function SignUp({ activeStep, handleNext }) {
-  const [validateInput, setValidateInput] = React.useState("");
+  const [validateInput, setValidateInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { handleSignup } = useAuthSession();
   const emailCheck =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   const passwordCheck = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/;
@@ -23,18 +26,25 @@ export default function SignUp({ activeStep, handleNext }) {
     if (emailCheck.test(data.get("email"))) {
       if (data.get("password") === data.get("confirmPassword")) {
         if (passwordCheck.test(data.get("password"))) {
-          const { user, session, error } = await supabase.auth.signUp(
-            {
-              email: data.get("email"),
-              password: data.get("password"),
-            },
-            {
-              data: {
-                username: data.get("username"),
-              },
-            }
-          );
-          console.log("successfully signed up!");
+          setLoading(true);
+          const user = await handleSignup({
+            username: data.get("username"),
+            email: data.get("email"),
+            password: data.get("password"),
+          });
+          // const { user, session, error } = await supabase.auth.signUp(
+          //   {
+          //     email: data.get("email"),
+          //     password: data.get("password"),
+          //   },
+          //   {
+          //     data: {
+          //       username: data.get("username"),
+          //     },
+          //   }
+          // );
+          setLoading(false);
+          console.log("successfully signed up!", user);
           handleNext();
         } else if (data.get("password").length < 8) {
           setValidateInput("Password is too short! (minimum 8 characters)");
@@ -58,7 +68,6 @@ export default function SignUp({ activeStep, handleNext }) {
       }
     } else {
       setValidateInput("Email entered is invalid!");
-      console.log("xxx");
     }
   };
 
@@ -120,6 +129,7 @@ export default function SignUp({ activeStep, handleNext }) {
           </Grid>
         </Grid>
         <Button
+          disabled={loading}
           type="submit"
           fullWidth
           variant="contained"

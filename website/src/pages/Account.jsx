@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -7,16 +7,16 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { AuthSessionContext, SnackbarContext } from "../contexts";
 import { supabase } from "../services";
 import { ResponsiveStack } from "../components";
+import { useAuthSession, useSnackbar } from "../providers";
 
 export default function Account() {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
-  const { session, signedIn } = useContext(AuthSessionContext);
-  const { pushSnack } = useContext(SnackbarContext);
+  const { signedIn, user } = useAuthSession();
+  const { pushSnack } = useSnackbar();
 
   const getProfile = useCallback(async () => {
     try {
@@ -96,7 +96,7 @@ export default function Account() {
           id="email"
           label="Email"
           variant="outlined"
-          value={session?.user?.email || "No email found"}
+          value={user?.email || "No email found"}
           disabled
         />
         <TextField

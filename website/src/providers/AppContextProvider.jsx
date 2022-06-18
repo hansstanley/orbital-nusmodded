@@ -1,9 +1,9 @@
 import { CookiesProvider } from "react-cookie";
-import AuthSessionProvider from "./authSession.provider";
+import { AuthSessionProvider } from "./auth-session.provider";
 import DrawerContextProvider from "./drawer.provider";
 import LandingProvider from "./landing.provider";
 import ModuleInfoProvider from "./moduleInfo.provider";
-import SnackbarProvider from "./snackbar.provider";
+import { SnackbarProvider } from "./snackbar.provider";
 import ThemeContextProvider from "./themeContext.provider";
 import CourseInfoProvider from "./courseInfo.provider";
 
