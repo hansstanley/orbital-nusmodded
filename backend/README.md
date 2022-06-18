@@ -92,14 +92,7 @@ const { data, error } = await supabase
   .match({ id: user.id });
 ```
 
-1. Generate a hash with `bcrypt` on the `authToken` with 8 salt rounds.
-
-```javascript
-import { hashSync } from 'bcrypt';
-const hash = hashSync(authToken, 8);
-```
-
-5. POST the hash to `{domain}/auth/login` (refer to route description below).
+4. POST the `authToken` to `{domain}/auth/login` (refer to route description below).
 
 ```javascript
 // e.g. with Axios; adjust accordingly with your preferred HTTP client
@@ -113,7 +106,7 @@ const { status, data } = await axios.post(`${domain}/auth/login`, {
 const { accessToken } = data;
 ```
 
-6. The request will return an `accessToken`, which are to be included in the headers as `Authorization: Bearer {accessToken}` for subsequent API calls.
+5. The request will return an `accessToken`, which are to be included in the headers as `Authorization: Bearer {accessToken}` for subsequent API calls.
 
 ```javascript
 const { status, data } = await axios.get(`${domain}/user/profile`, {
