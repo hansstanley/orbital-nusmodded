@@ -1,9 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
 import * as randomBytes from "randombytes";
 import { supabase } from "../services";
-
-const BACKEND_DOMAIN = "https://nusmodded.herokuapp.com";
+import { useAccessToken } from "./access-token.provider";
+import { useBackend } from "./backend.provider";
 
 const defaultUser = {
   signedIn: false,
@@ -14,7 +13,6 @@ const defaultUser = {
 };
 
 const AuthSessionContext = createContext({
-  accessToken: undefined,
   signedIn: false,
   user: defaultUser,
   handleSignup: async ({ username, email, password }) => {},
@@ -25,7 +23,8 @@ const AuthSessionContext = createContext({
 function AuthSessionProvider({ children }) {
   const [user, setUser] = useState(defaultUser);
   const [signedIn, setSignedIn] = useState(false);
-  const [accessToken, setAccessToken] = useState(undefined);
+  const { setAccessToken } = useAccessToken();
+  const { makeRequest } = useBackend();
 
   useEffect(() => {
     setSignedIn(!!supabase.auth.user());
@@ -45,19 +44,20 @@ function AuthSessionProvider({ children }) {
         .match({ id: user.id });
       if (error) throw error;
 
-      const { status, data } = await axios.post(
-        `${BACKEND_DOMAIN}/auth/login`,
-        {
+      const { status, data } = await makeRequest({
+        method: "post",
+        route: "/auth/login",
+        data: {
           username: user.username,
           password: authToken,
-        }
-      );
+        },
+      });
 
       if (status === 200) setAccessToken(data.accessToken);
     }
 
     if (user.signedIn) getAccessToken();
-  }, [user]);
+  }, [user, setAccessToken]);
 
   const handleSignup = async ({ username, email, password }) => {
     const { user, error } = await supabase.auth.signUp({
@@ -129,7 +129,6 @@ function AuthSessionProvider({ children }) {
   return (
     <AuthSessionContext.Provider
       value={{
-        accessToken,
         signedIn: signedIn,
         user,
         handleSignup,
