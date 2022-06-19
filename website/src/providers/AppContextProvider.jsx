@@ -9,6 +9,7 @@ import ThemeContextProvider from "./themeContext.provider";
 import CourseInfoProvider from "./courseInfo.provider";
 import { AccessTokenProvider } from "./access-token.provider";
 import { BackendProvider } from "./backend.provider";
+import { CourseProvider } from "./course.provider";
 
 function combineComponents(...components) {
   return components.reduce(
@@ -29,6 +30,7 @@ const providers = [
   BackendProvider,
   AuthSessionProvider,
   ThemeContextProvider,
+  CourseProvider,
   ModuleInfoProvider,
   LandingProvider,
   DrawerContextProvider,

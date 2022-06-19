@@ -2,6 +2,7 @@ import { AppContextProvider } from "./AppContextProvider";
 import { AccessTokenProvider, useAccessToken } from "./access-token.provider";
 import { AuthSessionProvider, useAuthSession } from "./auth-session.provider";
 import { BackendProvider, useBackend } from "./backend.provider";
+import { CourseProvider, useCourse } from "./course.provider";
 import DrawerContextProvider from "./drawer.provider";
 import DurationContextProvider from "./duration.provider";
 import LandingProvider from "./landing.provider";
@@ -14,6 +15,7 @@ export {
   AccessTokenProvider,
   AuthSessionProvider,
   BackendProvider,
+  CourseProvider,
   DrawerContextProvider,
   DurationContextProvider,
   LandingProvider,
@@ -22,4 +24,4 @@ export {
   ThemeContextProvider,
 };
 
-export { useAccessToken, useAuthSession, useBackend, useSnackbar };
+export { useAccessToken, useAuthSession, useBackend, useCourse, useSnackbar };

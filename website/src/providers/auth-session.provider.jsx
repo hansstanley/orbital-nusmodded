@@ -57,7 +57,7 @@ function AuthSessionProvider({ children }) {
     }
 
     if (user.signedIn) getAccessToken();
-  }, [user, setAccessToken]);
+  }, [user, setAccessToken, makeRequest]);
 
   const handleSignup = async ({ username, email, password }) => {
     const { user, error } = await supabase.auth.signUp({

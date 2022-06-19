@@ -47,11 +47,19 @@ export default function LoginDialog({ open, handleClose }) {
     setLoading(true);
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    await handleSignin({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-    setLoading(false);
+    try {
+      await handleSignin({
+        email: data.get("email"),
+        password: data.get("password"),
+      });
+    } catch (error) {
+      pushSnack({
+        message: error.message,
+        action: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
 
     pushSnack({
       message: "Successfully logged in!",
