@@ -17,8 +17,9 @@ const AuthSessionContext = createContext({
   accessToken: undefined,
   signedIn: false,
   user: defaultUser,
-  handleSignup: ({ username, email, password }) => {},
-  handleSignin: ({ email, password }) => {},
+  handleSignup: async ({ username, email, password }) => {},
+  handleSignin: async ({ email, password }) => {},
+  handleSignout: async () => {},
 });
 
 function AuthSessionProvider({ children }) {
@@ -121,6 +122,10 @@ function AuthSessionProvider({ children }) {
     }
   };
 
+  const handleSignout = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
     <AuthSessionContext.Provider
       value={{
@@ -129,6 +134,7 @@ function AuthSessionProvider({ children }) {
         user,
         handleSignup,
         handleSignin,
+        handleSignout,
       }}
     >
       {children}

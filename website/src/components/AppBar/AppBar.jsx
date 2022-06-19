@@ -1,12 +1,17 @@
-import { AppBar as MuiAppBar, Box, IconButton, Toolbar, Stack } from "@mui/material";
+import {
+  AppBar as MuiAppBar,
+  Box,
+  IconButton,
+  Toolbar,
+  Stack,
+} from "@mui/material";
 import React, { useContext } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import AppTitle from "./AppTitle";
 import MenuIcon from "@mui/icons-material/Menu";
 import ColorModeButton from "./ColorModeButton";
 import { DrawerContext, LandingContext } from "../../contexts";
-import LoginButton from "./LoginButton";
-import SignUpButton from "./SignUpButton";
+import AuthButtonGroup from "../AuthButtonGroup";
 
 const AnimatedAppBar = animated(MuiAppBar);
 
@@ -59,10 +64,7 @@ export default function AppBar() {
         </IconButton>
         <AppTitle />
         <Box sx={{ flex: 1 }} />
-        <Stack direction = "row" spacing = {1}>
-          <LoginButton />
-          <SignUpButton />
-        </Stack>
+        <AuthButtonGroup />
         <ColorModeButton />
       </Toolbar>
     </MuiAppBar>

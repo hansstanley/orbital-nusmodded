@@ -7,13 +7,15 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useAuthSession } from "../../providers";
 import { supabase } from "../../services";
 
 export default function LogoutDialog({ open, handleClose }) {
   const navigate = useNavigate();
+  const { handleSignout } = useAuthSession();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await handleSignout();
     handleClose();
     navigate("/");
   };

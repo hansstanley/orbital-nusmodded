@@ -25,6 +25,7 @@ export default function LoginDialog({ open, handleClose }) {
   const { handleSignin } = useAuthSession();
   const { pushSnack } = useSnackbar();
 
+  // Enables responsive dialog box
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
