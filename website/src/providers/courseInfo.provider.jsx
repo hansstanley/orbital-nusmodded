@@ -20,7 +20,7 @@ export default function CoursesInfoProvider(props) {
       setCourseMap(courseInfoService.getCourseMap());
       setIsCoursesLoaded(true);
     };
-    foo();
+    // foo(); // Disabled here
   }, [courseInfoService]);
 
   return (

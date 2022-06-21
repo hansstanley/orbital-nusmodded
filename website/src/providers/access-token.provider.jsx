@@ -1,28 +1,53 @@
-import { useCallback, useContext } from "react";
-import { useState } from "react";
-import { createContext } from "react";
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useContext,
+  useState,
+} from "react";
+import { useCookies } from "react-cookie";
 
 const AccessTokenContext = createContext({
-  hasAccess: false,
   accessToken: undefined,
+  hasAccess: false,
   setAccessToken: (newAccessToken) => {},
+  clearAccessToken: () => {},
 });
 
 function AccessTokenProvider({ children }) {
-  const [hasAccess, setHasAccess] = useState(false);
+  const [cookies, setCookies, removeCookies] = useCookies(["accessToken"]);
   const [accessToken, setAccessToken] = useState(undefined);
+  const [hasAccess, setHasAccess] = useState(false);
 
-  const setToken = useCallback((newAccessToken) => {
-    setHasAccess(true);
-    setAccessToken(newAccessToken);
-  }, []);
+  useEffect(() => {
+    if (cookies.accessToken) {
+      setAccessToken(cookies.accessToken);
+      setHasAccess(true);
+    }
+  }, [cookies.accessToken]);
+
+  const setToken = useCallback(
+    (newAccessToken) => {
+      setAccessToken(newAccessToken);
+      setCookies("accessToken", newAccessToken);
+      setHasAccess(true);
+    },
+    [setCookies]
+  );
+
+  const clearToken = useCallback(() => {
+    setAccessToken(undefined);
+    removeCookies("accessToken");
+    setHasAccess(false);
+  }, [removeCookies]);
 
   return (
     <AccessTokenContext.Provider
       value={{
-        hasAccess,
         accessToken,
+        hasAccess,
         setAccessToken: setToken,
+        clearAccessToken: clearToken,
       }}
     >
       {children}

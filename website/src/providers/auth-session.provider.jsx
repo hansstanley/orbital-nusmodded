@@ -1,93 +1,118 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import * as randomBytes from "randombytes";
 import { supabase } from "../services";
 import { useAccessToken } from "./access-token.provider";
 import { useBackend } from "./backend.provider";
-
-const defaultUser = {
-  signedIn: false,
-  id: undefined,
-  username: undefined,
-  email: undefined,
-  avatarUrl: undefined,
-};
+import { useSnackbar } from "./snackbar.provider";
+import { Profile } from "../models";
 
 const AuthSessionContext = createContext({
-  signedIn: false,
-  user: defaultUser,
+  profile: new Profile(),
   handleSignup: async ({ username, email, password }) => {},
   handleSignin: async ({ email, password }) => {},
   handleSignout: async () => {},
+  updateProfile: async ({ id, ...updates }) => new Profile(),
 });
 
 function AuthSessionProvider({ children }) {
-  const [user, setUser] = useState(defaultUser);
-  const [signedIn, setSignedIn] = useState(false);
-  const { setAccessToken } = useAccessToken();
+  const [profile, setProfile] = useState(new Profile());
+  const { setAccessToken, clearAccessToken } = useAccessToken();
   const { makeRequest } = useBackend();
+  const { pushSnack } = useSnackbar();
 
-  useEffect(() => {
-    setSignedIn(!!supabase.auth.user());
+  const getAccessToken = async (userId, username) => {
+    const authToken = randomBytes(16).toString("hex");
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSignedIn(!!supabase.auth.user());
+    const { error } = await supabase
+      .from("profiles")
+      .update({ auth_token: authToken }, { returning: "minimal" })
+      .match({ id: userId });
+    if (error) throw error;
+
+    const { status, data } = await makeRequest({
+      method: "post",
+      route: "/auth/login",
+      data: {
+        username: username,
+        password: authToken,
+      },
     });
-  }, []);
 
-  useEffect(() => {
-    async function getAccessToken() {
-      const authToken = randomBytes(16).toString("hex");
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({ auth_token: authToken })
-        .match({ id: user.id });
-      if (error) throw error;
-
-      const { status, data } = await makeRequest({
-        method: "post",
-        route: "/auth/login",
-        data: {
-          username: user.username,
-          password: authToken,
-        },
-      });
-
-      if (status === 200) setAccessToken(data.accessToken);
+    if (status === 200 && data) {
+      setAccessToken(data.accessToken);
+      return data.accessToken;
+    } else {
+      throw new Error(`Unable to retrieve access token for ${username}`);
     }
+  };
 
-    if (user.signedIn) getAccessToken();
-  }, [user, setAccessToken, makeRequest]);
+  const getProfile = async (userId) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select()
+      .eq("id", userId)
+      .single();
+    if (error) throw error;
+
+    const result = profile
+      .updateProperty("username", data.username)
+      .updateProperty("avatarUrl", data.avatar_url);
+
+    setProfile(result);
+    return result;
+  };
+
+  const createProfile = async (userId, username) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .insert({
+        id: userId,
+        username,
+      })
+      .single();
+    if (error) throw error;
+
+    const result = profile
+      .updateProperty("username", data.username)
+      .updateProperty("avatarUrl", data.avatar_url);
+
+    setProfile(result);
+    return result;
+  };
+
+  const updateProfile = async ({ id, ...updates }) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .update(updates)
+      .match({ id })
+      .single();
+    if (error) throw error;
+
+    const result = profile
+      .updateProperty("username", data.username)
+      .updateProperty("avatarUrl", data.avatar_url);
+
+    setProfile(result);
+    return result;
+  };
 
   const handleSignup = async ({ username, email, password }) => {
     const { user, error } = await supabase.auth.signUp({
       email,
       password,
     });
-
     if (error) throw error;
-    if (user) {
-      setSignedIn(true);
 
-      const info = {
-        id: user.id,
-        username,
-      };
-      const { error, data } = await supabase.from("profiles").insert([info]);
-      if (error) throw error;
+    const result = (await createProfile(user.id, username))
+      .updateProperty("id", user.id)
+      .updateProperty("email", email);
+    setProfile(result);
 
-      setUser({
-        signedIn: true,
-        id: user.id,
-        email: email,
-        username: data[0].username,
-        avatarUrl: data[0].avatar_url,
-      });
-
-      return user;
-    } else {
-      throw new Error("Unable to sign up");
-    }
+    await getAccessToken(result.id, result.username);
+    pushSnack({
+      message: `Email verification feature coming soon, ${result.username}`,
+      severity: "info",
+    });
   };
 
   const handleSignin = async ({ email, password }) => {
@@ -97,43 +122,36 @@ function AuthSessionProvider({ children }) {
     });
     if (error) throw error;
 
-    if (user) {
-      setSignedIn(true);
-      const { data, error } = await supabase
-        .from("profiles")
-        .select()
-        .eq("id", user.id)
-        .single();
-      if (error) throw error;
+    const result = (await getProfile(user.id))
+      .updateProperty("id", user.id)
+      .updateProperty("email", email);
+    setProfile(result);
 
-      if (data) {
-        setUser({
-          signedIn: true,
-          id: data.id,
-          username: data.username,
-          email: email,
-          avatarUrl: data.avatar_url,
-        });
-      }
-
-      return user;
-    } else {
-      throw new Error("Unable to sign in");
-    }
+    await getAccessToken(result.id, result.username);
+    pushSnack({
+      message: `Welcome, ${result.username}!`,
+      severity: "success",
+    });
   };
 
   const handleSignout = async () => {
+    clearAccessToken();
     await supabase.auth.signOut();
+    setProfile(new Profile());
+    pushSnack({
+      message: "Goodbye!",
+      severity: "info",
+    });
   };
 
   return (
     <AuthSessionContext.Provider
       value={{
-        signedIn: signedIn,
-        user,
+        profile,
         handleSignup,
         handleSignin,
         handleSignout,
+        updateProfile,
       }}
     >
       {children}

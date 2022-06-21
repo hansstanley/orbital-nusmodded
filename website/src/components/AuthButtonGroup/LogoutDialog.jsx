@@ -21,7 +21,7 @@ export default function LogoutDialog({ open, handleClose }) {
   };
 
   return (
-    <Dialog open={open} handleClose={handleClose}>
+    <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Logout</DialogTitle>
       <DialogContent>
         <DialogContentText>Are you sure you wish to logout?</DialogContentText>

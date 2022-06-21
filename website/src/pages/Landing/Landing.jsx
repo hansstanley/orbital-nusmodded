@@ -2,16 +2,16 @@ import { Button, Stack, Typography } from "@mui/material";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { LandingContext } from "../../contexts";
-import { useAuthSession } from "../../providers";
+import { useAccessToken, useAuthSession } from "../../providers";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { hasAccess } = useAccessToken();
   const { toggleLanding } = useContext(LandingContext);
-  const { signedIn } = useAuthSession();
 
   const handleStart = () => {
     toggleLanding();
-    navigate(signedIn ? "/roadmap" : "/login");
+    navigate(hasAccess ? "/roadmap" : "/login");
   };
 
   return (
@@ -23,7 +23,7 @@ export default function Landing() {
         NUSMODDED
       </Typography>
       <Button variant="contained" onClick={handleStart}>
-        {signedIn ? "Continue" : "Get started"}
+        {hasAccess ? "Continue" : "Get started"}
       </Button>
     </Stack>
   );

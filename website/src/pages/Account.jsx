@@ -8,68 +8,45 @@ import {
   Typography,
 } from "@mui/material";
 import { supabase } from "../services";
-import { ResponsiveStack } from "../components";
-import { useAuthSession, useSnackbar } from "../providers";
+import { AuthGuard, ResponsiveStack } from "../components";
+import { useAccessToken, useAuthSession, useSnackbar } from "../providers";
 
 export default function Account() {
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState(null);
-  const [avatarUrl, setAvatarUrl] = useState(null);
-  const { signedIn, user } = useAuthSession();
+  const [username, setUsername] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const { hasAccess } = useAccessToken();
+  const { profile, updateProfile } = useAuthSession();
   const { pushSnack } = useSnackbar();
 
-  const getProfile = useCallback(async () => {
-    try {
-      setLoading(true);
-      const user = supabase.auth.user();
-
-      let { data, error, status } = await supabase
-        .from("profiles")
-        .select(`username, avatar_url`)
-        .eq("id", user.id)
-        .single();
-
-      if (error && status !== 406) throw error;
-
-      if (data) {
-        setUsername(data.username);
-        setAvatarUrl(data.avatar_url);
-      }
-    } catch (error) {
-      pushSnack({
-        message: error.message,
-        severity: "error",
-      });
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (hasAccess) {
+      setUsername(profile.username);
+      setAvatarUrl(profile.avatarUrl);
     }
-  }, [pushSnack]);
+  }, [profile, hasAccess]);
 
-  const updateProfile = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
     try {
       setLoading(true);
-      const user = supabase.auth.user();
 
       const updates = {
-        id: user.id,
+        id: profile.id,
         username: username,
         avatar_url: avatarUrl,
         updated_at: new Date(),
       };
 
-      let { error } = await supabase
-        .from("profiles")
-        .upsert(updates, { returning: "minimal" });
-
-      if (error) throw error;
+      await updateProfile(updates);
 
       pushSnack({
         message: "Profile updated!",
         severity: "success",
       });
     } catch (error) {
+      console.error(error);
       pushSnack({
         message: error.message,
         severity: "error",
@@ -79,46 +56,42 @@ export default function Account() {
     }
   };
 
-  useEffect(() => {
-    if (signedIn) getProfile();
-  }, [signedIn, getProfile]);
-
-  return signedIn ? (
-    <ResponsiveStack>
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Avatar
-          src={avatarUrl}
-          sx={{ height: 240, width: 240, bgcolor: "primary.main" }}
-        />
-      </Box>
-      <Stack spacing={2}>
-        <TextField
-          id="email"
-          label="Email"
-          variant="outlined"
-          value={user?.email || "No email found"}
-          disabled
-        />
-        <TextField
-          id="username"
-          label="Username"
-          variant="outlined"
-          value={username || ""}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <TextField
-          id="avatar"
-          label="Avatar URL"
-          variant="outlined"
-          value={avatarUrl || ""}
-          onChange={(e) => setAvatarUrl(e.target.value)}
-        />
-        <Button variant="contained" onClick={updateProfile} disabled={loading}>
-          Update profile
-        </Button>
-      </Stack>
-    </ResponsiveStack>
-  ) : (
-    <Typography variant="h6">Please log in.</Typography>
+  return (
+    <AuthGuard>
+      <ResponsiveStack>
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Avatar
+            src={avatarUrl}
+            sx={{ height: 240, width: 240, bgcolor: "primary.main" }}
+          />
+        </Box>
+        <Stack spacing={2}>
+          <TextField
+            id="email"
+            label="Email"
+            variant="outlined"
+            value={profile.email || "No email found"}
+            disabled
+          />
+          <TextField
+            id="username"
+            label="Username"
+            variant="outlined"
+            value={username || ""}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <TextField
+            id="avatar"
+            label="Avatar URL"
+            variant="outlined"
+            value={avatarUrl || ""}
+            onChange={(e) => setAvatarUrl(e.target.value)}
+          />
+          <Button variant="contained" onClick={handleUpdate} disabled={loading}>
+            Update profile
+          </Button>
+        </Stack>
+      </ResponsiveStack>
+    </AuthGuard>
   );
 }

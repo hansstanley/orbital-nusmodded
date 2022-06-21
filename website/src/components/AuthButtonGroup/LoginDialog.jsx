@@ -12,6 +12,7 @@ import {
   useTheme,
   Collapse,
   Alert,
+  LinearProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuthSession, useSnackbar } from "../../providers";
@@ -52,26 +53,22 @@ export default function LoginDialog({ open, handleClose }) {
         email: data.get("email"),
         password: data.get("password"),
       });
+      handleCloseReset();
     } catch (error) {
+      console.error(error);
       pushSnack({
         message: error.message,
-        action: "error",
+        severity: "error",
       });
     } finally {
       setLoading(false);
     }
 
-    pushSnack({
-      message: "Successfully logged in!",
-      severity: "success",
-    });
     setValidateInput("");
-    handleCloseReset();
-    navigate("/");
   };
 
   return (
-    <Dialog open={open} handleClose={handleClose} fullScreen={fullScreen}>
+    <Dialog open={open} onClose={handleClose} fullScreen={fullScreen}>
       <Box component="form" onSubmit={handleSubmit}>
         <DialogTitle>Login</DialogTitle>
         <DialogContent>
@@ -116,6 +113,11 @@ export default function LoginDialog({ open, handleClose }) {
           </Button>
           <Button onClick={handleCloseReset}>Cancel</Button>
         </DialogActions>
+        {loading ? (
+          <LinearProgress />
+        ) : (
+          <LinearProgress variant="determinate" value={100} />
+        )}
       </Box>
       {/* <Card
         sx={{

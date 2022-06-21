@@ -49,7 +49,9 @@ export default function CourseHeader() {
         <Select value={sortBy} label="Sort by" onChange={handleSortByChange}>
           <MenuItem value="">None</MenuItem>
           {columns.map((col) => (
-            <MenuItem value={col.id}>{col.label}</MenuItem>
+            <MenuItem key={col.id} value={col.id}>
+              {col.label}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>

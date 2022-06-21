@@ -10,6 +10,7 @@ import CourseInfoProvider from "./courseInfo.provider";
 import { AccessTokenProvider } from "./access-token.provider";
 import { BackendProvider } from "./backend.provider";
 import { CourseProvider } from "./course.provider";
+import { ModProvider } from "./mod.provider";
 
 function combineComponents(...components) {
   return components.reduce(
@@ -26,15 +27,16 @@ function combineComponents(...components) {
 
 const providers = [
   CookiesProvider,
+  SnackbarProvider,
   AccessTokenProvider,
   BackendProvider,
   AuthSessionProvider,
   ThemeContextProvider,
   CourseProvider,
+  ModProvider,
   ModuleInfoProvider,
   LandingProvider,
   DrawerContextProvider,
-  SnackbarProvider,
   CourseInfoProvider,
 ];
 

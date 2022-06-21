@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useContext } from "react";
 import { createContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAccessToken } from "./access-token.provider";
+import { useSnackbar } from "./snackbar.provider";
 
 const BACKEND_DOMAIN = "https://nusmodded.herokuapp.com";
 
@@ -13,7 +15,9 @@ const BackendContext = createContext({
 });
 
 function BackendProvider({ children }) {
-  const { accessToken } = useAccessToken();
+  const { accessToken, clearAccessToken } = useAccessToken();
+  const { pushSnack } = useSnackbar();
+  const navigate = useNavigate();
 
   const makeRequest = async ({
     method,
@@ -34,6 +38,15 @@ function BackendProvider({ children }) {
       data,
       params,
     });
+
+    if (!isPublic && res.status === 401) {
+      pushSnack({
+        message: "Session expired, please login again",
+        severity: "error",
+      });
+      clearAccessToken();
+      navigate("/");
+    }
 
     return res;
   };

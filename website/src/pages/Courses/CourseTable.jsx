@@ -1,5 +1,6 @@
 import {
   Button,
+  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -8,18 +9,17 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useCourse, useSnackbar } from "../../providers";
 import { columns } from "./constants";
 
 export default function CourseTable() {
-  const { getCourseArray } = useCourse();
+  const navigate = useNavigate();
+  const { loading, getCourseArray } = useCourse();
   const { pushSnack } = useSnackbar();
 
-  const handleExplore = () => {
-    pushSnack({
-      message: `This button navigates to CourseDetail`,
-      severity: "warning",
-    });
+  const handleExplore = (courseId) => () => {
+    navigate("/courses/detail", { state: { courseId } });
   };
 
   return (
@@ -28,7 +28,9 @@ export default function CourseTable() {
         <TableHead>
           <TableRow>
             {columns.map((col) => (
-              <TableCell align={col.align}>{col.label}</TableCell>
+              <TableCell key={col.id} align={col.align}>
+                {col.label}
+              </TableCell>
             ))}
             <TableCell align="right" />
           </TableRow>
@@ -37,13 +39,20 @@ export default function CourseTable() {
           {getCourseArray().map((course) => (
             <TableRow key={course.id}>
               {columns.map((col) => (
-                <TableCell align={col.align}>{course[col.id]}</TableCell>
+                <TableCell key={col.id} align={col.align}>
+                  {course[col.id]}
+                </TableCell>
               ))}
               <TableCell align="right">
-                <Button onClick={handleExplore}>Explore</Button>
+                <Button onClick={handleExplore(course.id)}>Explore</Button>
               </TableCell>
             </TableRow>
           ))}
+          <TableRow>
+            <TableCell align="center" colSpan={4} variant="footer">
+              {loading ? <CircularProgress /> : "No more courses."}
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </TableContainer>
