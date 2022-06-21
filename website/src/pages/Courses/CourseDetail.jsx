@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Divider, Stack, Typography } from "@mui/material";
+import { Divider, LinearProgress, Stack, Typography } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { NIL as NIL_UUID } from "uuid";
 import { Course } from "../../models";
-import { ResponsiveStack } from "../../components";
-import { useCourse, useMod, useSnackbar } from "../../providers";
+import { AuthGuard, ResponsiveStack } from "../../components";
+import { useCourse, useSnackbar } from "../../providers";
 import { ModuleBox } from "../../components/Mod";
+import { Box } from "@mui/system";
 
 /**
  * Component to show detailed information
@@ -13,42 +14,59 @@ import { ModuleBox } from "../../components/Mod";
  */
 export default function CourseDetail() {
   const { state } = useLocation();
-  const { getCourse, getCourseMods } = useCourse();
-  const { getModInfo } = useMod();
+  const { loading, getCourse, getCourseMods } = useCourse();
   const { pushSnack } = useSnackbar();
+  const [progress, setProgress] = useState(0);
   const [course, setCourse] = useState(new Course({ id: NIL_UUID }));
   const [mods, setMods] = useState([]);
 
   useEffect(() => {
-    async function init(courseId) {
-      let course = getCourse(courseId);
-      setCourse(course);
-
-      let mods = await getCourseMods(courseId);
-      setMods(mods);
-      mods = await Promise.all(mods.map((mod) => getModInfo(mod.moduleCode)));
-      setMods(mods);
+    async function loadCourse(courseId) {
+      const data = getCourse(courseId);
+      setCourse(data);
+      setProgress(30);
     }
 
-    if (state?.courseId) init(state.courseId);
-  }, [state, getCourse, getCourseMods, getModInfo]);
+    async function loadMods(courseId) {
+      const data = await getCourseMods(courseId);
+      setMods(data);
+      setProgress(100);
+    }
+
+    if (state?.courseId) {
+      setProgress(0);
+      loadCourse(state.courseId);
+      loadMods(state.courseId);
+    }
+  }, [state, getCourse, getCourseMods]);
 
   return (
-    <ResponsiveStack>
-      <Stack spacing={2}>
+    <AuthGuard>
+      <Stack spacing={2} maxHeight="100%">
+        <Typography variant="h6">{course.department}</Typography>
         <Typography variant="h3" color="primary">
           {course.title}
         </Typography>
-        <Typography variant="h6">{course.department}</Typography>
+        <Box>
+          <LinearProgress
+            variant={loading ? "indeterminate" : "determinate"}
+            value={progress}
+          />
+        </Box>
+        <ResponsiveStack>
+          <Box>
+            <Typography variant="body1">{course.description}</Typography>
+          </Box>
+          <Stack spacing={1}>
+            <Typography variant="h5">Modules</Typography>
+            <Divider />
+            {mods.map((mod) => (
+              <ModuleBox key={mod.moduleCode} moduleCode={mod.moduleCode} />
+            ))}
+          </Stack>
+        </ResponsiveStack>
         <Divider />
-        <Typography variant="body1">{course.description}</Typography>
       </Stack>
-      <Stack spacing={1}>
-        <Typography variant="h5">Modules</Typography>
-        {mods.map((mod, index) => (
-          <ModuleBox key={mod.moduleCode} mod={mod} />
-        ))}
-      </Stack>
-    </ResponsiveStack>
+    </AuthGuard>
   );
 }

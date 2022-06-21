@@ -56,7 +56,7 @@ function CourseProvider({ children }) {
     }
 
     if (hasAccess) buildCourses();
-  }, [hasAccess, makeRequest]);
+  }, [hasAccess, makeRequest, pushSnack]);
 
   const getCourseArray = useCallback(
     () => Array.from(courseMap.values()),

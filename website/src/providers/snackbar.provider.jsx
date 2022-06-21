@@ -1,4 +1,10 @@
-import { useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import {
   Alert,
   Button,
@@ -7,8 +13,6 @@ import {
   Snackbar,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { createContext } from "react";
-import { useContext } from "react";
 
 const severities = ["success", "info", "warning", "error"];
 
@@ -29,12 +33,12 @@ function SnackbarProvider({ children }) {
     }
   }, [snack, snackPack]);
 
-  const pushSnack = ({ message, severity, action }) => {
+  const pushSnack = useCallback(({ message, severity, action }) => {
     setSnackPack((prev) => [
       ...prev,
       { message: message, severity: severity, action: action },
     ]);
-  };
+  }, []);
 
   const handleLatest = () => {
     setOpen(false);
