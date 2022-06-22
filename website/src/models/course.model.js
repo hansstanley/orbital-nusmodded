@@ -1,5 +1,3 @@
-import { NIL as NIL_UUID } from "uuid";
-
 export default class Course {
   id; // UUID V4
   title; // Title of the course

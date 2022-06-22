@@ -9,6 +9,7 @@ import {
   Post
 } from '@nestjs/common';
 import { Mod } from 'src/mod/mod.entity';
+import { Public } from 'src/utils/decorators';
 import {
   BindModsDto,
   CreateModGroupDto,
@@ -24,16 +25,19 @@ export class ModGroupController {
     private readonly modGroupService: ModGroupService
   ) { }
 
+  @Public()
   @Get()
   async findAll(): Promise<ModGroup[]> {
     return this.modGroupService.findAll();
   }
 
+  @Public()
   @Get(':id')
   async find(@Param('id') id: string): Promise<ModGroup> {
     return this.modGroupService.find(id);
   }
 
+  @Public()
   @Get(':id/modules')
   async getMods(@Param('id') id: string): Promise<Mod[]> {
     const modGroup = await this.modGroupService.find(id);

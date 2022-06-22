@@ -5,7 +5,6 @@ import { createContext } from "react";
 import { Course, Mod } from "../models";
 import { useBackend } from "./backend.provider";
 import { useState } from "react";
-import { useAccessToken } from "./access-token.provider";
 import { useSnackbar } from "./snackbar.provider";
 
 const CourseContext = createContext({
@@ -14,13 +13,15 @@ const CourseContext = createContext({
   getCourseMap: () => new Map(),
   getCourse: (courseId) => new Course({ id: courseId }),
   getCourseMods: async (courseId) => [],
+  createCourse: async (data) => new Course(),
+  updateCourse: async (courseId, data) => new Course(),
 });
 
 function CourseProvider({ children }) {
-  const { hasAccess } = useAccessToken();
   const { makeRequest } = useBackend();
   const { pushSnack } = useSnackbar();
   const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(true);
   const [courseMap, setCourseMap] = useState(new Map());
 
   useEffect(() => {
@@ -31,7 +32,6 @@ function CourseProvider({ children }) {
         const { status, data } = await makeRequest({
           method: "get",
           route: "/course",
-          isPublic: false,
         });
 
         if (status === 200 && Array.isArray(data)) {
@@ -52,11 +52,12 @@ function CourseProvider({ children }) {
         });
       } finally {
         setLoading(false);
+        setRefresh(false);
       }
     }
 
-    if (hasAccess) buildCourses();
-  }, [hasAccess, makeRequest, pushSnack]);
+    if (refresh) buildCourses();
+  }, [refresh, makeRequest, pushSnack]);
 
   const getCourseArray = useCallback(
     () => Array.from(courseMap.values()),
@@ -74,7 +75,6 @@ function CourseProvider({ children }) {
     const { status, data } = await makeRequest({
       method: "get",
       route: `/course/${courseId}/modules`,
-      isPublic: false,
     });
 
     if (status === 200 && Array.isArray(data)) {
@@ -86,12 +86,51 @@ function CourseProvider({ children }) {
     }
   };
 
+  const createCourse = async ({ title, department, description }) => {
+    const { status, data } = await makeRequest({
+      method: "post",
+      route: "/course/new",
+      data: { title, department, description },
+      isPublic: false,
+    });
+
+    if (status === 201 && data) {
+      setRefresh(true);
+      return plainToInstance(Course, data);
+    } else {
+      throw new Error(`Unable to create course ${title}`);
+    }
+  };
+
+  const updateCourse = async (courseId, { title, department, description }) => {
+    const params = {};
+    if (title) params.title = title;
+    if (department) params.department = department;
+    if (description) params.description = description;
+
+    const { status, data } = await makeRequest({
+      method: "post",
+      route: `/course/${courseId}/edit`,
+      data: params,
+      isPublic: false,
+    });
+
+    if (status === 200 && data) {
+      setRefresh(true);
+      return plainToInstance(Course, data);
+    } else {
+      throw new Error(`Unable to update course ${title}`);
+    }
+  };
+
   const values = {
     loading,
     getCourseArray,
     getCourseMap,
     getCourse,
     getCourseMods,
+    createCourse,
+    updateCourse,
   };
 
   return (

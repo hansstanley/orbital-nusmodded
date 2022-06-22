@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import {
@@ -71,8 +72,10 @@ function SnackbarProvider({ children }) {
       </IconButton>
     );
 
+  const value = useMemo(() => ({ pushSnack }), [pushSnack]);
+
   return (
-    <SnackbarContext.Provider value={{ pushSnack: pushSnack }}>
+    <SnackbarContext.Provider value={value}>
       {snack && severities.includes(snack.severity) ? (
         <Snackbar
           open={open}

@@ -62,6 +62,10 @@ $ npm run test:cov
 
 ## API
 
+**Note:** API routes that do not require authentication are flagged as "PUBLIC", e.g.
+
+> PUBLIC
+
 <details><summary>Authentication</summary>
 
 Steps to authenticate with the backend server:
@@ -113,10 +117,6 @@ const { status, data } = await axios.get(`${domain}/user/profile`, {
   headers: { Authorization: `Bearer ${accessToken}` },
 });
 ```
-
-**Note:** API routes that do not require authentication are flagged as "PUBLIC", e.g.
-
-> PUBLIC
 
 ---
 
@@ -239,12 +239,62 @@ Response `200 OK`: `UserSettings`
 
 #### Validate roadmap
 
+> PUBLIC
+
 > :x: Not implemented
 
 Checks the roadmap for potential errors.
 
 ```
-POST /roadmap/validate
+POST /roadmap/validate/all
+```
+
+```typescript
+type body = Roadmap; // Refer to schema below
+```
+
+Response `200 OK`: `RoadmapError[]`
+
+#### Validate module availability
+
+> PUBLIC
+
+> :white_check_mark: Implemented
+
+```
+POST /roadmap/validate/module-availability
+```
+
+```typescript
+type body = Roadmap; // Refer to schema below
+```
+
+Response `200 OK`: `RoadmapError[]`
+
+#### Validate course requirements
+
+> PUBLIC
+
+> :white_check_mark: Implemented
+
+```
+POST /roadmap/validate/course-requirement
+```
+
+```typescript
+type body = Roadmap; // Refer to schema below
+```
+
+Response `200 OK`: `RoadmapError[]`
+
+#### Validate module prerequisites
+
+> PUBLIC
+
+> :white_check_mark: Implemented
+
+```
+POST /roadmap/validate/prerequisite
 ```
 
 ```typescript
@@ -258,6 +308,8 @@ Response `200 OK`: `RoadmapError[]`
 <details><summary>Courses</summary>
 
 #### Get all courses
+
+> PUBLIC
 
 > :white_check_mark: Implemented
 
@@ -309,6 +361,8 @@ Response `200 OK`: `Course`
 
 #### Get course info
 
+> PUBLIC
+
 > :white_check_mark: Implemented
 
 ```
@@ -337,6 +391,8 @@ Response `200 OK`: `Course`
 
 #### Get course modules
 
+> PUBLIC
+
 > :white_check_mark: Implemented
 
 Returns an array of modules associated to the course.
@@ -352,6 +408,8 @@ type courseId = string; // UUID V4
 Repsonse `200 OK`: `Mod[]`.
 
 #### Get course module groups
+
+> PUBLIC
 
 > :white_check_mark: Implemented
 
@@ -422,6 +480,8 @@ type body = {
 
 #### Get all module groups
 
+> PUBLIC
+
 > :white_check_mark: Not Implemented
 
 ```
@@ -486,6 +546,8 @@ Response `200 OK`: `ModGroup`
 
 #### Get module group info
 
+> PUBLIC
+
 > :white_check_mark: Not Implemented
 
 ```
@@ -499,6 +561,8 @@ type groupId = string; // UUID V4
 Response `200 OK`: `ModGroup`
 
 #### Get modules belonging to a module group
+
+> PUBLIC
 
 > :white_check_mark: Not Implemented
 
@@ -567,6 +631,7 @@ type body = {
 #### Get all modules
 
 > PUBLIC
+
 > :white_check_mark: Implemented
 
 ```
@@ -578,6 +643,7 @@ Response `200 OK`: `Mod[]`
 #### Get module information
 
 > PUBLIC
+
 > :white_check_mark: Implemented
 
 ```

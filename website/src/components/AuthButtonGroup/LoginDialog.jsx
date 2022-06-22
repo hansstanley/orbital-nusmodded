@@ -15,7 +15,7 @@ import {
   LinearProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useAuthSession, useSnackbar } from "../../providers";
+import { useAuthSession } from "../../providers";
 
 export default function LoginDialog({ open, handleClose }) {
   const navigate = useNavigate();
@@ -24,7 +24,6 @@ export default function LoginDialog({ open, handleClose }) {
   const [password, setPassword] = useState("");
   const [validateInput, setValidateInput] = useState("");
   const { handleSignin } = useAuthSession();
-  const { pushSnack } = useSnackbar();
 
   // Enables responsive dialog box
   const theme = useTheme();
@@ -54,17 +53,13 @@ export default function LoginDialog({ open, handleClose }) {
         password: data.get("password"),
       });
       handleCloseReset();
+      navigate("/");
     } catch (error) {
       console.error(error);
-      pushSnack({
-        message: error.message,
-        severity: "error",
-      });
+      setValidateInput(error.message || "Error logging in");
     } finally {
       setLoading(false);
     }
-
-    setValidateInput("");
   };
 
   return (

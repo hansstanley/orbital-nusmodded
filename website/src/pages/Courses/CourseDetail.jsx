@@ -3,10 +3,11 @@ import { Divider, LinearProgress, Stack, Typography } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { NIL as NIL_UUID } from "uuid";
 import { Course } from "../../models";
-import { AuthGuard, ResponsiveStack } from "../../components";
+import { ResponsiveStack } from "../../components";
 import { useCourse, useSnackbar } from "../../providers";
 import { ModuleBox } from "../../components/Mod";
 import { Box } from "@mui/system";
+import EditCourseButton from "./EditCourseButton";
 
 /**
  * Component to show detailed information
@@ -22,7 +23,7 @@ export default function CourseDetail() {
 
   useEffect(() => {
     async function loadCourse(courseId) {
-      const data = getCourse(courseId);
+      const data = getCourse(courseId) || new Course({ id: NIL_UUID });
       setCourse(data);
       setProgress(30);
     }
@@ -41,32 +42,37 @@ export default function CourseDetail() {
   }, [state, getCourse, getCourseMods]);
 
   return (
-    <AuthGuard>
-      <Stack spacing={2} maxHeight="100%">
+    <Stack spacing={2} sx={{ flex: 1 }}>
+      <Stack direction="row" justifyContent="space-between">
         <Typography variant="h6">{course.department}</Typography>
-        <Typography variant="h3" color="primary">
-          {course.title}
-        </Typography>
-        <Box>
-          <LinearProgress
-            variant={loading ? "indeterminate" : "determinate"}
-            value={progress}
-          />
-        </Box>
-        <ResponsiveStack>
-          <Box>
-            <Typography variant="body1">{course.description}</Typography>
-          </Box>
-          <Stack spacing={1}>
-            <Typography variant="h5">Modules</Typography>
-            <Divider />
-            {mods.map((mod) => (
-              <ModuleBox key={mod.moduleCode} moduleCode={mod.moduleCode} />
-            ))}
-          </Stack>
-        </ResponsiveStack>
-        <Divider />
+        <EditCourseButton variant="contained" course={course} />
       </Stack>
-    </AuthGuard>
+      <Typography variant="h3" color="primary">
+        {course.title}
+      </Typography>
+      <Box>
+        <LinearProgress
+          variant={loading ? "indeterminate" : "determinate"}
+          value={progress}
+        />
+      </Box>
+      <ResponsiveStack>
+        <Box>
+          <Typography variant="body1">{course.description}</Typography>
+        </Box>
+        <Stack spacing={1}>
+          <Typography variant="h5">Modules</Typography>
+          <Divider />
+          {mods.length ? (
+            mods.map((mod) => (
+              <ModuleBox key={mod.moduleCode} moduleCode={mod.moduleCode} />
+            ))
+          ) : (
+            <Typography variant="body2">No modules.</Typography>
+          )}
+        </Stack>
+      </ResponsiveStack>
+      <Divider />
+    </Stack>
   );
 }

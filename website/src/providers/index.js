@@ -1,5 +1,4 @@
 import { AppContextProvider } from "./AppContextProvider";
-import { AccessTokenProvider, useAccessToken } from "./access-token.provider";
 import { AuthSessionProvider, useAuthSession } from "./auth-session.provider";
 import { BackendProvider, useBackend } from "./backend.provider";
 import { CourseProvider, useCourse } from "./course.provider";
@@ -13,7 +12,6 @@ import ThemeContextProvider from "./themeContext.provider";
 
 export {
   AppContextProvider,
-  AccessTokenProvider,
   AuthSessionProvider,
   BackendProvider,
   CourseProvider,
@@ -26,11 +24,4 @@ export {
   ThemeContextProvider,
 };
 
-export {
-  useAccessToken,
-  useAuthSession,
-  useBackend,
-  useCourse,
-  useMod,
-  useSnackbar,
-};
+export { useAuthSession, useBackend, useCourse, useMod, useSnackbar };
