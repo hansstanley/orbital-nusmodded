@@ -1,12 +1,12 @@
 import { Stack, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import { useAccessToken } from "../providers";
+import { useAuthSession } from "../providers";
 import AuthButtonGroup from "./AuthButtonGroup";
 
 export default function AuthGuard({ children }) {
-  const { hasAccess } = useAccessToken();
+  const { isAuth } = useAuthSession();
 
-  return hasAccess ? (
+  return isAuth() ? (
     children
   ) : (
     <Box

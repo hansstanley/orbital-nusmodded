@@ -1,13 +1,13 @@
 import { Button, ButtonGroup } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAccessToken } from "../../providers";
+import { useAuthSession } from "../../providers";
 import LoginDialog from "./LoginDialog";
 import LogoutDialog from "./LogoutDialog";
 
 export default function AuthButtonGroup() {
   const navigate = useNavigate();
-  const { hasAccess } = useAccessToken();
+  const { isAuth } = useAuthSession();
   const [loginOpen, setLoginOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
 
@@ -23,7 +23,7 @@ export default function AuthButtonGroup() {
     <>
       <LoginDialog open={loginOpen} handleClose={handleLoginClose} />
       <LogoutDialog open={logoutOpen} handleClose={handleLogoutClose} />
-      {hasAccess ? (
+      {isAuth() ? (
         <Button variant="outlined" onClick={handleLogoutOpen}>
           Logout
         </Button>

@@ -7,24 +7,22 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { supabase } from "../services";
 import { AuthGuard, ResponsiveStack } from "../components";
-import { useAccessToken, useAuthSession, useSnackbar } from "../providers";
+import { useAuthSession, useSnackbar } from "../providers";
 
 export default function Account() {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  const { hasAccess } = useAccessToken();
   const { profile, updateProfile } = useAuthSession();
   const { pushSnack } = useSnackbar();
 
   useEffect(() => {
-    if (hasAccess) {
+    if (profile) {
       setUsername(profile.username);
       setAvatarUrl(profile.avatarUrl);
     }
-  }, [profile, hasAccess]);
+  }, [profile]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -65,12 +63,12 @@ export default function Account() {
             sx={{ height: 240, width: 240, bgcolor: "primary.main" }}
           />
         </Box>
-        <Stack spacing={2}>
+        <Stack spacing={2} sx={{ flex: 1 }}>
           <TextField
             id="email"
             label="Email"
             variant="outlined"
-            value={profile.email || "No email found"}
+            value={profile?.email || "No email found"}
             disabled
           />
           <TextField

@@ -1,6 +1,4 @@
 import {
-  Button,
-  ButtonGroup,
   FormControl,
   InputLabel,
   MenuItem,
@@ -9,36 +7,31 @@ import {
   TextField,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { useState } from "react";
-import { useSnackbar } from "../../providers";
+import { useEffect, useState } from "react";
+import AddCourseButton from "./AddCourseButton";
 import { columns } from "./constants";
 
-export default function CourseHeader() {
-  const { pushSnack } = useSnackbar();
+export default function CourseHeader({
+  handleSort = (sortBy) => {},
+  handleSearch = (searchBy) => {},
+}) {
   const [sortBy, setSortBy] = useState("");
   const [search, setSearch] = useState("");
 
+  useEffect(() => {
+    handleSort(sortBy);
+  }, [sortBy, handleSort]);
+
+  useEffect(() => {
+    handleSearch(search.toLowerCase());
+  }, [search, handleSearch]);
+
   const handleSortByChange = (event) => {
     setSortBy(event.target.value);
-    pushSnack({
-      message: `Sorting by ${event.target.value} (does not yet work)`,
-      severity: "warning",
-    });
   };
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
-    pushSnack({
-      message: `Searching by ${event.target.value} (does not yet work)`,
-      severity: "warning",
-    });
-  };
-
-  const handleAddCourse = () => {
-    pushSnack({
-      message: "Open AddCourseDialog",
-      severity: "warning",
-    });
   };
 
   return (
@@ -47,18 +40,18 @@ export default function CourseHeader() {
       <FormControl size="small" sx={{ minWidth: 100 }}>
         <InputLabel>Sort by</InputLabel>
         <Select value={sortBy} label="Sort by" onChange={handleSortByChange}>
-          <MenuItem value="">None</MenuItem>
-          {columns.map((col) => (
-            <MenuItem key={col.id} value={col.id}>
-              {col.label}
-            </MenuItem>
-          ))}
+          <MenuItem value="None">None</MenuItem>
+          {columns.map((col) =>
+            col.isSort ? (
+              <MenuItem key={col.id} value={col.id}>
+                {col.label}
+              </MenuItem>
+            ) : null
+          )}
         </Select>
       </FormControl>
       <Box sx={{ flex: 1 }} />
-      <Button variant="outlined" onClick={handleAddCourse}>
-        Add course
-      </Button>
+      <AddCourseButton />
     </Stack>
   );
 }

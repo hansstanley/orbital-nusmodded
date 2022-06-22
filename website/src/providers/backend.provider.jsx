@@ -1,11 +1,10 @@
 import axios from "axios";
-import { useContext } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { createContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAccessToken } from "./access-token.provider";
+import { useAuthSession } from "./auth-session.provider";
 import { useSnackbar } from "./snackbar.provider";
-
-const BACKEND_DOMAIN = "https://nusmodded.herokuapp.com";
+import { BACKEND_DOMAIN } from "../utils/constants";
 
 const BackendContext = createContext({
   makeRequest: async ({ method, route, data, params, isPublic = true }) => {
@@ -15,46 +14,43 @@ const BackendContext = createContext({
 });
 
 function BackendProvider({ children }) {
-  const { accessToken, clearAccessToken } = useAccessToken();
+  const { accessToken, handleSignout } = useAuthSession();
   const { pushSnack } = useSnackbar();
   const navigate = useNavigate();
 
-  const makeRequest = async ({
-    method,
-    route,
-    data,
-    params,
-    isPublic = true,
-  }) => {
-    if (!isPublic && !accessToken) {
-      throw new Error("Sign in required for this backend request");
-    }
+  const makeRequest = useCallback(
+    async ({ method, route, data, params, isPublic = true }) => {
+      if (!isPublic && !accessToken) {
+        throw new Error("Sign in required for this backend request");
+      }
 
-    const res = await axios({
-      url: route,
-      method,
-      baseURL: BACKEND_DOMAIN,
-      headers: isPublic ? {} : { Authorization: `Bearer ${accessToken}` },
-      data,
-      params,
-    });
-
-    if (!isPublic && res.status === 401) {
-      pushSnack({
-        message: "Session expired, please login again",
-        severity: "error",
+      const res = await axios({
+        url: route,
+        method,
+        baseURL: BACKEND_DOMAIN,
+        headers: isPublic ? {} : { Authorization: `Bearer ${accessToken}` },
+        data,
+        params,
       });
-      clearAccessToken();
-      navigate("/");
-    }
 
-    return res;
-  };
+      if (!isPublic && res.status === 401) {
+        pushSnack({
+          message: "Session expired, please login again",
+          severity: "error",
+        });
+        handleSignout();
+        navigate("/");
+      }
+
+      return res;
+    },
+    [accessToken, handleSignout, navigate, pushSnack]
+  );
+
+  const value = useMemo(() => ({ makeRequest }), [makeRequest]);
 
   return (
-    <BackendContext.Provider value={{ makeRequest }}>
-      {children}
-    </BackendContext.Provider>
+    <BackendContext.Provider value={value}>{children}</BackendContext.Provider>
   );
 }
 

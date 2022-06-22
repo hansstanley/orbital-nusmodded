@@ -7,7 +7,6 @@ import ModuleInfoProvider from "./moduleInfo.provider";
 import { SnackbarProvider } from "./snackbar.provider";
 import ThemeContextProvider from "./themeContext.provider";
 import CourseInfoProvider from "./courseInfo.provider";
-import { AccessTokenProvider } from "./access-token.provider";
 import { BackendProvider } from "./backend.provider";
 import { CourseProvider } from "./course.provider";
 import { ModProvider } from "./mod.provider";
@@ -28,9 +27,8 @@ function combineComponents(...components) {
 const providers = [
   CookiesProvider,
   SnackbarProvider,
-  AccessTokenProvider,
-  BackendProvider,
   AuthSessionProvider,
+  BackendProvider,
   ThemeContextProvider,
   CourseProvider,
   ModProvider,
