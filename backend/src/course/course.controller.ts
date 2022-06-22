@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ModGroup } from 'src/mod-group/mod-group.entity';
 import { Mod } from 'src/mod/mod.entity';
+import { Public } from 'src/utils/decorators';
 import { Course } from './course.entity';
 import { CourseService } from './course.service';
 import { BindModsDto, CreateCourseDto, UnbindModsDto, UpdateCourseDto } from './dto';
@@ -20,22 +21,26 @@ export class CourseController {
     private readonly courseService: CourseService
   ) { }
 
+  @Public()
   @Get()
   async findAll(): Promise<Course[]> {
     return this.courseService.findAll();
   }
 
+  @Public()
   @Get(':id')
   async find(@Param('id') id: string): Promise<Course> {
     return this.courseService.find(id);
   }
 
+  @Public()
   @Get(':id/modules')
   async getMods(@Param('id') id: string): Promise<Mod[]> {
     const course = await this.courseService.find(id);
     return course.$get('mods');
   }
 
+  @Public()
   @Get(':id/module-groups')
   async getModGroups(@Param('id') id: string): Promise<ModGroup[]> {
     const course = await this.courseService.find(id);
