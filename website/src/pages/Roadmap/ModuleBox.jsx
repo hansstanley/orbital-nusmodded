@@ -26,7 +26,7 @@ export default function ModuleBox(props) {
     return moduleInfo ? (
       <>
         <Card>
-          <CardActionArea onClick={handleClickOpen}>
+          <CardActionArea onClick={handleClickOpen} disableRipple>
             <CardContent sx={{ width: 340, height: 90 }}>
               <Typography variant="caption" position='relative' bottom='5%'>
                 {moduleInfo.moduleCredit} MCs

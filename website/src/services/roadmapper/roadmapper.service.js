@@ -65,6 +65,11 @@ export default class RoadmapperService {
     return this.#roadmap.length;
   }
 
+  getAllModules() {
+    const mods = this.#roadmap.reduce((prev, curr) => prev.concat(curr.modules), []);
+    return mods;
+  }
+
   getModulesFor(year, semester) {
     for (const sem of this.#roadmap) {
       if (sem.year === year && sem.semester === semester) {

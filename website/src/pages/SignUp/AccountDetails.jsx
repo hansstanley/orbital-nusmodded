@@ -103,6 +103,7 @@ export default function SignUp({ activeStep, handleNext }) {
               required
               fullWidth
               id="email"
+              type="email"
               label="Email Address"
               name="email"
             />
