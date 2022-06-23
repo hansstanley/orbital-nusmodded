@@ -17,6 +17,7 @@ const CourseContext = createContext({
   unbindCourseMods: async (courseId, moduleCodes) => 0,
   createCourse: async (data) => new Course(),
   updateCourse: async (courseId, data) => new Course(),
+  deleteCourse: async (courseId) => new Course(),
 });
 
 function CourseProvider({ children }) {
@@ -160,6 +161,21 @@ function CourseProvider({ children }) {
     }
   };
 
+  const deleteCourse = async (courseId) => {
+    const { status, data } = await makeRequest({
+      method: "delete",
+      route: `/course/${courseId}`,
+      isPublic: false,
+    });
+
+    if (status === 200) {
+      setRefresh(true);
+      return plainToInstance(Course, data);
+    } else {
+      throw new Error(`Unable to delete course ${courseId}`);
+    }
+  };
+
   const values = {
     loading,
     getCourseArray,
@@ -170,6 +186,7 @@ function CourseProvider({ children }) {
     unbindCourseMods,
     createCourse,
     updateCourse,
+    deleteCourse,
   };
 
   return (

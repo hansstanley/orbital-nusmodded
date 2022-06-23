@@ -1,5 +1,6 @@
 import {
   Alert,
+  Box,
   Button,
   Collapse,
   Dialog,
@@ -9,7 +10,6 @@ import {
   LinearProgress,
   TextField,
 } from "@mui/material";
-import { Box } from "@mui/system";
 import { Course } from "../../models";
 
 export default function CourseFormDialog({

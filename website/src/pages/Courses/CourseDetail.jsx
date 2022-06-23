@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Divider, LinearProgress, Stack, Typography } from "@mui/material";
+import {
+  ButtonGroup,
+  Divider,
+  LinearProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { NIL as NIL_UUID } from "uuid";
 import { Box } from "@mui/system";
@@ -8,6 +14,7 @@ import { ResponsiveStack } from "../../components";
 import { useCourse, useSnackbar } from "../../providers";
 import { ModuleStack } from "../../components/Mod";
 import EditCourseButton from "./EditCourseButton";
+import DeleteCourseButton from "./DeleteCourseButton";
 
 /**
  * Component to show detailed information
@@ -75,7 +82,10 @@ export default function CourseDetail() {
     <Stack spacing={2} sx={{ flex: 1 }}>
       <Stack direction="row" justifyContent="space-between">
         <Typography variant="h6">{course.department}</Typography>
-        <EditCourseButton variant="contained" course={course} />
+        <Stack direction="row" spacing={1}>
+          <EditCourseButton variant="contained" course={course} />
+          <DeleteCourseButton variant="outlined" course={course} />
+        </Stack>
       </Stack>
       <Typography variant="h3" color="primary">
         {course.title}
@@ -84,6 +94,7 @@ export default function CourseDetail() {
         <LinearProgress
           variant={loading ? "indeterminate" : "determinate"}
           value={progress}
+          sx={{ borderRadius: 1 }}
         />
       </Box>
       <ResponsiveStack>
