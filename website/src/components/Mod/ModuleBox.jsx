@@ -3,7 +3,9 @@ import {
   Button,
   Card,
   CardActionArea,
+  CardActions,
   CardContent,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -14,13 +16,13 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Mod } from "../../models";
 import { useMod, useSnackbar } from "../../providers";
 
-export default function ModuleBox({ id, moduleCode }) {
+export default function ModuleBox({ id, moduleCode, actions = null }) {
   const { getModInfo } = useMod();
   const { pushSnack } = useSnackbar();
   const [mod, setMod] = useState(null);
+  const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -43,6 +45,8 @@ export default function ModuleBox({ id, moduleCode }) {
 
     init();
   }, [pushSnack]);
+
+  const toggleOpen = () => setOpen(!open);
 
   const handleOpenDialog = () => setDialogOpen(!loading);
   const handleCloseDialog = () => setDialogOpen(false);
@@ -81,12 +85,12 @@ export default function ModuleBox({ id, moduleCode }) {
   ) : null;
 
   return (
-    <Card key={id}>
+    <Card key={id} sx={{ width: 320 }}>
       {!loading && !mod ? (
         unknown
       ) : (
-        <CardActionArea onClick={handleOpenDialog}>
-          <CardContent sx={{ width: 240 }}>
+        <CardActionArea onClick={toggleOpen}>
+          <CardContent>
             <Typography variant="subtitle2">
               {loading ? <Skeleton /> : `${mod.moduleCredit} MC`}
             </Typography>
@@ -99,6 +103,13 @@ export default function ModuleBox({ id, moduleCode }) {
           </CardContent>
         </CardActionArea>
       )}
+      <Collapse in={open}>
+        <Divider />
+        <CardActions sx={{ justifyContent: "space-between" }}>
+          <Button onClick={handleOpenDialog}>View</Button>
+          {actions}
+        </CardActions>
+      </Collapse>
       {dialog}
     </Card>
   );

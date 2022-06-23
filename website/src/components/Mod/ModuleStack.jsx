@@ -6,13 +6,11 @@ import {
   Card,
   Collapse,
   IconButton,
-  Paper,
   Stack,
   TextField,
   Tooltip,
   Typography,
   Zoom,
-  CardHeader,
   CardContent,
   CardActions,
   createFilterOptions,
@@ -20,6 +18,7 @@ import {
   Divider,
   InputAdornment,
 } from "@mui/material";
+import { TransitionGroup } from "react-transition-group";
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
 import { useAuthSession, useMod, useSnackbar } from "../../providers";
@@ -29,6 +28,7 @@ export default function ModuleStack({
   title = "Modules",
   mods = [],
   handleAddMods = async (moduleCodes = []) => {},
+  handleDeleteMod = async (moduleCode) => {},
 }) {
   const { isAuth } = useAuthSession();
   const { getModArray } = useMod();
@@ -106,8 +106,28 @@ export default function ModuleStack({
     [mods, search]
   );
 
+  const handleDelete = (moduleCode) => async () => {
+    setLoading(true);
+
+    try {
+      await handleDeleteMod(moduleCode);
+      pushSnack({
+        message: `${moduleCode} deleted!`,
+        severity: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: error.message || `Unable to delete ${moduleCode}`,
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Stack spacing={1} minWidth={240}>
+    <Stack spacing={1} width={320}>
       <Stack
         spacing={2}
         direction="row"
@@ -196,11 +216,26 @@ export default function ModuleStack({
           )}
         </Card>
       </Collapse>
-      {sortMods().length ? (
-        sortMods().map((mod) => (
-          <ModuleBox key={mod.moduleCode} moduleCode={mod.moduleCode} />
-        ))
-      ) : (
+      <TransitionGroup component={Stack} spacing={1}>
+        {sortMods().map((mod) => (
+          <Collapse key={mod.moduleCode}>
+            <ModuleBox
+              key={mod.moduleCode}
+              moduleCode={mod.moduleCode}
+              actions={
+                <Button
+                  color="error"
+                  disabled={loading}
+                  onClick={handleDelete(mod.moduleCode)}
+                >
+                  Delete
+                </Button>
+              }
+            />
+          </Collapse>
+        ))}
+      </TransitionGroup>
+      {sortMods().length ? null : (
         <Typography variant="body2">No modules.</Typography>
       )}
     </Stack>

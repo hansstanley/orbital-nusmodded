@@ -15,7 +15,13 @@ import EditCourseButton from "./EditCourseButton";
  */
 export default function CourseDetail() {
   const { state } = useLocation();
-  const { loading, getCourse, getCourseMods, bindCourseMods } = useCourse();
+  const {
+    loading,
+    getCourse,
+    getCourseMods,
+    bindCourseMods,
+    unbindCourseMods,
+  } = useCourse();
   const { pushSnack } = useSnackbar();
   const [progress, setProgress] = useState(0);
   const [refreshMods, setRefreshMods] = useState(false);
@@ -59,6 +65,12 @@ export default function CourseDetail() {
     return added;
   };
 
+  const handleDeleteMod = async (moduleCode) => {
+    const count = await unbindCourseMods(course.id, [moduleCode]);
+    setRefreshMods(true);
+    return count;
+  };
+
   return (
     <Stack spacing={2} sx={{ flex: 1 }}>
       <Stack direction="row" justifyContent="space-between">
@@ -75,10 +87,14 @@ export default function CourseDetail() {
         />
       </Box>
       <ResponsiveStack>
-        <Box>
+        <Box sx={{ flex: 1 }}>
           <Typography variant="body1">{course.description}</Typography>
         </Box>
-        <ModuleStack mods={mods} handleAddMods={handleAddMods} />
+        <ModuleStack
+          mods={mods}
+          handleAddMods={handleAddMods}
+          handleDeleteMod={handleDeleteMod}
+        />
       </ResponsiveStack>
       <Divider />
     </Stack>

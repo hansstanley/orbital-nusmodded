@@ -14,6 +14,7 @@ const CourseContext = createContext({
   getCourse: (courseId) => new Course({ id: courseId }),
   getCourseMods: async (courseId) => [],
   bindCourseMods: async (courseId, { type, moduleCodes }) => [],
+  unbindCourseMods: async (courseId, moduleCodes) => 0,
   createCourse: async (data) => new Course(),
   updateCourse: async (courseId, data) => new Course(),
 });
@@ -103,7 +104,22 @@ function CourseProvider({ children }) {
       if (unbound.length) console.error("Unable to bind", unbound);
       return data.bound;
     } else {
-      throw new Error();
+      throw new Error(`Unable to bind modules to course`);
+    }
+  };
+
+  const unbindCourseMods = async (courseId, moduleCodes = []) => {
+    const { status, data } = await makeRequest({
+      method: "post",
+      route: `/course/${courseId}/remove-modules`,
+      data: { moduleCodes },
+      isPublic: false,
+    });
+
+    if (status === 200 && data) {
+      return data.count;
+    } else {
+      throw new Error(`Unable to bind modules from course`);
     }
   };
 
@@ -151,6 +167,7 @@ function CourseProvider({ children }) {
     getCourse,
     getCourseMods,
     bindCourseMods,
+    unbindCourseMods,
     createCourse,
     updateCourse,
   };

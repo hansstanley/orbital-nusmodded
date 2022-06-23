@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuthSession } from "../../providers";
-import { supabase } from "../../services";
 
 export default function LogoutDialog({ open, handleClose }) {
   const navigate = useNavigate();
