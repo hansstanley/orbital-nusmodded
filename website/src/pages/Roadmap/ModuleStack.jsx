@@ -17,72 +17,104 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const roadmapperService = new RoadmapperService();
 
-
-const SortableItem = SortableElement(({ moduleCode, index }) => (
-  <ModuleBox moduleCode={moduleCode} key={index} />
-));
-
-const SortableList = SortableContainer(({ items }) => (
-  <Stack direction="row" spacing = {2}>
-    {items.map((moduleCode, index) => (
-      <SortableItem moduleCode={moduleCode} index={index} />
-    ))}
-  </Stack>
-));
-
-function Semester(props) {
-  const { modules, year, semester } = props;
-  const [moduleList, setModuleList] = React.useState(modules);
-
-  const onSortEnd = ({oldIndex, newIndex}) => {
-    setModuleList(arrayMoveImmutable(moduleList, oldIndex, newIndex));
-  };
-
+ function Semester(props) {
+  const { modules, year, semester, index } = props;
 
   return (
-    <Stack spacing={1} direction = "row">
-      <Typography variant="h6" sx={{ alignSelf: "center" }}>
-        Y{year}S{semester}
-      </Typography>
-      <Divider />
-      <SortableList
-					axis={'xy'}
-          distance={1}
-					items={moduleList}
-					onSortEnd={onSortEnd}
-          onSortStart={(_, event) => event.preventDefault()}
-				/>
-    </Stack>
+    <Droppable droppableId={String(index + 1)} direction="horizontal">
+      {(provided) => (
+        <div {...provided.droppableProps} ref={provided.innerRef}>
+          <Stack spacing={1} direction = "row" ref = {provided.innerRef}>
+            <Typography variant="h6" sx={{ alignSelf: "center" }}>
+              Y{year}S{semester}
+            </Typography>
+            <Divider />
+            {modules.map((moduleCode, index) => (
+              <ModuleBox moduleCode={moduleCode} key={moduleCode} index = {index} />
+            ))}
+          </Stack>
+        </div>
+      )}
+      </Droppable>
   );
-}
-
-/* function Semester(props) {
-  const { modules, year, semester } = props;
-
-  return (
-    <Stack spacing={1} direction = "row">
-      <Typography variant="h6" sx={{ alignSelf: "center" }}>
-        Y{year}S{semester}
-      </Typography>
-      <Divider />
-      {modules.map((moduleCode, index) => (
-        <ModuleBox moduleCode={moduleCode} key={index} />
-      ))}
-    </Stack>
-  );
-} */
+} 
 
 export default function NestedGrid() {
+  const [roadMap, setRoadMap] = React.useState(roadmapperService.getRoadmap());
+
+  const onDragEnd = ({ source, destination, draggableId }) => {
+    // dropped inside of the list
+    if (source && destination) {
+      setRoadMap(prevState => {
+        const { index: sourceIndex, droppableId: sourceId } = source;
+
+        const {
+          index: destinationIndex,
+          droppableId: destinationId
+        } = destination;
+     
+        const sourceSemester = prevState.find(
+          sem => parseInt(sem.id) === parseInt(sourceId)
+        );
+
+        const destinationSemester = prevState.find(
+          sem => parseInt(sem.id) === parseInt(destinationId)
+        );
+
+        const sourceModules = sourceSemester.modules;
+
+        const destinationModules = destinationSemester.modules;
+
+        const isSameSemester = sourceSemester.id === destinationSemester.id;
+
+        sourceModules.splice(sourceIndex, 1);
+
+        if (isSameSemester) {
+          sourceModules.splice(destinationIndex, 0, draggableId);
+        } else {
+          destinationModules.splice(destinationIndex, 0, draggableId);
+        }
+
+        const newSourceSemester = {
+          ...sourceSemester,
+          modules: sourceModules
+        };
+
+        const newDestinationSemester = {
+          ...destinationSemester,
+          modules: destinationModules
+        };
+
+        const roadmap = prevState.map(roadmap => {
+          if (roadmap.id === newSourceSemester.id) {
+            return newSourceSemester;
+          } else if (
+            roadmap.id === newDestinationSemester.id &&
+            !isSameSemester
+          ) {
+            return newDestinationSemester;
+          } else {
+            return roadmap;
+          }
+        });
+
+        return roadmap;
+      });
+    }
+  };
+
   return (
     <Stack spacing={1.5}>
+    <DragDropContext onDragEnd={onDragEnd}>
       {roadmapperService.getRoadmap().map((sem, index) => (
         <Semester
           modules={sem.modules}
           year={sem.year}
           semester={sem.semester}
-          key={index}
+          index={index}
         />
       ))}
+      </DragDropContext>
     </Stack>
   );
 }
