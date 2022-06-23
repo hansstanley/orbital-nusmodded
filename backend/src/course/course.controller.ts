@@ -13,7 +13,7 @@ import { Mod } from 'src/mod/mod.entity';
 import { Public } from 'src/utils/decorators';
 import { Course } from './course.entity';
 import { CourseService } from './course.service';
-import { BindModsDto, CreateCourseDto, UnbindModsDto, UpdateCourseDto } from './dto';
+import { BindModGroupsDto, BindModsDto, CreateCourseDto, UnbindModGroupsDto, UnbindModsDto, UpdateCourseDto } from './dto';
 
 @Controller('course')
 export class CourseController {
@@ -90,6 +90,38 @@ export class CourseController {
     );
 
     return { count };
+  }
+
+  @Post(':id/add-module-groups')
+  @HttpCode(HttpStatus.OK)
+  async bindModGroups(
+    @Param('id') id: string,
+    @Body() bindModGroupsDto: BindModGroupsDto
+  ): Promise<{ bound: string[] }> {
+    const course = await this.courseService.find(id);
+
+    const ids = await this.courseService.bindModGroups(
+      course,
+      bindModGroupsDto
+    );
+
+    return { bound: ids };
+  }
+
+  @Post(':id/remove-module-groups')
+  @HttpCode(HttpStatus.OK)
+  async unbindModGroups(
+    @Param('id') id: string,
+    @Body() unbindModGroupsDto: UnbindModGroupsDto
+  ): Promise<{ count: number }> {
+    const course = await this.courseService.find(id);
+
+    const count = await this.courseService.unbindModGroups(
+      course,
+      unbindModGroupsDto
+    );
+
+    return { count }
   }
 
   @Delete(':id')
