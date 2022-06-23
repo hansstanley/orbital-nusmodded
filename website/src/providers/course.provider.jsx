@@ -13,6 +13,7 @@ const CourseContext = createContext({
   getCourseMap: () => new Map(),
   getCourse: (courseId) => new Course({ id: courseId }),
   getCourseMods: async (courseId) => [],
+  bindCourseMods: async (courseId, { type, moduleCodes }) => [],
   createCourse: async (data) => new Course(),
   updateCourse: async (courseId, data) => new Course(),
 });
@@ -86,6 +87,26 @@ function CourseProvider({ children }) {
     }
   };
 
+  const bindCourseMods = async (
+    courseId,
+    { type = "Core", moduleCodes = [] }
+  ) => {
+    const { status, data } = await makeRequest({
+      method: "post",
+      route: `/course/${courseId}/add-modules`,
+      data: { type, moduleCodes },
+      isPublic: false,
+    });
+
+    if (status === 200 && Array.isArray(data?.bound)) {
+      const unbound = moduleCodes.filter((code) => !data.bound.includes(code));
+      if (unbound.length) console.error("Unable to bind", unbound);
+      return data.bound;
+    } else {
+      throw new Error();
+    }
+  };
+
   const createCourse = async ({ title, department, description }) => {
     const { status, data } = await makeRequest({
       method: "post",
@@ -129,6 +150,7 @@ function CourseProvider({ children }) {
     getCourseMap,
     getCourse,
     getCourseMods,
+    bindCourseMods,
     createCourse,
     updateCourse,
   };

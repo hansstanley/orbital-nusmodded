@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { Divider, LinearProgress, Stack, Typography } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { NIL as NIL_UUID } from "uuid";
+import { Box } from "@mui/system";
 import { Course } from "../../models";
 import { ResponsiveStack } from "../../components";
 import { useCourse, useSnackbar } from "../../providers";
-import { ModuleBox } from "../../components/Mod";
-import { Box } from "@mui/system";
+import { ModuleStack } from "../../components/Mod";
 import EditCourseButton from "./EditCourseButton";
 
 /**
@@ -15,9 +15,10 @@ import EditCourseButton from "./EditCourseButton";
  */
 export default function CourseDetail() {
   const { state } = useLocation();
-  const { loading, getCourse, getCourseMods } = useCourse();
+  const { loading, getCourse, getCourseMods, bindCourseMods } = useCourse();
   const { pushSnack } = useSnackbar();
   const [progress, setProgress] = useState(0);
+  const [refreshMods, setRefreshMods] = useState(false);
   const [course, setCourse] = useState(new Course({ id: NIL_UUID }));
   const [mods, setMods] = useState([]);
 
@@ -28,18 +29,35 @@ export default function CourseDetail() {
       setProgress(30);
     }
 
-    async function loadMods(courseId) {
-      const data = await getCourseMods(courseId);
-      setMods(data);
-      setProgress(100);
-    }
-
     if (state?.courseId) {
       setProgress(0);
       loadCourse(state.courseId);
-      loadMods(state.courseId);
+      setRefreshMods(true);
     }
   }, [state, getCourse, getCourseMods]);
+
+  useEffect(() => {
+    async function loadMods(courseId) {
+      setProgress(30);
+      const data = await getCourseMods(courseId);
+      setMods(data);
+      setProgress(100);
+      setRefreshMods(false);
+    }
+
+    if (state?.courseId && refreshMods) {
+      loadMods(state.courseId);
+    }
+  }, [state, refreshMods, getCourseMods]);
+
+  const handleAddMods = async (moduleCodes = []) => {
+    const added = await bindCourseMods(course.id, {
+      type: "Core",
+      moduleCodes: moduleCodes,
+    });
+    setRefreshMods(true);
+    return added;
+  };
 
   return (
     <Stack spacing={2} sx={{ flex: 1 }}>
@@ -60,17 +78,7 @@ export default function CourseDetail() {
         <Box>
           <Typography variant="body1">{course.description}</Typography>
         </Box>
-        <Stack spacing={1}>
-          <Typography variant="h5">Modules</Typography>
-          <Divider />
-          {mods.length ? (
-            mods.map((mod) => (
-              <ModuleBox key={mod.moduleCode} moduleCode={mod.moduleCode} />
-            ))
-          ) : (
-            <Typography variant="body2">No modules.</Typography>
-          )}
-        </Stack>
+        <ModuleStack mods={mods} handleAddMods={handleAddMods} />
       </ResponsiveStack>
       <Divider />
     </Stack>

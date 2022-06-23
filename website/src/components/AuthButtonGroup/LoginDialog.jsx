@@ -19,11 +19,11 @@ import { useAuthSession } from "../../providers";
 
 export default function LoginDialog({ open, handleClose }) {
   const navigate = useNavigate();
+  const { handleSignin } = useAuthSession();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [validateInput, setValidateInput] = useState("");
-  const { handleSignin } = useAuthSession();
 
   // Enables responsive dialog box
   const theme = useTheme();
