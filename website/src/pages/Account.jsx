@@ -1,12 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import {
-  Avatar,
-  Box,
-  Button,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { useEffect, useState } from "react";
+import { Avatar, Box, Button, Stack, TextField } from "@mui/material";
 import { AuthGuard, ResponsiveStack } from "../components";
 import { useAuthSession, useSnackbar } from "../providers";
 

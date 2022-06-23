@@ -13,8 +13,11 @@ const CourseContext = createContext({
   getCourseMap: () => new Map(),
   getCourse: (courseId) => new Course({ id: courseId }),
   getCourseMods: async (courseId) => [],
+  bindCourseMods: async (courseId, { type, moduleCodes }) => [],
+  unbindCourseMods: async (courseId, moduleCodes) => 0,
   createCourse: async (data) => new Course(),
   updateCourse: async (courseId, data) => new Course(),
+  deleteCourse: async (courseId) => new Course(),
 });
 
 function CourseProvider({ children }) {
@@ -86,6 +89,41 @@ function CourseProvider({ children }) {
     }
   };
 
+  const bindCourseMods = async (
+    courseId,
+    { type = "Core", moduleCodes = [] }
+  ) => {
+    const { status, data } = await makeRequest({
+      method: "post",
+      route: `/course/${courseId}/add-modules`,
+      data: { type, moduleCodes },
+      isPublic: false,
+    });
+
+    if (status === 200 && Array.isArray(data?.bound)) {
+      const unbound = moduleCodes.filter((code) => !data.bound.includes(code));
+      if (unbound.length) console.error("Unable to bind", unbound);
+      return data.bound;
+    } else {
+      throw new Error(`Unable to bind modules to course`);
+    }
+  };
+
+  const unbindCourseMods = async (courseId, moduleCodes = []) => {
+    const { status, data } = await makeRequest({
+      method: "post",
+      route: `/course/${courseId}/remove-modules`,
+      data: { moduleCodes },
+      isPublic: false,
+    });
+
+    if (status === 200 && data) {
+      return data.count;
+    } else {
+      throw new Error(`Unable to bind modules from course`);
+    }
+  };
+
   const createCourse = async ({ title, department, description }) => {
     const { status, data } = await makeRequest({
       method: "post",
@@ -123,14 +161,32 @@ function CourseProvider({ children }) {
     }
   };
 
+  const deleteCourse = async (courseId) => {
+    const { status, data } = await makeRequest({
+      method: "delete",
+      route: `/course/${courseId}`,
+      isPublic: false,
+    });
+
+    if (status === 200) {
+      setRefresh(true);
+      return plainToInstance(Course, data);
+    } else {
+      throw new Error(`Unable to delete course ${courseId}`);
+    }
+  };
+
   const values = {
     loading,
     getCourseArray,
     getCourseMap,
     getCourse,
     getCourseMods,
+    bindCourseMods,
+    unbindCourseMods,
     createCourse,
     updateCourse,
+    deleteCourse,
   };
 
   return (
