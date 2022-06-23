@@ -71,7 +71,7 @@ export default function CourseTable({ sortBy = "", searchBy = "" }) {
                 </TableCell>
               ))}
               <TableCell align="center">
-                <Button onClick={handleExplore(course.id)}>Explore</Button>
+                <Button onClick={handleExplore(course.id)}>View</Button>
                 <EditCourseButton course={course} />
               </TableCell>
             </TableRow>

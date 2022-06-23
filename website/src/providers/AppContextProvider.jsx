@@ -10,6 +10,7 @@ import CourseInfoProvider from "./courseInfo.provider";
 import { BackendProvider } from "./backend.provider";
 import { CourseProvider } from "./course.provider";
 import { ModProvider } from "./mod.provider";
+import { ModGroupProvider } from "./mod-group.provider";
 
 function combineComponents(...components) {
   return components.reduce(
@@ -32,6 +33,7 @@ const providers = [
   ThemeContextProvider,
   CourseProvider,
   ModProvider,
+  ModGroupProvider,
   ModuleInfoProvider,
   LandingProvider,
   DrawerContextProvider,

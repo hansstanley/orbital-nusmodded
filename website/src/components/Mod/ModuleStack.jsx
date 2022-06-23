@@ -134,7 +134,7 @@ export default function ModuleStack({
         justifyContent="space-between"
         alignItems="center"
       >
-        <Typography variant="h5">{title}</Typography>
+        <Typography variant="h6">{title}</Typography>
         <Zoom in={!open}>
           <IconButton
             size="inherit"
@@ -150,7 +150,7 @@ export default function ModuleStack({
         fullWidth
         size="small"
         margin="dense"
-        label="Search"
+        label="Search module code"
         value={search}
         onChange={handleSearch}
         InputProps={{
@@ -225,7 +225,7 @@ export default function ModuleStack({
               actions={
                 <Button
                   color="error"
-                  disabled={loading}
+                  disabled={!isAuth() || loading}
                   onClick={handleDelete(mod.moduleCode)}
                 >
                   Delete

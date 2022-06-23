@@ -90,7 +90,7 @@ export default function DeleteCourseButton({
               </Typography>
               <Divider />
               <Typography>
-                Type <b>{course.title}</b> to confirm
+                Type <b>{course.title}</b> to confirm:
               </Typography>
               <TextField
                 name="title"

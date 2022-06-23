@@ -3,6 +3,7 @@ import {
   ButtonGroup,
   Divider,
   LinearProgress,
+  Skeleton,
   Stack,
   Typography,
 } from "@mui/material";
@@ -15,6 +16,7 @@ import { useCourse, useSnackbar } from "../../providers";
 import { ModuleStack } from "../../components/Mod";
 import EditCourseButton from "./EditCourseButton";
 import DeleteCourseButton from "./DeleteCourseButton";
+import { ModGroupBox, ModGroupStack } from "../../components/ModGroup";
 
 /**
  * Component to show detailed information
@@ -26,24 +28,42 @@ export default function CourseDetail() {
     loading,
     getCourse,
     getCourseMods,
+    getCourseModGroups,
     bindCourseMods,
     unbindCourseMods,
   } = useCourse();
   const { pushSnack } = useSnackbar();
   const [progress, setProgress] = useState(0);
+  const [loaded, setLoaded] = useState({
+    courseStatus: false,
+    modsStatus: false,
+    modGroupsStatus: false,
+  });
   const [refreshMods, setRefreshMods] = useState(false);
   const [course, setCourse] = useState(new Course({ id: NIL_UUID }));
   const [mods, setMods] = useState([]);
+  const [modGroups, setModGroups] = useState([]);
+
+  useEffect(() => {
+    let progressValue = 0;
+    if (loaded.courseStatus) progressValue += 20;
+    if (loaded.modsStatus) progressValue += 40;
+    if (loaded.modGroupsStatus) progressValue += 40;
+    setProgress(progressValue);
+  }, [loaded]);
 
   useEffect(() => {
     async function loadCourse(courseId) {
       const data = getCourse(courseId) || new Course({ id: NIL_UUID });
       setCourse(data);
-      setProgress(30);
+
+      setLoaded((loaded) => {
+        const { courseStatus, ...others } = loaded;
+        return { courseStatus: true, ...others };
+      });
     }
 
     if (state?.courseId) {
-      setProgress(0);
       loadCourse(state.courseId);
       setRefreshMods(true);
     }
@@ -51,17 +71,36 @@ export default function CourseDetail() {
 
   useEffect(() => {
     async function loadMods(courseId) {
-      setProgress(30);
       const data = await getCourseMods(courseId);
       setMods(data);
-      setProgress(100);
       setRefreshMods(false);
+
+      setLoaded((loaded) => {
+        const { modsStatus, ...others } = loaded;
+        return { modsStatus: true, ...others };
+      });
     }
 
     if (state?.courseId && refreshMods) {
       loadMods(state.courseId);
     }
   }, [state, refreshMods, getCourseMods]);
+
+  useEffect(() => {
+    async function loadModGroups(courseId) {
+      const data = await getCourseModGroups(courseId);
+      setModGroups(data);
+
+      setLoaded((loaded) => {
+        const { modGroupsStatus, ...others } = loaded;
+        return { modGroupsStatus: true, ...others };
+      });
+    }
+
+    if (state?.courseId) {
+      loadModGroups(state.courseId);
+    }
+  }, [state, getCourseModGroups]);
 
   const handleAddMods = async (moduleCodes = []) => {
     const added = await bindCourseMods(course.id, {
@@ -81,14 +120,16 @@ export default function CourseDetail() {
   return (
     <Stack spacing={2} sx={{ flex: 1 }}>
       <Stack direction="row" justifyContent="space-between">
-        <Typography variant="h6">{course.department}</Typography>
+        <Typography variant="h6">
+          {loading ? <Skeleton width={120} /> : course.department}
+        </Typography>
         <Stack direction="row" spacing={1}>
           <EditCourseButton variant="contained" course={course} />
           <DeleteCourseButton variant="outlined" course={course} />
         </Stack>
       </Stack>
       <Typography variant="h3" color="primary">
-        {course.title}
+        {loading ? <Skeleton /> : course.title}
       </Typography>
       <Box>
         <LinearProgress
@@ -99,13 +140,20 @@ export default function CourseDetail() {
       </Box>
       <ResponsiveStack>
         <Box sx={{ flex: 1 }}>
-          <Typography variant="body1">{course.description}</Typography>
+          <Typography variant="body1">
+            {loading ? (
+              <Skeleton variant="rectangular" height={120} />
+            ) : (
+              course.description
+            )}
+          </Typography>
         </Box>
         <ModuleStack
           mods={mods}
           handleAddMods={handleAddMods}
           handleDeleteMod={handleDeleteMod}
         />
+        <ModGroupStack modGroups={modGroups} />
       </ResponsiveStack>
       <Divider />
     </Stack>

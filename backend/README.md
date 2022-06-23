@@ -474,6 +474,52 @@ type body = {
 };
 ```
 
+#### Add module groups to course
+
+> :white_check_mark: Implemented
+
+```
+POST /course/{courseId}/add-module-groups
+```
+
+```typescript
+type courseId = string; // UUID V4
+type body = {
+  groupIds: string[]; // Module group UUIDs to add
+};
+```
+
+Response `200 OK`:
+
+```typescript
+type body = {
+  bound: string[]; // Module group UUIDs added
+};
+```
+
+#### Remove module groups from course
+
+> :white_check_mark: Implemented
+
+```
+POST /course/{courseId}/remove-module-groups
+```
+
+```typescript
+type courseId = string; // UUID V4
+type body = {
+  groupIds: string[]; // Module group UUIDs to remove
+};
+```
+
+Response `200 OK`:
+
+```typescript
+type body = {
+  count: number; // Number of module groups removed
+};
+```
+
 </details>
 
 <details><summary>Module groups</summary>
@@ -689,6 +735,8 @@ type ModGroup = {
   id: string; // UUID V4
   name: string;
   description: string;
+  minimum: number;
+  maximum: number;
   createdAt: Date;
   updatedAt: Date;
 };

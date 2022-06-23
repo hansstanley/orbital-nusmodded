@@ -2,7 +2,7 @@ import { plainToInstance } from "class-transformer";
 import { useCallback, useContext } from "react";
 import { useEffect } from "react";
 import { createContext } from "react";
-import { Course, Mod } from "../models";
+import { Course, Mod, ModGroup } from "../models";
 import { useBackend } from "./backend.provider";
 import { useState } from "react";
 import { useSnackbar } from "./snackbar.provider";
@@ -13,6 +13,7 @@ const CourseContext = createContext({
   getCourseMap: () => new Map(),
   getCourse: (courseId) => new Course({ id: courseId }),
   getCourseMods: async (courseId) => [],
+  getCourseModGroups: async (courseId) => [],
   bindCourseMods: async (courseId, { type, moduleCodes }) => [],
   unbindCourseMods: async (courseId, moduleCodes) => 0,
   createCourse: async (data) => new Course(),
@@ -83,8 +84,21 @@ function CourseProvider({ children }) {
     if (status === 200 && Array.isArray(data)) {
       return data.map((raw) => plainToInstance(Mod, raw));
     } else {
+      throw new Error(`Unable to retrieve modules for course ${courseId}`);
+    }
+  };
+
+  const getCourseModGroups = async (courseId) => {
+    const { status, data } = await makeRequest({
+      method: "get",
+      route: `/course/${courseId}/module-groups`,
+    });
+
+    if (status === 200 && Array.isArray(data)) {
+      return data.map((raw) => plainToInstance(ModGroup, raw));
+    } else {
       throw new Error(
-        `Unable to retrieve modules for course ${courseMap.get(courseId).id}`
+        `Unable to retrieve module groups for course ${courseId}`
       );
     }
   };
@@ -105,7 +119,7 @@ function CourseProvider({ children }) {
       if (unbound.length) console.error("Unable to bind", unbound);
       return data.bound;
     } else {
-      throw new Error(`Unable to bind modules to course`);
+      throw new Error(`Unable to bind modules to course ${courseId}`);
     }
   };
 
@@ -120,7 +134,7 @@ function CourseProvider({ children }) {
     if (status === 200 && data) {
       return data.count;
     } else {
-      throw new Error(`Unable to bind modules from course`);
+      throw new Error(`Unable to unbind modules from course ${courseId}`);
     }
   };
 
@@ -157,7 +171,7 @@ function CourseProvider({ children }) {
       setRefresh(true);
       return plainToInstance(Course, data);
     } else {
-      throw new Error(`Unable to update course ${title}`);
+      throw new Error(`Unable to update course ${courseId}`);
     }
   };
 
@@ -182,6 +196,7 @@ function CourseProvider({ children }) {
     getCourseMap,
     getCourse,
     getCourseMods,
+    getCourseModGroups,
     bindCourseMods,
     unbindCourseMods,
     createCourse,

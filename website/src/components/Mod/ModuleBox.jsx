@@ -44,7 +44,7 @@ export default function ModuleBox({ id, moduleCode, actions = null }) {
     }
 
     init();
-  }, [pushSnack]);
+  }, [moduleCode, getModInfo, pushSnack]);
 
   const toggleOpen = () => setOpen(!open);
 
@@ -85,7 +85,7 @@ export default function ModuleBox({ id, moduleCode, actions = null }) {
   ) : null;
 
   return (
-    <Card key={id} sx={{ width: 320 }}>
+    <Card key={id || moduleCode} sx={{ width: 320 }}>
       {!loading && !mod ? (
         unknown
       ) : (

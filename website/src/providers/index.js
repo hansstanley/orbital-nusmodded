@@ -5,6 +5,7 @@ import { CourseProvider, useCourse } from "./course.provider";
 import DrawerContextProvider from "./drawer.provider";
 import DurationContextProvider from "./duration.provider";
 import LandingProvider from "./landing.provider";
+import { ModGroupProvider, useModGroup } from "./mod-group.provider";
 import { ModProvider, useMod } from "./mod.provider";
 import ModuleInfoProvider from "./moduleInfo.provider";
 import { SnackbarProvider, useSnackbar } from "./snackbar.provider";
@@ -18,10 +19,18 @@ export {
   DrawerContextProvider,
   DurationContextProvider,
   LandingProvider,
+  ModGroupProvider,
   ModProvider,
   ModuleInfoProvider,
   SnackbarProvider,
   ThemeContextProvider,
 };
 
-export { useAuthSession, useBackend, useCourse, useMod, useSnackbar };
+export {
+  useAuthSession,
+  useBackend,
+  useCourse,
+  useModGroup,
+  useMod,
+  useSnackbar,
+};
