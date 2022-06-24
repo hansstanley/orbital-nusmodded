@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsInt, IsOptional, IsString } from "class-validator";
 
 export class CreateModGroupDto {
   @IsString()
@@ -15,4 +15,7 @@ export class CreateModGroupDto {
   @IsOptional()
   @IsInt()
   maximum?: number;
+
+  @IsBoolean()
+  global: boolean;
 }
