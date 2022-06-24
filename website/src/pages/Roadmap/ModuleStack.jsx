@@ -106,6 +106,28 @@ export default function NestedGrid() {
       });
     }
   };
+  const handleAdd = (selected) => {
+    setRoadMap(prevState => {
+      const holdingSemester = prevState.find(
+        sem => parseInt(sem.id) === -1
+      );
+      const sourceModules = holdingSemester.modules.concat(selected.map((mod) => mod.moduleCode));
+      console.log("hold" + holdingSemester.modules);
+      console.log("sourceModules" + sourceModules);
+      const newHoldingSemester = {
+        ...holdingSemester,
+        modules: sourceModules
+      };
+      const roadmap = prevState.map(roadmap => {
+        if (roadmap.id === newHoldingSemester.id) {
+          return newHoldingSemester;
+        } else {
+          return roadmap;
+        }
+      });
+      return roadmap;
+    });
+  }
 
   return (
     <Stack spacing={1.5}>
@@ -118,7 +140,7 @@ export default function NestedGrid() {
           index={index}
         />
       ))}
-      <RightDrawer roadmapperService = {roadmapperService}/>
+      <RightDrawer roadMap = {roadMap} handleAdd = {handleAdd}/>
       </DragDropContext>
     </Stack>
   );

@@ -84,14 +84,6 @@ export default class RoadmapperService {
     return mods;
   }
 
-  setModules(year, semester, modules) {
-    this.#roadmap.find(sem => sem.year === year && sem.semester === semester).modules = modules;
-  }
-  
-  setModules(id, modules) {
-    this.#roadmap.find(sem => sem.id === id).modules = modules;
-  }
-
   getModulesFor(year, semester) {
     for (const sem of this.#roadmap) {
       if (sem.year === year && sem.semester === semester) {

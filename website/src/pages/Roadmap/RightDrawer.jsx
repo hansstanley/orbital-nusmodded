@@ -20,7 +20,7 @@ const drawerWidth = 350;
 
 
 
-export default function DrawerRight({roadmapperService}) {
+export default function DrawerRight({roadMap, handleAdd}) {
   const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = () => {
@@ -58,7 +58,7 @@ export default function DrawerRight({roadmapperService}) {
             <ChevronRightIcon />
           </IconButton>
         <Divider />
-          <AddModules sx={{zIndex: 2000}} handleDrawerClose = {handleDrawerClose} roadmapperService = {roadmapperService}/>
+          <AddModules sx={{zIndex: 2000}} roadMap = {roadMap} handleAdd = {handleAdd}/>
         </Paper>
       </Drawer>
     </Box>

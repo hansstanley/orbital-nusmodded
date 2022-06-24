@@ -25,7 +25,7 @@ import { useAuthSession, useMod, useSnackbar } from "../../providers";
 import ModuleBox from "./ModuleBox";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
-export default function ModuleStack({handleDrawerClose, roadmapperService}) {
+export default function ModuleStack({roadMap, handleAdd}) {
   const { isAuth } = useAuthSession();
   const { getModArray } = useMod();
   const { pushSnack } = useSnackbar();
@@ -34,7 +34,7 @@ export default function ModuleStack({handleDrawerClose, roadmapperService}) {
   const [modArray, setModArray] = useState([]);
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
-  const [roadMap, setRoadMap] = useState(roadmapperService.getRoadmap());
+  // const [roadMap, setRoadMap] = useState(roadmapperService.getRoadmap());
 
   useEffect(() => {
     async function init() {
@@ -96,24 +96,7 @@ export default function ModuleStack({handleDrawerClose, roadmapperService}) {
   // };
 
   const handleSubmit = () => {
-    setRoadMap(prevState => {
-      const holdingSemester = prevState.find(
-        sem => parseInt(sem.id) === -1
-      );
-      const sourceModules = holdingSemester.modules.concat(selected.map((mod) => mod.moduleCode));
-      const newHoldingSemester = {
-        ...holdingSemester,
-        modules: sourceModules
-      };
-      const roadmap = prevState.map(roadmap => {
-        if (roadmap.id === newHoldingSemester.id) {
-          return newHoldingSemester;
-        } else {
-          return roadmap;
-        }
-      });
-      return roadmap;
-    });
+    handleAdd(selected);
     console.log(roadMap.find(sem => parseInt(sem.id) === -1));
     handleClose();
   };
@@ -237,7 +220,7 @@ export default function ModuleStack({handleDrawerClose, roadmapperService}) {
               />
           ))}
         </Stack>
-            {roadmapperService.getRoadmap().find(sem => parseInt(sem.id) === -1).modules.length ? null : (
+            {roadMap.find(sem => parseInt(sem.id) === -1).modules.length ? null : (
             <Typography variant="body2">No modules.</Typography>
           )}
         </div>
