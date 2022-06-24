@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  ButtonGroup,
   Divider,
   LinearProgress,
   Skeleton,
@@ -16,7 +15,7 @@ import { useCourse, useSnackbar } from "../../providers";
 import { ModuleStack } from "../../components/Mod";
 import EditCourseButton from "./EditCourseButton";
 import DeleteCourseButton from "./DeleteCourseButton";
-import { ModGroupBox, ModGroupStack } from "../../components/ModGroup";
+import { ModGroupStack } from "../../components/ModGroup";
 
 /**
  * Component to show detailed information
@@ -31,6 +30,8 @@ export default function CourseDetail() {
     getCourseModGroups,
     bindCourseMods,
     unbindCourseMods,
+    bindCourseModGroups,
+    unbindCourseModGroups,
   } = useCourse();
   const { pushSnack } = useSnackbar();
   const [progress, setProgress] = useState(0);
@@ -40,6 +41,7 @@ export default function CourseDetail() {
     modGroupsStatus: false,
   });
   const [refreshMods, setRefreshMods] = useState(false);
+  const [refreshModGroups, setRefreshModGroups] = useState(false);
   const [course, setCourse] = useState(new Course({ id: NIL_UUID }));
   const [mods, setMods] = useState([]);
   const [modGroups, setModGroups] = useState([]);
@@ -66,8 +68,9 @@ export default function CourseDetail() {
     if (state?.courseId) {
       loadCourse(state.courseId);
       setRefreshMods(true);
+      setRefreshModGroups(true);
     }
-  }, [state, getCourse, getCourseMods]);
+  }, [state, getCourse]);
 
   useEffect(() => {
     async function loadMods(courseId) {
@@ -90,6 +93,7 @@ export default function CourseDetail() {
     async function loadModGroups(courseId) {
       const data = await getCourseModGroups(courseId);
       setModGroups(data);
+      setRefreshModGroups(false);
 
       setLoaded((loaded) => {
         const { modGroupsStatus, ...others } = loaded;
@@ -97,10 +101,10 @@ export default function CourseDetail() {
       });
     }
 
-    if (state?.courseId) {
+    if (state?.courseId && refreshModGroups) {
       loadModGroups(state.courseId);
     }
-  }, [state, getCourseModGroups]);
+  }, [state, refreshModGroups, getCourseModGroups]);
 
   const handleAddMods = async (moduleCodes = []) => {
     const added = await bindCourseMods(course.id, {
@@ -114,6 +118,18 @@ export default function CourseDetail() {
   const handleDeleteMod = async (moduleCode) => {
     const count = await unbindCourseMods(course.id, [moduleCode]);
     setRefreshMods(true);
+    return count;
+  };
+
+  const handleAddModGroup = async (groupId) => {
+    const added = await bindCourseModGroups(course.id, [groupId]);
+    setRefreshModGroups(true);
+    return added;
+  };
+
+  const handleDeleteModGroup = async (groupId) => {
+    const count = await unbindCourseModGroups(course.id, [groupId]);
+    setRefreshModGroups(true);
     return count;
   };
 
@@ -153,7 +169,11 @@ export default function CourseDetail() {
           handleAddMods={handleAddMods}
           handleDeleteMod={handleDeleteMod}
         />
-        <ModGroupStack modGroups={modGroups} />
+        <ModGroupStack
+          modGroups={modGroups}
+          handleAddModGroup={handleAddModGroup}
+          handleDeleteModGroup={handleDeleteModGroup}
+        />
       </ResponsiveStack>
       <Divider />
     </Stack>

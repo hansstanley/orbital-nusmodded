@@ -26,11 +26,13 @@ import { useModGroup, useSnackbar } from "../../providers";
 import ModuleStack from "../Mod/ModuleStack";
 import ResponsiveStack from "../ResponsiveStack";
 
-export default function ModGroupBox({ modGroup = new ModGroup(), expanded }) {
+export default function ModGroupBox({
+  modGroup = new ModGroup(),
+  actions = null,
+}) {
   const { getModGroupMods, bindModGroupMods, unbindModGroupMods } =
     useModGroup();
   const { pushSnack } = useSnackbar();
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [mods, setMods] = useState([]);
   const [refreshMods, setRefreshMods] = useState(true);
@@ -97,13 +99,14 @@ export default function ModGroupBox({ modGroup = new ModGroup(), expanded }) {
         </Stack>
       </AccordionDetails>
       <AccordionActions>
+        {actions}
         <Button onClick={handleOpen}>View</Button>
       </AccordionActions>
       <Dialog open={open} onClose={handleClose} maxWidth="md">
         <DialogTitle>{modGroup ? modGroup.name : <Skeleton />}</DialogTitle>
         <DialogContent dividers>
           <ResponsiveStack>
-            <Stack spacing={1}>
+            <Stack spacing={1} divider={<Divider />}>
               {modGroup.minimum ? (
                 <Typography variant="body2">
                   Minimum: {modGroup.minimum} MCs
@@ -114,7 +117,6 @@ export default function ModGroupBox({ modGroup = new ModGroup(), expanded }) {
                   Maximum: {modGroup.maximum} MCs
                 </Typography>
               ) : null}
-              <Divider />
               <Typography>
                 {modGroup ? (
                   modGroup.description

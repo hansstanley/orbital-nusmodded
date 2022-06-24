@@ -121,7 +121,12 @@ function ModGroupProvider({ children }) {
     }
   };
 
-  const createModGroup = async ({ name, description, minimum, maximum }) => {
+  const createModGroup = async ({
+    name,
+    description = null,
+    minimum = null,
+    maximum = null,
+  }) => {
     const { status, data } = await makeRequest({
       method: "post",
       route: "/module-group/new",

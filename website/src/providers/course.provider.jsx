@@ -16,6 +16,8 @@ const CourseContext = createContext({
   getCourseModGroups: async (courseId) => [],
   bindCourseMods: async (courseId, { type, moduleCodes }) => [],
   unbindCourseMods: async (courseId, moduleCodes) => 0,
+  bindCourseModGroups: async (courseId, groupIds = []) => [],
+  unbindCourseModGroups: async (courseId, groupIds = []) => 0,
   createCourse: async (data) => new Course(),
   updateCourse: async (courseId, data) => new Course(),
   deleteCourse: async (courseId) => new Course(),
@@ -138,6 +140,38 @@ function CourseProvider({ children }) {
     }
   };
 
+  const bindCourseModGroups = async (courseId, groupIds = []) => {
+    const { status, data } = await makeRequest({
+      method: "post",
+      route: `/course/${courseId}/add-module-groups`,
+      data: { groupIds },
+      isPublic: false,
+    });
+
+    if (status === 200 && Array.isArray(data?.bound)) {
+      const unbound = groupIds.filter((id) => !data.bound.includes(id));
+      if (unbound.length) console.error("Unable to bind", unbound);
+      return data.bound;
+    } else {
+      throw new Error(`Unable to bind module groups to course ${courseId}`);
+    }
+  };
+
+  const unbindCourseModGroups = async (courseId, groupIds = []) => {
+    const { status, data } = await makeRequest({
+      method: "post",
+      route: `/course/${courseId}/remove-module-groups`,
+      data: { groupIds },
+      isPublic: false,
+    });
+
+    if (status === 200 && data) {
+      return data.count;
+    } else {
+      throw new Error(`Unable to unbind module groups from course ${courseId}`);
+    }
+  };
+
   const createCourse = async ({ title, department, description }) => {
     const { status, data } = await makeRequest({
       method: "post",
@@ -199,6 +233,8 @@ function CourseProvider({ children }) {
     getCourseModGroups,
     bindCourseMods,
     unbindCourseMods,
+    bindCourseModGroups,
+    unbindCourseModGroups,
     createCourse,
     updateCourse,
     deleteCourse,
