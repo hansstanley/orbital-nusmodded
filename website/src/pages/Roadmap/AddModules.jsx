@@ -201,31 +201,16 @@ export default function ModuleStack({roadMap, handleAdd}) {
           )}
         </Card>
       </Collapse>
-      <Droppable droppableId={"-1"} >
-      {(provided) => (
-        <div {...provided.droppableProps} ref={provided.innerRef}>
-        <Stack spacing={1} ref = {provided.innerRef}>
+        <Stack spacing={1} >
           {roadMap.find(sem => parseInt(sem.id) === parseInt(-1)).modules.map((moduleCode, index) => (
               <ModuleBox
                 moduleCode={moduleCode} key={moduleCode} index = {index}
-                // actions={
-                //   <Button
-                //     color="error"
-                //     disabled={!isAuth() || loading}
-                //     onClick={handleDelete(mod.moduleCode)}
-                //   >
-                //     Delete
-                //   </Button>
-                // }
               />
           ))}
         </Stack>
             {roadMap.find(sem => parseInt(sem.id) === -1).modules.length ? null : (
             <Typography variant="body2">No modules.</Typography>
           )}
-        </div>
-      )}
-      </Droppable>
     </Stack>
   );
 }
