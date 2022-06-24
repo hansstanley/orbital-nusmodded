@@ -4,8 +4,7 @@ import { Paper, Stack, Typography, Divider, Box } from "@mui/material";
 import { RoadmapperService } from "../../services";
 import ModuleBox from "./ModuleBox";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import {SortableContainer, SortableElement } from 'react-sortable-hoc';
-import {arrayMoveImmutable} from 'array-move';
+import RightDrawer from "./RightDrawer";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -20,8 +19,12 @@ const roadmapperService = new RoadmapperService();
  function Semester(props) {
   const { modules, year, semester, index } = props;
 
+  if (year === null) {
+    return <></>;
+  }
+
   return (
-    <Droppable droppableId={String(index + 1)} direction="horizontal">
+    <Droppable droppableId={String(index + 1)} direction="horizontal" >
       {(provided) => (
         <div {...provided.droppableProps} ref={provided.innerRef}>
           <Stack spacing={1} direction = "row" ref = {provided.innerRef}>
@@ -98,6 +101,7 @@ export default function NestedGrid() {
           }
         });
 
+        console.log(roadmap.find(sem => parseInt(sem.id) === parseInt("-1")));
         return roadmap;
       });
     }
@@ -114,6 +118,7 @@ export default function NestedGrid() {
           index={index}
         />
       ))}
+      <RightDrawer roadmapperService = {roadmapperService}/>
       </DragDropContext>
     </Stack>
   );

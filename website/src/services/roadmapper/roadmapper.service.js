@@ -59,6 +59,12 @@ export default class RoadmapperService {
       semester: 2,
       modules: ["CS5242", "CS5340", "CS5446"],
     },
+    {
+      id: -1,
+      year: null,
+      semester: null,
+      modules: ["CS1010X"],
+    }
   ];
 
   getRoadmap() {
