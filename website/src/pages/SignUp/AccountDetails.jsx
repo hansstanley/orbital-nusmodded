@@ -22,8 +22,9 @@ export default function SignUp({ activeStep, handleNext }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-
-    if (emailCheck.test(data.get("email"))) {
+    if(data.get("username").length < 3) {
+      setValidateInput("Username is too short! (minimum 3 characters)");
+    } else if (emailCheck.test(data.get("email"))) {
       if (data.get("password") === data.get("confirmPassword")) {
         if (passwordCheck.test(data.get("password"))) {
           setLoading(true);
