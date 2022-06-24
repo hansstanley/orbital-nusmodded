@@ -111,7 +111,7 @@ export default function NestedGrid() {
       const holdingSemester = prevState.find(
         sem => parseInt(sem.id) === -1
       );
-      const sourceModules = holdingSemester.modules.concat(selected.map((mod) => mod.moduleCode));
+      const sourceModules = selected.map((mod) => mod.moduleCode).concat(holdingSemester.modules);
       console.log("hold" + holdingSemester.modules);
       console.log("sourceModules" + sourceModules);
       const newHoldingSemester = {

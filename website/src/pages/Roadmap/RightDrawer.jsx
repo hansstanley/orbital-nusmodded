@@ -35,9 +35,9 @@ export default function DrawerRight({roadMap, handleAdd}) {
   return (
     <Box sx={{ display: 'flex' }}>
       { !open &&
-      <Button sx = {{position: "absolute", top: '45%', right: "-1%", zIndex: 2000, transform: 'rotate(-90deg)', height: 50, width: 150}} onClick={handleDrawerOpen}>
-        <Typography noWrap>Add modules</Typography>
-      </Button>
+        <Button sx = {{position: "absolute", top: '45%', right: "-1%", zIndex: 2000, transform: 'rotate(-90deg)', height: 50, width: 150}} onClick={handleDrawerOpen}>
+          <Typography noWrap>Add modules</Typography>
+        </Button>
       }
       <Drawer
         sx={{
