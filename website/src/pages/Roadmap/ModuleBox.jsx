@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 export default function ModuleBox(props) {
-  const { moduleCode, index } = props;
+  const { moduleCode, index, handleDelete } = props;
 
   const [open, setOpen] = React.useState(false);
 
@@ -50,7 +50,13 @@ export default function ModuleBox(props) {
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
                 style={getStyle(provided.draggableProps.style, snapshot)}>
-                <CardContent sx={{ width: 340, height: 90 }} onClick={handleClickOpen}>
+                <CardContent sx={{ position: "relative", width: 340, height: 90 }} onClick={handleClickOpen}>
+                
+                  {index === "-1"
+                  ? <IconButton sx={{ position: "absolute", top: 8, right: 25}} onClick = {() => handleDelete(moduleInfo.moduleCode)}>
+                      <CloseIcon />
+                    </IconButton>
+                  : <></>}
                   <Typography variant="caption" position='relative' bottom='5%'>
                     {moduleInfo.moduleCredit} MCs
                   </Typography>

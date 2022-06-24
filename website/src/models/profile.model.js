@@ -5,6 +5,7 @@ export default class Profile {
   email = undefined;
   username = undefined;
   avatarUrl = undefined;
+  roadmap = undefined;
 
   updateProperty(key, value) {
     if (this.hasOwnProperty(key)) {

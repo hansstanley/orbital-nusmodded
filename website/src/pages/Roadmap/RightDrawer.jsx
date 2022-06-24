@@ -22,7 +22,7 @@ const drawerWidth = 350;
 
 
 
-export default function DrawerRight({roadMap, handleAdd}) {
+export default function DrawerRight({roadMap, handleAdd, loadingProfile, allMods, handleDelete}) {
   const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = () => {
@@ -33,9 +33,10 @@ export default function DrawerRight({roadMap, handleAdd}) {
     setOpen(false);
   };
 
-        {/* <Button sx = {{position: "absolute", top: '45%', right: "-1%", zIndex: 2000, transform: 'rotate(-90deg)', height: 50, width: 150}} >
-          <Typography noWrap>Add modules</Typography>
-        </Button> */}
+{/* <Button sx = {{position: "absolute", top: '45%', right: "-1%", zIndex: 2000, transform: 'rotate(-90deg)', height: 50, width: 150}} >
+  <Typography noWrap>Add modules</Typography>
+</Button> */}
+
   return (
     <Box sx={{ display: 'flex' }}>
       { !open &&
@@ -69,7 +70,13 @@ export default function DrawerRight({roadMap, handleAdd}) {
             <ChevronRightIcon />
           </IconButton>
         <Divider />
-          <AddModules sx={{zIndex: 2000}} roadMap = {roadMap} handleAdd = {handleAdd}/>
+          <AddModules sx={{zIndex: 2000}} 
+            roadMap = {roadMap}
+            handleAdd = {handleAdd} 
+            loadingProfile = {loadingProfile} 
+            allMods = {allMods}
+            handleDelete = {handleDelete}
+            />
         </Paper>
         </div>
       )}

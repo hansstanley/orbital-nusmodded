@@ -15,17 +15,14 @@ import {
   CardActions,
   createFilterOptions,
   LinearProgress,
-  Divider,
-  InputAdornment,
 } from "@mui/material";
 import { TransitionGroup } from "react-transition-group";
 import AddIcon from "@mui/icons-material/Add";
-import ClearIcon from "@mui/icons-material/Clear";
 import { useAuthSession, useMod, useSnackbar } from "../../providers";
 import ModuleBox from "./ModuleBox";
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import CloseIcon from '@mui/icons-material/Close';
 
-export default function ModuleStack({roadMap, handleAdd}) {
+export default function ModuleStack({roadMap, handleAdd, loadingProfile, allMods, handleDelete}) {
   const { isAuth } = useAuthSession();
   const { getModArray } = useMod();
   const { pushSnack } = useSnackbar();
@@ -34,7 +31,6 @@ export default function ModuleStack({roadMap, handleAdd}) {
   const [modArray, setModArray] = useState([]);
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
-  // const [roadMap, setRoadMap] = useState(roadmapperService.getRoadmap());
 
   useEffect(() => {
     async function init() {
@@ -161,7 +157,7 @@ export default function ModuleStack({roadMap, handleAdd}) {
               multiple
               onChange={handleAutocomplete}
               value={selected}
-              options={modArray}
+              options={modArray.filter(mod => !allMods.includes(mod.moduleCode))}
               getOptionLabel={(option) => option.moduleCode}
               isOptionEqualToValue={(option, value) =>
                 option.moduleCode === value.moduleCode
@@ -202,15 +198,15 @@ export default function ModuleStack({roadMap, handleAdd}) {
         </Card>
       </Collapse>
         <Stack spacing={1} >
-          {roadMap.find(sem => parseInt(sem.id) === parseInt(-1)).modules.map((moduleCode, index) => (
-              <ModuleBox
-                moduleCode={moduleCode} key={moduleCode} index = {index}
-              />
-          ))}
+          {!loadingProfile ? roadMap.find(sem => parseInt(sem.id) === parseInt(-1)).modules.map((moduleCode, index) => (
+            <ModuleBox
+              moduleCode={moduleCode} key={moduleCode} index = {"-1"} handleDelete = {handleDelete}
+            />
+          )) : <></>}
         </Stack>
-            {roadMap.find(sem => parseInt(sem.id) === -1).modules.length ? null : (
+            {!loadingProfile ? roadMap.find(sem => parseInt(sem.id) === -1).modules.length ? null : (
             <Typography variant="body2">No modules.</Typography>
-          )}
+          ) : <></>}
     </Stack>
   );
 }

@@ -79,7 +79,8 @@ function AuthSessionProvider({ children }) {
 
     const result = new Profile()
       .updateProperty("username", data.username)
-      .updateProperty("avatarUrl", data.avatar_url);
+      .updateProperty("avatarUrl", data.avatar_url)
+      .updateProperty("roadmap", data.roadmap);
     return result;
   }, []);
 
@@ -95,7 +96,8 @@ function AuthSessionProvider({ children }) {
 
     const result = new Profile()
       .updateProperty("username", data.username)
-      .updateProperty("avatarUrl", data.avatar_url);
+      .updateProperty("avatarUrl", data.avatar_url)
+      .updateProperty("roadmap", data.roadmap);
     return result;
   }, []);
 
@@ -109,7 +111,8 @@ function AuthSessionProvider({ children }) {
 
     const result = (profile || new Profile())
       .updateProperty("username", data.username)
-      .updateProperty("avatarUrl", data.avatar_url);
+      .updateProperty("avatarUrl", data.avatar_url)
+      .updateProperty("roadmap", data.roadmap);
 
     setProfile(result);
     return result;

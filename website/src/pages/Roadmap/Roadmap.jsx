@@ -1,13 +1,17 @@
 import ModuleStack from "./ModuleStack";
 import { ResponsiveStack } from "../../components";
-import RoadmapFab from "./RoadmapFab";
+import { AuthGuard } from "../../components";
+import { useAuthSession } from "../../providers";
 
 export default function Roadmap() {
+  const { isAuth } = useAuthSession();
   return (
     <>
       <ResponsiveStack>
-        <ModuleStack />
-        {/* <RoadmapFab /> */}
+        {isAuth() 
+        ? <ModuleStack />
+        : <AuthGuard />
+        }
       </ResponsiveStack>
     </>
   );

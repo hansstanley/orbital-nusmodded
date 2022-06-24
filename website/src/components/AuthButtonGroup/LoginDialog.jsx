@@ -53,7 +53,7 @@ export default function LoginDialog({ open, handleClose }) {
         password: data.get("password"),
       });
       handleCloseReset();
-      navigate("/");
+      navigate("/roadmap");
     } catch (error) {
       console.error(error);
       setValidateInput(error.message || "Error logging in");

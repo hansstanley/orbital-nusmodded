@@ -11,7 +11,7 @@ export default function Landing() {
 
   const handleStart = () => {
     toggleLanding();
-    navigate(isAuth() ? "/roadmap" : "/login");
+    navigate(isAuth() ? "/roadmap" : "/signup");
   };
 
   return (
