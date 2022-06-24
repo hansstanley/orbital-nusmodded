@@ -16,6 +16,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AddModules from "./AddModules";
 import { ModuleStack as ModStack } from "../../components/Mod";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import RoadmapFab from "./RoadmapFab";
 
 const drawerWidth = 350;
 
@@ -32,12 +33,13 @@ export default function DrawerRight({roadMap, handleAdd}) {
     setOpen(false);
   };
 
+        {/* <Button sx = {{position: "absolute", top: '45%', right: "-1%", zIndex: 2000, transform: 'rotate(-90deg)', height: 50, width: 150}} >
+          <Typography noWrap>Add modules</Typography>
+        </Button> */}
   return (
     <Box sx={{ display: 'flex' }}>
       { !open &&
-        <Button sx = {{position: "absolute", top: '45%', right: "-1%", zIndex: 2000, transform: 'rotate(-90deg)', height: 50, width: 150}} onClick={handleDrawerOpen}>
-          <Typography noWrap>Add modules</Typography>
-        </Button>
+        <RoadmapFab onClick={handleDrawerOpen}/>
       }
       <Drawer
         sx={{

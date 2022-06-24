@@ -2,7 +2,7 @@ import { Box, SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import BackpackIcon from "@mui/icons-material/Backpack";
 import BookIcon from "@mui/icons-material/Book";
 
-export default function RoadmapFab() {
+export default function RoadmapFab({onClick}) {
   return (
     <SpeedDial
       ariaLabel="Roadmap SpeedDial"
@@ -13,7 +13,7 @@ export default function RoadmapFab() {
         icon={<BackpackIcon />}
         tooltipTitle="My module groups"
       />
-      <SpeedDialAction icon={<BookIcon />} tooltipTitle="My modules" />
+      <SpeedDialAction icon={<BookIcon />} tooltipTitle="My modules" onClick = {onClick}/>
     </SpeedDial>
   );
 }

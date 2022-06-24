@@ -7,7 +7,7 @@ export default function Roadmap() {
     <>
       <ResponsiveStack>
         <ModuleStack />
-        <RoadmapFab />
+        {/* <RoadmapFab /> */}
       </ResponsiveStack>
     </>
   );
