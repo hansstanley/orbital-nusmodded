@@ -50,7 +50,7 @@ const AnimatedAppBar = animated(MuiAppBar);
 // }
 
 export default function AppBar() {
-  const { handleDrawerToggle } = useContext(DrawerContext);
+  const { drawerOpen, handleDrawerToggle } = useContext(DrawerContext);
 
   return (
     <MuiAppBar
@@ -62,7 +62,7 @@ export default function AppBar() {
         <IconButton color="primary" edge="start" onClick={handleDrawerToggle}>
           <MenuIcon />
         </IconButton>
-        <AppTitle />
+        <AppTitle drawerOpen = {drawerOpen} onClick={handleDrawerToggle}/>
         <Box sx={{ flex: 1 }} />
         <AuthButtonGroup />
         <ColorModeButton />
