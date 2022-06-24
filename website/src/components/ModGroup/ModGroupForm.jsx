@@ -11,6 +11,7 @@ import {
   FormControlLabel,
   LinearProgress,
   Stack,
+  Switch,
   TextField,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
@@ -132,6 +133,12 @@ export default function ModGroupForm({
             multiline
             minRows={2}
             maxRows={6}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox name="global" defaultChecked={!!modGroup.global} />
+            }
+            label="Make this a global module group"
           />
           <Collapse in={!!validationMessage}>
             <Alert severity="error">{validationMessage}</Alert>

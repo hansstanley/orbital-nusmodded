@@ -4,6 +4,7 @@ export default class ModGroup {
   description;
   minimum;
   maximum;
+  global;
   createdAt;
   updatedAt;
 }

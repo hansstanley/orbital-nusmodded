@@ -550,6 +550,7 @@ type body = {
   description: string;
   minimum?: number; // Minimum number of modules a student needs to take in this module group
   maximum?: number; // Maximum number of modules a student can take in this module group
+  global: boolean; // Whether this module group is shared; non-global module groups are deleted when unbound from its course
 };
 ```
 
@@ -571,6 +572,7 @@ type body = {
   description?: string;
   minimum?: number;
   maximum?: number;
+  global: boolean;
 };
 ```
 
@@ -737,6 +739,7 @@ type ModGroup = {
   description: string;
   minimum: number;
   maximum: number;
+  global: boolean;
   createdAt: Date;
   updatedAt: Date;
 };

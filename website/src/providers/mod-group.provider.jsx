@@ -126,11 +126,12 @@ function ModGroupProvider({ children }) {
     description = null,
     minimum = null,
     maximum = null,
+    global = false,
   }) => {
     const { status, data } = await makeRequest({
       method: "post",
       route: "/module-group/new",
-      data: { name, description, minimum, maximum },
+      data: { name, description, minimum, maximum, global },
       isPublic: false,
     });
 
@@ -144,13 +145,14 @@ function ModGroupProvider({ children }) {
 
   const updateModGroup = async (
     groupId,
-    { name, description, minimum, maximum }
+    { name, description, minimum, maximum, global }
   ) => {
     const params = {};
     if (name) params.name = name;
     if (description) params.description = description;
     if (minimum) params.minimum = minimum;
     if (maximum) params.maximum = maximum;
+    if (typeof global === "boolean") params.global = global;
 
     const { status, data } = await makeRequest({
       method: "post",

@@ -1,15 +1,17 @@
 import { Button } from "@mui/material";
 import { useState } from "react";
-import { Course } from "../../models";
-import { useAuthSession, useCourse, useSnackbar } from "../../providers";
-import CourseFormDialog from "./CourseFormDialog";
+import { ModGroup } from "../../models";
+import { useAuthSession, useModGroup, useSnackbar } from "../../providers";
+import ModGroupForm from "./ModGroupForm";
+import { stringToInt } from "../../utils/parsers";
 
-export default function EditCourseButton({
-  course = new Course(),
+export default function EditModGroupButton({
+  modGroup = new ModGroup(),
   variant = "text",
+  handleBindModGroup = async (groupId) => {},
 }) {
   const { isAuth } = useAuthSession();
-  const { updateCourse } = useCourse();
+  const { updateModGroup } = useModGroup();
   const { pushSnack } = useSnackbar();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,19 +30,24 @@ export default function EditCourseButton({
     const data = new FormData(event.currentTarget);
 
     try {
-      const newCourse = await updateCourse(course.id, {
-        title: data.get("title"),
-        department: data.get("department"),
-        description: data.get("description"),
-      });
+      const params = {
+        name: data.get("name"),
+        description: data.get("description") || null,
+        minimum: stringToInt(data.get("minimum")),
+        maximum: stringToInt(data.get("maximum")),
+        global: !!data.get("global"),
+      };
+      const newModGroup = await updateModGroup(modGroup.id, params);
+      await handleBindModGroup(newModGroup.id);
+
       pushSnack({
-        message: `Updated ${newCourse.title}!`,
+        message: `Updated ${newModGroup.name}!`,
         severity: "success",
       });
       handleClose();
     } catch (error) {
       console.error(error);
-      setValidationMessage(error.message || "Error updating course");
+      setValidationMessage(error.message || "Error updating module group");
     } finally {
       setLoading(false);
     }
@@ -55,13 +62,13 @@ export default function EditCourseButton({
       >
         Edit
       </Button>
-      <CourseFormDialog
+      <ModGroupForm
         open={open}
         loading={loading}
-        title="Edit course"
+        title="Edit module group"
         submitLabel="Edit"
+        modGroup={modGroup}
         validationMessage={validationMessage}
-        course={course}
         handleSubmit={handleSubmit}
         handleClose={handleClose}
       />

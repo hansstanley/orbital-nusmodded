@@ -1,15 +1,24 @@
-import { Box, Divider, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import { useModGroup, useSnackbar } from "../../providers";
 import ModGroupBox from "./ModGroupBox";
 import ModGroupForm from "./ModGroupForm";
 import { stringToInt } from "../../utils/parsers";
+import EditModGroupButton from "./EditModGroupButton";
 
 export default function ModGroupStack({
+  title = "Module groups",
   modGroups = [],
-  handleAddModGroup = async (groupId) => {},
-  handleDeleteModGroup = async (groupId) => {},
+  handleBindModGroup = async (groupId) => {},
+  handleUnbindModGroup = async (groupId) => {},
 }) {
   const { createModGroup } = useModGroup();
   const { pushSnack } = useSnackbar();
@@ -35,9 +44,10 @@ export default function ModGroupStack({
         description: data.get("description") || null,
         minimum: stringToInt(data.get("minimum")),
         maximum: stringToInt(data.get("maximum")),
+        global: !!data.get("global"),
       };
       const modGroup = await createModGroup(params);
-      await handleAddModGroup(modGroup.id);
+      await handleBindModGroup(modGroup.id);
 
       pushSnack({
         message: `Created ${modGroup.name}!`,
@@ -52,10 +62,30 @@ export default function ModGroupStack({
     }
   };
 
+  const handleDelete = (groupId) => async () => {
+    setLoading(true);
+
+    try {
+      await handleUnbindModGroup(groupId);
+      pushSnack({
+        message: "Module group deleted!",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: error.message || `Unable to delete module group ${groupId}`,
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Stack spacing={1} width={320}>
       <Stack spacing={2} direction="row" justifyContent="space-between">
-        <Typography variant="h6">Module groups</Typography>
+        <Typography variant="h6">{title}</Typography>
         <IconButton color="primary" onClick={handleOpen}>
           <AddIcon />
         </IconButton>
@@ -64,7 +94,25 @@ export default function ModGroupStack({
       <Box>
         {modGroups.length ? (
           modGroups.map((modGroup) => (
-            <ModGroupBox key={modGroup.id} modGroup={modGroup} />
+            <ModGroupBox
+              key={modGroup.id}
+              modGroup={modGroup}
+              actions={
+                <>
+                  <Button
+                    color="error"
+                    disabled={loading}
+                    onClick={handleDelete(modGroup.id)}
+                  >
+                    Delete
+                  </Button>
+                  <EditModGroupButton
+                    modGroup={modGroup}
+                    handleBindModGroup={handleBindModGroup}
+                  />
+                </>
+              }
+            />
           ))
         ) : (
           <Typography variant="body2">No module groups.</Typography>

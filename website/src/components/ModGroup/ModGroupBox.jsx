@@ -107,6 +107,11 @@ export default function ModGroupBox({
         <DialogContent dividers>
           <ResponsiveStack>
             <Stack spacing={1} divider={<Divider />}>
+              {modGroup.global ? (
+                <Typography variant="body2">
+                  This is a global module group.
+                </Typography>
+              ) : null}
               {modGroup.minimum ? (
                 <Typography variant="body2">
                   Minimum: {modGroup.minimum} MCs

@@ -121,13 +121,13 @@ export default function CourseDetail() {
     return count;
   };
 
-  const handleAddModGroup = async (groupId) => {
+  const handleBindModGroup = async (groupId) => {
     const added = await bindCourseModGroups(course.id, [groupId]);
     setRefreshModGroups(true);
     return added;
   };
 
-  const handleDeleteModGroup = async (groupId) => {
+  const handleUnbindModGroup = async (groupId) => {
     const count = await unbindCourseModGroups(course.id, [groupId]);
     setRefreshModGroups(true);
     return count;
@@ -171,8 +171,8 @@ export default function CourseDetail() {
         />
         <ModGroupStack
           modGroups={modGroups}
-          handleAddModGroup={handleAddModGroup}
-          handleDeleteModGroup={handleDeleteModGroup}
+          handleBindModGroup={handleBindModGroup}
+          handleUnbindModGroup={handleUnbindModGroup}
         />
       </ResponsiveStack>
       <Divider />
