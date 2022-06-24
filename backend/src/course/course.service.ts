@@ -190,8 +190,14 @@ export class CourseService {
     unbindModGroupsDto: UnbindModGroupsDto
   ): Promise<number> {
     const { groupIds } = unbindModGroupsDto;
-
     const count = await course.$remove('modGroup', groupIds);
+
+    const modGroups: ModGroup[] = await Promise.all(
+      groupIds.map((id) => this.modGroupService.find(id))
+    );
+    await Promise.all(modGroups
+      .filter((modGroup) => !!modGroup && !modGroup.global)
+      .map((modGroup) => this.modGroupService.delete(modGroup.id)));
     return count;
   }
 }

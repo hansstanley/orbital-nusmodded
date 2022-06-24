@@ -31,6 +31,9 @@ export class ModGroup extends Model {
   @Column(DataType.SMALLINT)
   maximum: number;
 
+  @Column
+  global: boolean;
+
   @BelongsToMany(() => Course, () => CourseModGroup)
   courses: Course[];
 
