@@ -59,6 +59,7 @@ function Semester({ modules, year, semester, index }) {
           </Stack>
         )}
       </Droppable>
+      <Divider orientation="vertical" />
     </Stack>
   );
 }
@@ -81,7 +82,7 @@ export default function NestedGrid() {
         });
 
         if (status === 200 && Array.isArray(data?.ROADMAP)) {
-          setRoadMap(data.ROADMAP);
+          setRoadMap(data.ROADMAP || ROADMAP_TEMPLATE);
         } else {
           setRoadMap(ROADMAP_TEMPLATE);
         }
@@ -206,9 +207,7 @@ export default function NestedGrid() {
   const handleAddMyMods = (moduleCodes = []) => {
     const holdingSem = roadMap.find((sem) => parseInt(sem.id) === -1);
     const { modules: currCodes, ...others } = holdingSem;
-    const newCodes = moduleCodes.filter(
-      (code) => !allMods.includes(code) && !currCodes?.includes(code)
-    );
+    const newCodes = moduleCodes.filter((code) => !allMods.includes(code));
     const holdingCodes = newCodes.concat(holdingSem.modules || []);
     const newHoldingSem = {
       modules: holdingCodes,
