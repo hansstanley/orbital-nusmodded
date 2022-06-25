@@ -69,7 +69,7 @@ export default function DrawerRight({
     //   >
     <>
       <RoadmapFab onClick={handleDrawerOpen} hidden={open} />
-      <Slide direction="left" in={open}>
+      <Slide direction="left" in={open} mountOnEnter unmountOnExit>
         <Card
           raised={true}
           sx={{

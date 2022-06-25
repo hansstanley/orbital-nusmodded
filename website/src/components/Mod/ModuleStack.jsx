@@ -204,7 +204,11 @@ export default function ModuleStack({
             />
           </CardContent>
           <CardActions>
-            <Button variant="contained" onClick={handleSubmit}>
+            <Button
+              variant="contained"
+              disabled={loading}
+              onClick={handleSubmit}
+            >
               Add
             </Button>
             <Button onClick={handleClose}>Cancel</Button>
