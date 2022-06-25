@@ -26,5 +26,6 @@ export const USER_SETTINGS = [
 export const USER_SETTINGS_DEFAULT = {
   IS_HONORS: false,
   MC_LIMIT: 23,
-  COURSE_ID: null
+  COURSE_ID: null,
+  ROADMAP: []
 };

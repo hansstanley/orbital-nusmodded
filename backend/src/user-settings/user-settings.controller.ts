@@ -9,7 +9,7 @@ import {
   Req,
   UseGuards
 } from '@nestjs/common';
-import { isBoolean, isInt, isUUID } from 'class-validator';
+import { isBoolean, isInt, isObject, isUUID } from 'class-validator';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { ReqUserModel } from 'src/auth/models';
@@ -58,6 +58,10 @@ export class UserSettingsController {
           return this.userSettingsService.setModuleCreditLimit(id, value);
         }
         break;
+      case 'ROADMAP':
+        if (isObject(value)) {
+          return this.userSettingsService.setRoadmap(id, value);
+        }
     }
 
     throw new HttpException(

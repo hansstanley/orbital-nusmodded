@@ -800,7 +800,7 @@ type UserSettings = {
   profileId: string; // UUIDV V4
 };
 
-type UserSettingsKey = 'COURSE_ID' | 'IS_HONORS' | 'MC_LIMIT';
+type UserSettingsKey = 'COURSE_ID' | 'IS_HONORS' | 'MC_LIMIT' | 'ROADMAP';
 ```
 
 ## Support

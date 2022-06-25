@@ -39,7 +39,8 @@ export class UserSettingsService {
     const values = await Promise.all([
       this.getHonors(profileId),
       this.getModuleCreditLimit(profileId),
-      this.getCourseId(profileId)
+      this.getCourseId(profileId),
+      this.getRoadmap(profileId)
     ]);
 
     const result = {};
@@ -99,5 +100,22 @@ export class UserSettingsService {
     courseId: string
   ): Promise<UserSettings> {
     return this.create(profileId, 'COURSE_ID', courseId);
+  }
+
+  async getRoadmap(profileId: string): Promise<object> {
+    const setting = await this.find(profileId, 'ROADMAP');
+
+    if (setting) {
+      return JSON.parse(setting.value);
+    } else {
+      return USER_SETTINGS_DEFAULT.ROADMAP;
+    }
+  }
+
+  async setRoadmap(
+    profileId: string,
+    roadmap: object
+  ): Promise<UserSettings> {
+    return this.create(profileId, 'ROADMAP', JSON.stringify(roadmap));
   }
 }
