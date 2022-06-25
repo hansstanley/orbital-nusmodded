@@ -1,14 +1,22 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
-import { Paper, Stack, Typography, Divider, Box } from "@mui/material";
+import {
+  Paper,
+  Stack,
+  Typography,
+  Divider,
+  Box,
+  Skeleton,
+} from "@mui/material";
 import { RoadmapperService } from "../../services";
-import ModuleBox from "./ModuleBox";
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+// import ModuleBox from "./ModuleBox";
+import { ModuleBox } from "../../components/Mod";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import RightDrawer from "./RightDrawer";
 import { supabase } from "../../services";
-import {useBackend } from "../../providers";
+import { useBackend } from "../../providers";
 import { useAuthSession, useSnackbar } from "../../providers";
-
+import { useEffect } from "react";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -17,9 +25,8 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: "center",
   color: theme.palette.text.secondary,
 }));
-const roadmapperService = new RoadmapperService();
 
- function Semester(props) {
+function Semester(props) {
   const { modules, year, semester, index } = props;
 
   if (year === null) {
@@ -27,26 +34,34 @@ const roadmapperService = new RoadmapperService();
   }
 
   return (
-    <Droppable droppableId={String(index + 1)} direction="horizontal" >
+    <Droppable droppableId={String(index + 1)} direction="horizontal">
       {(provided) => (
-        <div {...provided.droppableProps} ref={provided.innerRef}>
-          <Stack spacing={1} direction = "row" ref = {provided.innerRef}>
-            <Typography variant="h6" sx={{ alignSelf: "center" }}>
-              Y{year}S{semester}
-            </Typography>
-            <Divider />
-            {modules.map((moduleCode, index) => (
-              <ModuleBox moduleCode={moduleCode} key={moduleCode} index = {index} />
-            ))}
-          </Stack>
-        </div>
+        <Stack
+          spacing={1}
+          direction="row"
+          {...provided.droppableProps}
+          ref={provided.innerRef}
+        >
+          <Typography variant="h6" sx={{ alignSelf: "center" }}>
+            Y{year}S{semester}
+          </Typography>
+          <Divider orientation="vertical" />
+          {modules.map((moduleCode, index) => (
+            <ModuleBox
+              moduleCode={moduleCode}
+              key={moduleCode}
+              index={index}
+              isDraggable={true}
+            />
+          ))}
+          {provided.placeholder}
+        </Stack>
       )}
-      </Droppable>
+    </Droppable>
   );
-} 
+}
 
 export default function NestedGrid() {
-
   // const {makeRequest} = useBackend();
   // const {status, data} = makeRequest({
   //   method: "get",
@@ -60,11 +75,20 @@ export default function NestedGrid() {
   const [loading, setLoading] = React.useState(true);
   const [allMods, setAllMods] = React.useState([]);
 
+  useEffect(() => {
+    console.log(roadMap);
+  }, [roadMap]);
+
   React.useEffect(() => {
     if (profile) {
       setRoadMap(profile.roadmap);
       setLoading(false);
-      setAllMods(profile.roadmap.reduce((prevSem, currSem) => prevSem.concat(currSem.modules), []));
+      setAllMods(
+        profile.roadmap.reduce(
+          (prevSem, currSem) => prevSem.concat(currSem.modules),
+          []
+        )
+      );
     }
   }, [profile]);
 
@@ -79,7 +103,6 @@ export default function NestedGrid() {
       };
 
       await updateProfile(updates);
-
     } catch (error) {
       console.error(error);
     }
@@ -88,20 +111,19 @@ export default function NestedGrid() {
   const onDragEnd = ({ source, destination, draggableId }) => {
     // dropped inside of the list
     if (source && destination) {
-      setRoadMap(prevState => {
+      console.log("source", source, "destination", destination);
+      setRoadMap((prevState) => {
         const { index: sourceIndex, droppableId: sourceId } = source;
 
-        const {
-          index: destinationIndex,
-          droppableId: destinationId
-        } = destination;
-     
+        const { index: destinationIndex, droppableId: destinationId } =
+          destination;
+
         const sourceSemester = prevState.find(
-          sem => parseInt(sem.id) === parseInt(sourceId)
+          (sem) => parseInt(sem.id) === parseInt(sourceId)
         );
 
         const destinationSemester = prevState.find(
-          sem => parseInt(sem.id) === parseInt(destinationId)
+          (sem) => parseInt(sem.id) === parseInt(destinationId)
         );
 
         const sourceModules = sourceSemester.modules;
@@ -120,15 +142,15 @@ export default function NestedGrid() {
 
         const newSourceSemester = {
           ...sourceSemester,
-          modules: sourceModules
+          modules: sourceModules,
         };
 
         const newDestinationSemester = {
           ...destinationSemester,
-          modules: destinationModules
+          modules: destinationModules,
         };
 
-        const roadmap = prevState.map(roadmap => {
+        const roadmap = prevState.map((roadmap) => {
           if (roadmap.id === newSourceSemester.id) {
             return newSourceSemester;
           } else if (
@@ -141,8 +163,8 @@ export default function NestedGrid() {
           }
         });
 
-        console.log(roadmap.find(sem => parseInt(sem.id) === parseInt("-1")));
-        
+        console.log(roadmap.find((sem) => parseInt(sem.id) === parseInt("-1")));
+
         handleUpdate(roadmap);
 
         return roadmap;
@@ -151,16 +173,16 @@ export default function NestedGrid() {
   };
 
   const handleAdd = (selected) => {
-    setRoadMap(prevState => {
-      const holdingSemester = prevState.find(
-        sem => parseInt(sem.id) === -1
-      );
-      const sourceModules = selected.map((mod) => mod.moduleCode).concat(holdingSemester.modules);
+    setRoadMap((prevState) => {
+      const holdingSemester = prevState.find((sem) => parseInt(sem.id) === -1);
+      const sourceModules = selected
+        .map((mod) => mod.moduleCode)
+        .concat(holdingSemester.modules);
       const newHoldingSemester = {
         ...holdingSemester,
-        modules: sourceModules
+        modules: sourceModules,
       };
-      const roadmap = prevState.map(roadmap => {
+      const roadmap = prevState.map((roadmap) => {
         if (roadmap.id === newHoldingSemester.id) {
           return newHoldingSemester;
         } else {
@@ -172,20 +194,18 @@ export default function NestedGrid() {
 
       return roadmap;
     });
-  }
+  };
 
   const handleDelete = (moduleCode) => {
-    setRoadMap(prevState => {
-      const holdingSemester = prevState.find(
-        sem => parseInt(sem.id) === -1
-      );
+    setRoadMap((prevState) => {
+      const holdingSemester = prevState.find((sem) => parseInt(sem.id) === -1);
       const sourceModules = holdingSemester.modules;
 
       const newHoldingSemester = {
         ...holdingSemester,
-        modules: sourceModules.filter(mod => mod !== moduleCode)
+        modules: sourceModules.filter((mod) => mod !== moduleCode),
       };
-      const roadmap = prevState.map(roadmap => {
+      const roadmap = prevState.map((roadmap) => {
         if (roadmap.id === newHoldingSemester.id) {
           return newHoldingSemester;
         } else {
@@ -197,21 +217,38 @@ export default function NestedGrid() {
       console.log(moduleCode);
       return roadmap;
     });
-  }
+  };
 
   return (
-    <Stack spacing={1.5}>
-    <DragDropContext onDragEnd={onDragEnd}>
-      {!loading ? roadMap.map((sem, index) => (
-        <Semester
-          modules={sem.modules}
-          year={sem.year}
-          semester={sem.semester}
-          index={index}
-        />
-      )): <></>}
-      <RightDrawer roadMap = {roadMap} handleAdd = {handleAdd} loadingProfile = {loading} allMods = {allMods} handleDelete = {handleDelete}/>
-      </DragDropContext>
-    </Stack>
+    <>
+      <Stack spacing={1.5} width="100%" overflow="auto">
+        <DragDropContext onDragEnd={onDragEnd}>
+          {loading
+            ? [...Array(4).keys()].map((key) => (
+                <Stack spacing={2} key={key}>
+                  <Skeleton variant="rectangular" width="100%">
+                    <Box sx={{ width: "100%", height: 120 }} />
+                  </Skeleton>
+                </Stack>
+              ))
+            : roadMap.map((sem, index) => (
+                <Semester
+                  key={index}
+                  modules={sem.modules}
+                  year={sem.year}
+                  semester={sem.semester}
+                  index={index}
+                />
+              ))}
+          <RightDrawer
+            roadMap={roadMap}
+            handleAdd={handleAdd}
+            loadingProfile={loading}
+            allMods={allMods}
+            handleDelete={handleDelete}
+          />
+        </DragDropContext>
+      </Stack>
+    </>
   );
 }

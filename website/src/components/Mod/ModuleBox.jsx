@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import {
+  Box,
   Button,
   Card,
   CardActionArea,
@@ -17,8 +18,14 @@ import {
   Typography,
 } from "@mui/material";
 import { useMod, useSnackbar } from "../../providers";
+import { Draggable } from "react-beautiful-dnd";
 
-export default function ModuleBox({ id, moduleCode, actions = null }) {
+export default function ModuleBox({
+  moduleCode,
+  actions = null,
+  isDraggable = false,
+  index,
+}) {
   const { getModInfo } = useMod();
   const { pushSnack } = useSnackbar();
   const [mod, setMod] = useState(null);
@@ -84,12 +91,12 @@ export default function ModuleBox({ id, moduleCode, actions = null }) {
     </Dialog>
   ) : null;
 
-  return (
-    <Card key={id || moduleCode} sx={{ width: 320 }}>
+  const content = (
+    <>
       {!loading && !mod ? (
         unknown
       ) : (
-        <CardActionArea onClick={toggleOpen}>
+        <CardActionArea onClick={toggleOpen} disabled={isDraggable}>
           <CardContent>
             <Typography variant="subtitle2">
               {loading ? <Skeleton /> : `${mod.moduleCredit} MC`}
@@ -110,7 +117,31 @@ export default function ModuleBox({ id, moduleCode, actions = null }) {
           {actions}
         </CardActions>
       </Collapse>
+    </>
+  );
+
+  return (
+    <>
+      {isDraggable ? (
+        <Draggable draggableId={moduleCode} index={index} key={moduleCode}>
+          {(provided, snapshot) => (
+            <Card
+              sx={{ width: 320 }}
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              onClick={toggleOpen}
+            >
+              {content}
+            </Card>
+          )}
+        </Draggable>
+      ) : (
+        <Card key={moduleCode} sx={{ width: 320 }}>
+          {content}
+        </Card>
+      )}
       {dialog}
-    </Card>
+    </>
   );
 }

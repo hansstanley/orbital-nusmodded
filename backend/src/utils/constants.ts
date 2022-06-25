@@ -19,7 +19,8 @@ export const JWT = {
 export const USER_SETTINGS = [
   'IS_HONORS',
   'MC_LIMIT',
-  'COURSE_ID'
+  'COURSE_ID',
+  'ROADMAP'
 ] as const;
 
 export const USER_SETTINGS_DEFAULT = {
