@@ -8,15 +8,13 @@ import {
   Box,
   Skeleton,
 } from "@mui/material";
-import { RoadmapperService } from "../../services";
-// import ModuleBox from "./ModuleBox";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import BookIcon from "@mui/icons-material/Book";
 import RightDrawer from "./RightDrawer";
-import { supabase } from "../../services";
 import { useBackend } from "../../providers";
-import { useAuthSession, useSnackbar } from "../../providers";
+import { useSnackbar } from "../../providers";
+import { ROADMAP_TEMPLATE } from "../../utils/constants";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -26,88 +24,120 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-function Semester(props) {
-  const { modules, year, semester, index } = props;
-
+function Semester({ modules, year, semester, index }) {
   if (year === null) {
     return <></>;
   }
 
   return (
-    <Droppable droppableId={String(index + 1)} direction="horizontal">
-      {(provided) => (
-        <Stack
-          spacing={1}
-          direction="row"
-          {...provided.droppableProps}
-          ref={provided.innerRef}
-        >
-          <Typography variant="h6" sx={{ alignSelf: "center" }}>
-            Y{year}S{semester}
-          </Typography>
-          <Divider orientation="vertical" />
-          {modules.map((moduleCode, index) => (
-            <ModuleBox
-              moduleCode={moduleCode}
-              key={moduleCode}
-              index={index}
-              isDraggable={true}
-            />
-          ))}
-          {provided.placeholder}
-        </Stack>
-      )}
-    </Droppable>
+    <Stack spacing={2} direction="row" alignItems="center">
+      <Typography variant="h6" sx={{ alignSelf: "center" }}>
+        Y{year} S{semester}
+      </Typography>
+      <Divider orientation="vertical" />
+      <Droppable droppableId={String(index + 1)} direction="horizontal">
+        {(provided) => (
+          <Stack
+            spacing={1}
+            direction="row"
+            alignItems="center"
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+          >
+            {modules?.map((moduleCode, index) => (
+              <ModuleBox
+                moduleCode={moduleCode}
+                key={moduleCode}
+                index={index}
+                isDraggable={true}
+              />
+            ))}
+            {modules?.length ? null : (
+              <Typography>Drag modules here.</Typography>
+            )}
+            {provided.placeholder}
+          </Stack>
+        )}
+      </Droppable>
+    </Stack>
   );
 }
 
 export default function NestedGrid() {
-  // const {makeRequest} = useBackend();
-  // const {status, data} = makeRequest({
-  //   method: "get",
-  //   route: "/user-settings",
-  //   data: {key: "roadmap", value: "..." },
-  //   isPublic: false
-  //   });
-  // console.log(data);
-  const { profile, updateProfile } = useAuthSession();
+  const { makeRequest } = useBackend();
+  const { pushSnack } = useSnackbar();
   const [roadMap, setRoadMap] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [allMods, setAllMods] = useState([]);
 
   useEffect(() => {
-    if (profile) {
-      setRoadMap(profile.roadmap);
-      setLoading(false);
+    async function init() {
+      setLoading(true);
+      try {
+        const { status, data } = await makeRequest({
+          method: "get",
+          route: "/user-settings",
+          isPublic: false,
+        });
+
+        if (status === 200 && Array.isArray(data?.ROADMAP)) {
+          setRoadMap(data.ROADMAP);
+        } else {
+          setRoadMap(ROADMAP_TEMPLATE);
+        }
+      } catch (error) {
+        console.error(error);
+        pushSnack({
+          message: "Unable to retrieve roadmap",
+          severity: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    init();
+  }, [makeRequest, pushSnack]);
+
+  useEffect(() => {
+    async function saveRoadmap() {
+      try {
+        const { status } = await makeRequest({
+          method: "post",
+          route: "/user-settings/edit",
+          data: {
+            key: "ROADMAP",
+            value: roadMap,
+          },
+          isPublic: false,
+        });
+
+        if (status !== 200) {
+          throw new Error("Unable to save roadmap");
+        }
+      } catch (error) {
+        console.error(error);
+        pushSnack({
+          message: error.message || "Unable to save roadmap",
+          severity: "error",
+        });
+      }
+    }
+
+    if (Array.isArray(roadMap) && roadMap.length) {
+      saveRoadmap();
       setAllMods(
-        profile.roadmap.reduce(
-          (prevSem, currSem) => prevSem.concat(currSem.modules),
+        roadMap.reduce(
+          (prev, currSem) => prev.concat(currSem?.modules || []),
           []
         )
       );
     }
-  }, [profile]);
-
-  const handleUpdate = async (roadmap) => {
-    try {
-      const updates = {
-        id: profile.id,
-        username: profile.username,
-        avatar_url: profile.avatarUrl,
-        roadmap: roadmap,
-        updated_at: new Date(),
-      };
-
-      await updateProfile(updates);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  }, [roadMap, makeRequest, pushSnack]);
 
   const onDragEnd = ({ source, destination, draggableId }) => {
     // dropped inside of the list
     if (source && destination) {
-      console.log("source", source, "destination", destination);
       setRoadMap((prevState) => {
         const { index: sourceIndex, droppableId: sourceId } = source;
 
@@ -159,8 +189,6 @@ export default function NestedGrid() {
           }
         });
 
-        handleUpdate(roadmap);
-
         return roadmap;
       });
     }
@@ -191,7 +219,6 @@ export default function NestedGrid() {
       sem.id === newHoldingSem.id ? newHoldingSem : sem
     );
     setRoadMap(newRoadmap);
-    handleUpdate(newRoadmap);
 
     return newCodes;
   };
@@ -208,7 +235,6 @@ export default function NestedGrid() {
       sem.id === newHoldingSem.id ? newHoldingSem : sem
     );
     setRoadMap(newRoadmap);
-    handleUpdate(newRoadmap);
   };
 
   const handleAdd = (selected) => {
@@ -228,8 +254,6 @@ export default function NestedGrid() {
           return roadmap;
         }
       });
-
-      handleUpdate(roadmap);
 
       return roadmap;
     });
@@ -252,7 +276,6 @@ export default function NestedGrid() {
         }
       });
 
-      handleUpdate(roadmap);
       return roadmap;
     });
   };
@@ -295,13 +318,6 @@ export default function NestedGrid() {
             />
             <div />
           </RightDrawer>
-          {/* <RightDrawer
-            roadMap={roadMap}
-            handleAdd={handleAdd}
-            loadingProfile={loading}
-            allMods={allMods}
-            handleDelete={handleDelete}
-          /> */}
         </DragDropContext>
       </Stack>
     </>

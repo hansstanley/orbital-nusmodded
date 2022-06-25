@@ -1,5 +1,5 @@
-// export const BACKEND_DOMAIN = "https://nusmodded.herokuapp.com";
-export const BACKEND_DOMAIN = "http://localhost:3002";
+export const BACKEND_DOMAIN = "https://nusmodded.herokuapp.com";
+// export const BACKEND_DOMAIN = "http://localhost:3002";
 
 export const AUTH_EVENT = {
   SIGNED_IN: "SIGNED_IN",
