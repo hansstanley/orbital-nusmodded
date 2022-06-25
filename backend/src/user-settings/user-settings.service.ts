@@ -106,7 +106,7 @@ export class UserSettingsService {
     const setting = await this.find(profileId, 'ROADMAP');
 
     if (setting) {
-      return JSON.parse(setting.value);
+      return JSON.parse(setting.value || null);
     } else {
       return USER_SETTINGS_DEFAULT.ROADMAP;
     }
@@ -114,7 +114,7 @@ export class UserSettingsService {
 
   async setRoadmap(
     profileId: string,
-    roadmap: object
+    roadmap: object[]
   ): Promise<UserSettings> {
     return this.create(profileId, 'ROADMAP', JSON.stringify(roadmap));
   }

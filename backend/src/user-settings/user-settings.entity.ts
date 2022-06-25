@@ -19,7 +19,7 @@ export class UserSettings extends Model {
   @Column
   key: UserSettingsKeys;
 
-  @Column
+  @Column(DataType.TEXT)
   value: string;
 
   @PrimaryKey

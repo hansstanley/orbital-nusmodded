@@ -27,9 +27,15 @@ function AuthSessionProvider({ children }) {
   const [authEvent, setAuthEvent] = useState(null);
   const [user, setUser] = useState(supabase.auth.user());
   const [profile, setProfile] = useState(null);
+  const [aud, setAud] = useState(false);
   const { pushSnack } = useSnackbar();
 
-  const isAuth = useCallback(() => !!user?.aud, [user?.aud]);
+  useEffect(() => {
+    const newAud = !!user && !!accessToken;
+    if (newAud !== aud) setAud(newAud);
+  }, [aud, user, accessToken]);
+
+  const isAuth = useCallback(() => aud, [aud]);
 
   const getAccessToken = async (userId, username) => {
     if (!userId || !username) return null;

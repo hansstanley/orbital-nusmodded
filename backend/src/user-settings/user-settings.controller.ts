@@ -9,7 +9,7 @@ import {
   Req,
   UseGuards
 } from '@nestjs/common';
-import { isBoolean, isInt, isObject, isUUID } from 'class-validator';
+import { isArray, isBoolean, isInt, isJSON, isObject, isUUID } from 'class-validator';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { ReqUserModel } from 'src/auth/models';
@@ -59,7 +59,7 @@ export class UserSettingsController {
         }
         break;
       case 'ROADMAP':
-        if (isObject(value)) {
+        if (isArray(value)) {
           return this.userSettingsService.setRoadmap(id, value);
         }
     }
