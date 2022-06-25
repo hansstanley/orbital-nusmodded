@@ -5,8 +5,9 @@ import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import AccountDetails from "./AccountDetails";
 import CustomizeSettings from "./CustomizeSettings";
+import WelcomePage from "./WelcomePage";
 
-const steps = ["Enter Account Details", "Customize Settings", "Done!"];
+const steps = ["Account Details", "Customize Settings", "Done!"];
 
 export default function ProgressStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
@@ -30,9 +31,9 @@ export default function ProgressStepper() {
       </Stepper>
       {
         {
-          0: <AccountDetails activeStep={activeStep} handleNext={handleNext} />,
-          1: <CustomizeSettings />,
-          2: <></>,
+          0: <AccountDetails handleNext={handleNext} />,
+          1: <CustomizeSettings handleNext={handleNext}/>,
+          2: <WelcomePage/>,
         }[activeStep]
       }
     </Box>

@@ -9,10 +9,13 @@ import {
   MenuItem,
   Box,
 } from "@mui/material";
-import { useState } from "react";
 import * as React from 'react';
+import { useCallback, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { CourseInfoContext } from "../../contexts";
+import { useCourse } from "../../providers";
+import { useBackend } from "../../providers";
+import { useSnackbar } from "../../providers";
 
 const minYearWidth = 1;
 const [minYear, maxYear] = [1, 6];
@@ -30,8 +33,17 @@ export default function Settings() {
   const [yearWidth, setYearWidth] = useState(cookies.yearWidth ?? [1, 4]);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [maxMCs, setMaxMCs] = useState("20");
-  const { courseList, isCoursesLoaded } = React.useContext(CourseInfoContext);
+  const { getCourseArray } = useCourse();
+  // const { courseList, isCoursesLoaded } = React.useContext([]);
   const arrMCs = [...Array(39).keys()].map(x => x += 12);
+
+  getCourseArray().map(course => course.title)
+
+  const sortCourses = React.useCallback(() => {
+    let courses = getCourseArray();
+
+    return courses;
+  }, [getCourseArray]);
 
   const handleChangeCourse = (event) => {
     setSelectedCourse(event.target.value);
@@ -59,9 +71,71 @@ export default function Settings() {
     setCookies("yearWidth", yearWidth, { path: "/" });
   };
 
+  const { makeRequest } = useBackend();
+  const { pushSnack } = useSnackbar();
+  const [loading, setLoading] = useState(false);
+  const [allMods, setAllMods] = useState([]);
+
+/*  useEffect(() => {
+    async function init() {
+      setLoading(true);
+      try {
+        const { status, data } = await makeRequest({
+          method: "get",
+          route: "/user-settings",
+          isPublic: false,
+        });
+
+        if (status === 200 && data?.COURSE) {
+          setSelectedCourse(data.COURSE || "");
+        } else {
+          setSelectedCourse("");
+        }
+      } catch (error) {
+        console.error(error);
+        pushSnack({
+          message: "Unable to retrieve course",
+          severity: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    init();
+  }, [makeRequest, pushSnack]);
+
+  useEffect(() => {
+    async function saveCourse() {
+      try {
+        const { status } = await makeRequest({
+          method: "post",
+          route: "/user-settings/edit",
+          data: {
+            key: "COURSE",
+            value: selectedCourse,
+          },
+          isPublic: false,
+        });
+
+        if (status !== 200) {
+          throw new Error("Unable to save course");
+        }
+      } catch (error) {
+        console.error(error);
+        pushSnack({
+          message: error.message || "Unable to save course",
+          severity: "error",
+        });
+      }
+    }
+
+    saveCourse();
+  }, [selectedCourse, makeRequest, pushSnack]);*/
+
   return (
     <Stack spacing={3} sx={{ display: "flex", flex: 1 }}>
-      <Stack spacing={1}>
+      {/* <Stack spacing={1}>
         <Typography variant="h6">Year of study</Typography>
         <Card sx={{ p: 2, pl: 5 }}>
           <Slider
@@ -76,7 +150,7 @@ export default function Settings() {
             disableSwap
           />
         </Card>
-      </Stack>
+      </Stack> */}
       <Stack spacing={1}>
         <Typography variant="h6">Course</Typography>
         <FormControl fullWidth sx={{ width: 300 }}>
@@ -86,7 +160,7 @@ export default function Settings() {
             label="Course"
             onChange={handleChangeCourse}
           >
-            {courseList
+            {sortCourses()
             .map( course => 
               <MenuItem value = {course.title}>{course.title}</MenuItem>
             )}

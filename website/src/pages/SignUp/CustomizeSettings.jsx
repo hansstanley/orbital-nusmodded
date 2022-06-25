@@ -7,15 +7,27 @@ import {
   Box,
   Typography,
   Card,
+  Stack,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { supabase } from "../../services";
 import Settings from "../Settings";
 
-export default function CustomizeSettings() {
+export default function CustomizeSettings({ handleNext }) {
   return (
-    <Box sx={{ display: "flex", flex: 1, margin: 2 }}>
+    <>
+    <Stack sx={{ display: "flex", flex: 1, margin: 2 }}>
+      <Stack marginTop={8} alignItems='center'>
       <Settings />
-    </Box>
+      <Button
+          variant="contained"
+          sx={{ mt: 20, width: 300 }}
+          onClick = {handleNext}
+        >
+          Next
+        </Button>
+    </Stack>
+    </Stack>
+    </>
   );
 }

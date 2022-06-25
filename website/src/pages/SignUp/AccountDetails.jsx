@@ -11,7 +11,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { supabase } from "../../services";
 import { useAuthSession } from "../../providers";
 
-export default function SignUp({ activeStep, handleNext }) {
+export default function SignUp({ handleNext }) {
   const [validateInput, setValidateInput] = useState("");
   const [loading, setLoading] = useState(false);
   const { handleSignup } = useAuthSession();
