@@ -29,7 +29,7 @@ function AuthSessionProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const { pushSnack } = useSnackbar();
 
-  const isAuth = useCallback(() => !!user, [user]);
+  const isAuth = useCallback(() => !!user?.aud, [user?.aud]);
 
   const getAccessToken = async (userId, username) => {
     if (!userId || !username) return null;

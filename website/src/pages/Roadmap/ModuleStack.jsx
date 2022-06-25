@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { styled } from "@mui/material/styles";
 import {
   Paper,
@@ -10,13 +10,13 @@ import {
 } from "@mui/material";
 import { RoadmapperService } from "../../services";
 // import ModuleBox from "./ModuleBox";
-import { ModuleBox } from "../../components/Mod";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import BookIcon from "@mui/icons-material/Book";
 import RightDrawer from "./RightDrawer";
 import { supabase } from "../../services";
 import { useBackend } from "../../providers";
 import { useAuthSession, useSnackbar } from "../../providers";
-import { useEffect } from "react";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -71,15 +71,11 @@ export default function NestedGrid() {
   //   });
   // console.log(data);
   const { profile, updateProfile } = useAuthSession();
-  const [roadMap, setRoadMap] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [allMods, setAllMods] = React.useState([]);
+  const [roadMap, setRoadMap] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [allMods, setAllMods] = useState([]);
 
   useEffect(() => {
-    console.log(roadMap);
-  }, [roadMap]);
-
-  React.useEffect(() => {
     if (profile) {
       setRoadMap(profile.roadmap);
       setLoading(false);
@@ -163,13 +159,56 @@ export default function NestedGrid() {
           }
         });
 
-        console.log(roadmap.find((sem) => parseInt(sem.id) === parseInt("-1")));
-
         handleUpdate(roadmap);
 
         return roadmap;
       });
     }
+  };
+
+  const myMods = useMemo(
+    () =>
+      roadMap
+        ?.find((sem) => parseInt(sem.id) === -1)
+        ?.modules?.map((moduleCode) => ({ moduleCode })) || [],
+
+    [roadMap]
+  );
+
+  const handleAddMyMods = (moduleCodes = []) => {
+    const holdingSem = roadMap.find((sem) => parseInt(sem.id) === -1);
+    const { modules: currCodes, ...others } = holdingSem;
+    const newCodes = moduleCodes.filter(
+      (code) => !allMods.includes(code) && !currCodes?.includes(code)
+    );
+    const holdingCodes = newCodes.concat(holdingSem.modules || []);
+    const newHoldingSem = {
+      modules: holdingCodes,
+      ...others,
+    };
+
+    const newRoadmap = roadMap.map((sem) =>
+      sem.id === newHoldingSem.id ? newHoldingSem : sem
+    );
+    setRoadMap(newRoadmap);
+    handleUpdate(newRoadmap);
+
+    return newCodes;
+  };
+
+  const handleDeleteMyMod = (moduleCode) => {
+    const holdingSem = roadMap.find((sem) => parseInt(sem.id) === -1);
+    const { modules: currCodes, ...others } = holdingSem;
+    const newHoldingSem = {
+      modules: currCodes?.filter((code) => code !== moduleCode) || [],
+      ...others,
+    };
+
+    const newRoadmap = roadMap.map((sem) =>
+      sem.id === newHoldingSem.id ? newHoldingSem : sem
+    );
+    setRoadMap(newRoadmap);
+    handleUpdate(newRoadmap);
   };
 
   const handleAdd = (selected) => {
@@ -214,7 +253,6 @@ export default function NestedGrid() {
       });
 
       handleUpdate(roadmap);
-      console.log(moduleCode);
       return roadmap;
     });
   };
@@ -241,12 +279,29 @@ export default function NestedGrid() {
                 />
               ))}
           <RightDrawer
+            items={[
+              {
+                icon: <BookIcon />,
+                label: "My modules",
+              },
+            ]}
+          >
+            <ModStack
+              mods={myMods}
+              isDroppable={true}
+              droppableId="-1"
+              handleAddMods={handleAddMyMods}
+              handleDeleteMod={handleDeleteMyMod}
+            />
+            <div />
+          </RightDrawer>
+          {/* <RightDrawer
             roadMap={roadMap}
             handleAdd={handleAdd}
             loadingProfile={loading}
             allMods={allMods}
             handleDelete={handleDelete}
-          />
+          /> */}
         </DragDropContext>
       </Stack>
     </>

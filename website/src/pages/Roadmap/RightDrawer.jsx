@@ -1,5 +1,3 @@
-import * as React from "react";
-import { styled, useTheme } from "@mui/material/styles";
 import {
   Button,
   Box,
@@ -14,10 +12,16 @@ import {
   Slide,
   CardHeader,
   CardContent,
+  SpeedDial,
+  SpeedDialIcon,
+  SpeedDialAction,
 } from "@mui/material";
+import { useState } from "react";
 import MuiAppBar from "@mui/material/AppBar";
+import BlockIcon from "@mui/icons-material/Block";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import EditIcon from "@mui/icons-material/Edit";
 import AddModules from "./AddModules";
 import { ModuleStack as ModStack } from "../../components/Mod";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -26,49 +30,52 @@ import { maxHeight } from "@mui/system";
 
 const drawerWidth = 350;
 
-export default function DrawerRight({
+export default function RightDrawer({
+  items = [], // { icon, label, content }
+  children,
   roadMap,
   handleAdd,
+  handleDelete,
   loadingProfile,
   allMods,
-  handleDelete,
 }) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [drawerIndex, setDrawerIndex] = useState(0);
+  const [drawerTitle, setDrawerTitle] = useState(null);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+  const handleDrawerOpen = () => setOpen(true);
+  const handleDrawerClose = () => setOpen(false);
+
+  const handleSelect = (title, index) => () => {
+    setDrawerTitle(title);
+    setDrawerIndex(index);
+    handleDrawerOpen();
   };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  {
-    /* <Button sx = {{position: "absolute", top: '45%', right: "-1%", zIndex: 2000, transform: 'rotate(-90deg)', height: 50, width: 150}} >
-  <Typography noWrap>Add modules</Typography>
-</Button> */
-  }
 
   return (
-    // <Box sx={{ display: "flex" }}>
-    //   {!open && <RoadmapFab onClick={handleDrawerOpen} />}
-    //   <Drawer
-    //     sx={{
-    //       width: "auto",
-    //       height: "auto",
-    //       flexShrink: 0,
-    //       "& .MuiDrawer-paper": {
-    //         width: drawerWidth,
-    //       },
-    //     }}
-    //     BackdropProps={{ invisible: true }}
-    //     variant="persistent"
-    //     anchor="right"
-    //     open={open}
-    //     onClose={handleDrawerClose}
-    //   >
     <>
-      <RoadmapFab onClick={handleDrawerOpen} hidden={open} />
+      <SpeedDial
+        ariaLabel="Roadmap SpeedDial"
+        icon={<SpeedDialIcon />}
+        sx={{ position: "absolute", bottom: 32, right: 32 }}
+        hidden={open}
+      >
+        {items.map((item, index) => (
+          <SpeedDialAction
+            key={index}
+            icon={item.icon || <EditIcon />}
+            tooltipTitle={item.label || ""}
+            onClick={handleSelect(item.label, index)}
+          />
+        ))}
+        {items.length ? null : (
+          <SpeedDialAction
+            icon={<BlockIcon />}
+            tooltipTitle="No actions available"
+            onClick={handleDrawerClose}
+          />
+        )}
+      </SpeedDial>
       <Slide direction="left" in={open} mountOnEnter unmountOnExit>
         <Card
           raised={true}
@@ -80,7 +87,7 @@ export default function DrawerRight({
           }}
         >
           <CardHeader
-            subheader="My modules"
+            subheader={drawerTitle}
             action={
               <IconButton onClick={handleDrawerClose}>
                 <ChevronRightIcon />
@@ -89,7 +96,8 @@ export default function DrawerRight({
           />
           <Divider />
           <CardContent>
-            <Droppable droppableId={"-1"}>
+            {children[drawerIndex] || "Nothing here."}
+            {/* <Droppable droppableId={"-1"}>
               {(provided, snapshot) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   <AddModules
@@ -103,12 +111,10 @@ export default function DrawerRight({
                   {provided.placeholder}
                 </div>
               )}
-            </Droppable>
+            </Droppable> */}
           </CardContent>
         </Card>
       </Slide>
     </>
-    //   </Drawer>
-    // </Box>
   );
 }

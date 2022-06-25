@@ -23,11 +23,14 @@ import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
 import { useAuthSession, useMod, useSnackbar } from "../../providers";
 import ModuleBox from "./ModuleBox";
+import { Droppable } from "react-beautiful-dnd";
 
 export default function ModuleStack({
   title = "Modules",
-  mods = [],
-  handleAddMods = async (moduleCodes = []) => {},
+  mods,
+  isDroppable = false,
+  droppableId,
+  handleAddMods = async (moduleCodes = []) => [],
   handleDeleteMod = async (moduleCode) => {},
 }) {
   const { isAuth } = useAuthSession();
@@ -126,6 +129,30 @@ export default function ModuleStack({
     }
   };
 
+  const moduleList = (
+    <TransitionGroup component={Stack} spacing={1}>
+      {sortMods().map((mod, index) => (
+        <Collapse key={mod.moduleCode}>
+          <ModuleBox
+            key={mod.moduleCode}
+            index={index}
+            moduleCode={mod.moduleCode}
+            isDraggable={isDroppable}
+            actions={
+              <Button
+                color="error"
+                disabled={!isAuth() || loading}
+                onClick={handleDelete(mod.moduleCode)}
+              >
+                Delete
+              </Button>
+            }
+          />
+        </Collapse>
+      ))}
+    </TransitionGroup>
+  );
+
   return (
     <Stack spacing={1} width={320}>
       <Stack
@@ -220,25 +247,18 @@ export default function ModuleStack({
           )}
         </Card>
       </Collapse>
-      <TransitionGroup component={Stack} spacing={1}>
-        {sortMods().map((mod) => (
-          <Collapse key={mod.moduleCode}>
-            <ModuleBox
-              key={mod.moduleCode}
-              moduleCode={mod.moduleCode}
-              actions={
-                <Button
-                  color="error"
-                  disabled={!isAuth() || loading}
-                  onClick={handleDelete(mod.moduleCode)}
-                >
-                  Delete
-                </Button>
-              }
-            />
-          </Collapse>
-        ))}
-      </TransitionGroup>
+      {isDroppable ? (
+        <Droppable droppableId={`${droppableId}`}>
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {moduleList}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      ) : (
+        moduleList
+      )}
       {sortMods().length ? null : (
         <Typography variant="body2">No modules.</Typography>
       )}
