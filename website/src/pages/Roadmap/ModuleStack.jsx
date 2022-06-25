@@ -7,9 +7,16 @@ import {
   Divider,
   Box,
   Skeleton,
+  ButtonGroup,
+  Button,
+  IconButton,
+  Collapse,
+  Zoom,
 } from "@mui/material";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import BookIcon from "@mui/icons-material/Book";
 import RightDrawer from "./RightDrawer";
 import { useBackend } from "../../providers";
@@ -25,22 +32,29 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function Semester({ modules, year, semester, index }) {
+  const [open, setOpen] = useState(false);
+
+  const toggleOpen = () => setOpen(!open);
+
   if (year === null) {
     return <></>;
   }
 
   return (
     <Stack spacing={2} direction="row" alignItems="center">
-      <Typography variant="h6" sx={{ alignSelf: "center" }}>
-        Y{year} S{semester}
-      </Typography>
+      <Button
+        variant="outlined"
+        endIcon={open ? <ArrowLeftIcon /> : <ArrowRightIcon />}
+        onClick={toggleOpen}
+      >
+        Y{year}S{semester}
+      </Button>
       <Divider orientation="vertical" />
-      <Droppable droppableId={String(index + 1)} direction="horizontal">
+      <Droppable droppableId={`${index + 1}`} direction="horizontal">
         {(provided) => (
           <Stack
             spacing={1}
             direction="row"
-            alignItems="center"
             {...provided.droppableProps}
             ref={provided.innerRef}
           >
