@@ -1,12 +1,8 @@
-import {
-  IconButton,
-  TextField,
-  InputAdornment,
-} from '@mui/material';
+import { IconButton, TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-const SearchBar = ({setSearchQuery, handleSearch }) => (
-    <TextField
+const SearchBar = ({ setSearchQuery, handleSearch }) => (
+  <TextField
     id="search-bar"
     className="text"
     onInput={(e) => {
@@ -17,15 +13,15 @@ const SearchBar = ({setSearchQuery, handleSearch }) => (
     placeholder="Search..."
     size="small"
     InputProps={{
-    endAdornment: (
-      <InputAdornment>
-        <IconButton>
-          <SearchIcon onClick = {handleSearch}/>
-        </IconButton>
-      </InputAdornment>
-      )
+      endAdornment: (
+        <InputAdornment position="end">
+          <IconButton>
+            <SearchIcon onClick={handleSearch} />
+          </IconButton>
+        </InputAdornment>
+      ),
     }}
-    />
+  />
 );
 
 export default function search({ setSearchQuery, handleSearch }) {
@@ -36,10 +32,9 @@ export default function search({ setSearchQuery, handleSearch }) {
         alignSelf: "center",
         justifyContent: "center",
         flexDirection: "column",
-        padding: 20
       }}
     >
-      <SearchBar setSearchQuery={setSearchQuery} handleSearch = {handleSearch}/>
+      <SearchBar setSearchQuery={setSearchQuery} handleSearch={handleSearch} />
     </div>
   );
 }
