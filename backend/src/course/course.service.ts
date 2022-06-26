@@ -6,14 +6,17 @@ import {
   Logger
 } from '@nestjs/common';
 import { ModGroup } from 'src/mod-group/mod-group.entity';
+import { ModGroupService } from 'src/mod-group/mod-group.service';
 import { Mod } from 'src/mod/mod.entity';
 import { ModService } from 'src/mod/mod.service';
 import { REPO } from 'src/utils/constants';
 import { v4 as uuidv4 } from 'uuid';
 import { Course } from './course.entity';
 import {
+  BindModGroupsDto,
   BindModsDto,
   CreateCourseDto,
+  UnbindModGroupsDto,
   UnbindModsDto,
   UpdateCourseDto
 } from './dto';
@@ -25,7 +28,8 @@ export class CourseService {
   constructor(
     @Inject(REPO.COURSE)
     private courseRepository: typeof Course,
-    private readonly modService: ModService
+    private readonly modService: ModService,
+    private readonly modGroupService: ModGroupService
   ) { }
 
   /**
@@ -135,7 +139,7 @@ export class CourseService {
     );
 
     const passed: string[] = await Promise.all(mods
-      .filter((mod) => mod ?? false)
+      .filter((mod) => !!mod)
       .map(async (mod) => {
         await course.$add('mod', mod, { through: { type } });
         return mod.moduleCode;
@@ -158,6 +162,42 @@ export class CourseService {
     const { moduleCodes } = unbindModsDto;
 
     const count = await course.$remove('mod', moduleCodes);
+    return count;
+  }
+
+  async bindModGroups(
+    course: Course,
+    bindModGroupsDto: BindModGroupsDto
+  ): Promise<string[]> {
+    const { groupIds } = bindModGroupsDto;
+
+    const modGroups: ModGroup[] = await Promise.all(
+      groupIds.map((id) => this.modGroupService.find(id))
+    );
+
+    const passed: string[] = await Promise.all(modGroups
+      .filter((modGroup) => !!modGroup)
+      .map(async (modGroup) => {
+        await course.$add('modGroup', modGroup);
+        return modGroup.id;
+      }));
+
+    return passed;
+  }
+
+  async unbindModGroups(
+    course: Course,
+    unbindModGroupsDto: UnbindModGroupsDto
+  ): Promise<number> {
+    const { groupIds } = unbindModGroupsDto;
+    const count = await course.$remove('modGroup', groupIds);
+
+    const modGroups: ModGroup[] = await Promise.all(
+      groupIds.map((id) => this.modGroupService.find(id))
+    );
+    await Promise.all(modGroups
+      .filter((modGroup) => !!modGroup && !modGroup.global)
+      .map((modGroup) => this.modGroupService.delete(modGroup.id)));
     return count;
   }
 }

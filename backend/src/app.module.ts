@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -8,6 +9,10 @@ import { NusmodsModule } from './nusmods/nusmods.module';
 import { ModModule } from './mod/mod.module';
 import { ModGroupModule } from './mod-group/mod-group.module';
 import { RoadmapModule } from './roadmap/roadmap.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { appProviders } from './app.providers';
+import { UserSettingsModule } from './user-settings/user-settings.module';
 
 @Module({
   imports: [
@@ -17,9 +22,15 @@ import { RoadmapModule } from './roadmap/roadmap.module';
     NusmodsModule,
     ModModule,
     ModGroupModule,
-    RoadmapModule
+    RoadmapModule,
+    AuthModule,
+    UserModule,
+    UserSettingsModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    ...appProviders
+  ],
 })
 export class AppModule { }

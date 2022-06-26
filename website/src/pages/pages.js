@@ -1,7 +1,7 @@
 import { Divider } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
-import MenuBookIcon from '@mui/icons-material/MenuBook';
+import MenuBookIcon from "@mui/icons-material/MenuBook";
 import MapIcon from "@mui/icons-material/Map";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Roadmap from "./Roadmap";
@@ -11,6 +11,8 @@ import Landing from "./Landing";
 import Auth from "./Auth";
 import Account from "./Account";
 import Courses from "./Courses";
+import SignUp from "./SignUp";
+import CourseDetail from "./Courses/CourseDetail";
 
 const pages = [
   {
@@ -63,9 +65,19 @@ const pages = [
     content: <Auth />,
   },
   {
+    key: "signup",
+    path: "/signup",
+    content: <SignUp />,
+  },
+  {
     key: "landing",
     path: "/",
     content: <Landing />,
+  },
+  {
+    key: "courseDetail",
+    path: "/courses/detail",
+    content: <CourseDetail />,
   },
 ];
 

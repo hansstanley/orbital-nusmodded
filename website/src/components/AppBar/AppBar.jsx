@@ -1,44 +1,72 @@
-import { AppBar as MuiAppBar, Box, IconButton, Toolbar } from "@mui/material";
+import {
+  AppBar as MuiAppBar,
+  Box,
+  IconButton,
+  Toolbar,
+  Stack,
+} from "@mui/material";
 import React, { useContext } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import AppTitle from "./AppTitle";
 import MenuIcon from "@mui/icons-material/Menu";
 import ColorModeButton from "./ColorModeButton";
 import { DrawerContext, LandingContext } from "../../contexts";
-import LoginButton from "./LoginButton";
+import AuthButtonGroup from "../AuthButtonGroup";
 
 const AnimatedAppBar = animated(MuiAppBar);
 
-/**
- * An application bar that goes into the navigation frame.
- *
- * @param {object} props Props from the parent container.
- * @returns An application bar.
- */
-export default function AppBar() {
-  const { handleDrawerToggle } = useContext(DrawerContext);
-  const { isLanding } = useContext(LandingContext);
+// /**
+//  * An application bar that goes into the navigation frame.
+//  *
+//  * @param {object} props Props from the parent container.
+//  * @returns An application bar.
+//  */
+// export default function AppBar() {
+//   const { handleDrawerToggle } = useContext(DrawerContext);
+//   const { isLanding } = useContext(LandingContext);
 
-  const { barY } = useSpring({
-    barY: isLanding ? -64 : 0,
-  });
+//   const { barY } = useSpring({
+//     barY: isLanding ? -64 : 0,
+//   });
+
+//   return (
+//     <AnimatedAppBar
+//       position="fixed"
+//       color="background"
+//       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+//       style={{ y: barY }}
+//     >
+//       <Toolbar>
+//         <IconButton color="primary" edge="start" onClick={handleDrawerToggle}>
+//           <MenuIcon />
+//         </IconButton>
+//         <AppTitle />
+//         <Box sx={{ flex: 1 }} />
+//         <LoginButton />
+//         <ColorModeButton />
+//       </Toolbar>
+//     </AnimatedAppBar>
+//   );
+// }
+
+export default function AppBar() {
+  const { drawerOpen, handleDrawerToggle } = useContext(DrawerContext);
 
   return (
-    <AnimatedAppBar
+    <MuiAppBar
       position="fixed"
       color="background"
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      style={{ y: barY }}
     >
       <Toolbar>
         <IconButton color="primary" edge="start" onClick={handleDrawerToggle}>
           <MenuIcon />
         </IconButton>
-        <AppTitle />
+        <AppTitle drawerOpen = {drawerOpen} onClick={handleDrawerToggle}/>
         <Box sx={{ flex: 1 }} />
-        <LoginButton />
+        <AuthButtonGroup />
         <ColorModeButton />
       </Toolbar>
-    </AnimatedAppBar>
+    </MuiAppBar>
   );
 }

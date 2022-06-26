@@ -1,10 +1,16 @@
 import { CookiesProvider } from "react-cookie";
-import AuthSessionProvider from "./authSession.provider";
+
+import { AuthSessionProvider } from "./auth-session.provider";
 import DrawerContextProvider from "./drawer.provider";
 import LandingProvider from "./landing.provider";
 import ModuleInfoProvider from "./moduleInfo.provider";
-import SnackbarProvider from "./snackbar.provider";
+import { SnackbarProvider } from "./snackbar.provider";
 import ThemeContextProvider from "./themeContext.provider";
+import CourseInfoProvider from "./courseInfo.provider";
+import { BackendProvider } from "./backend.provider";
+import { CourseProvider } from "./course.provider";
+import { ModProvider } from "./mod.provider";
+import { ModGroupProvider } from "./mod-group.provider";
 
 function combineComponents(...components) {
   return components.reduce(
@@ -21,12 +27,17 @@ function combineComponents(...components) {
 
 const providers = [
   CookiesProvider,
+  SnackbarProvider,
   AuthSessionProvider,
+  BackendProvider,
   ThemeContextProvider,
+  CourseProvider,
+  ModProvider,
+  ModGroupProvider,
   ModuleInfoProvider,
   LandingProvider,
   DrawerContextProvider,
-  SnackbarProvider,
+  CourseInfoProvider,
 ];
 
 export const AppContextProvider = combineComponents(...providers);

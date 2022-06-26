@@ -5,15 +5,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { supabase } from "../services";
 import { ResponsiveStack } from "../components";
-import { SnackbarContext } from "../contexts";
+import { useSnackbar } from "../providers";
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
-  const { pushSnack } = useContext(SnackbarContext);
+  const { pushSnack } = useSnackbar();
 
   const handleLogin = async (e) => {
     e.preventDefault();

@@ -2,8 +2,8 @@ import { ModGroup } from "src/mod-group/mod-group.entity";
 import { Mod } from "src/mod/mod.entity";
 
 export class RoadmapError {
-  mods?: Mod[];
-  modGroups?: ModGroup[];
+  affectedMods?: Mod[];
+  affectedModGroups?: ModGroup[];
   message: string;
 
   constructor(message: string) {
@@ -11,12 +11,13 @@ export class RoadmapError {
   }
 
   addMods(...mods: Mod[]) {
-    this.mods = (this.mods ?? []).concat(mods);
+    this.affectedMods = (this.affectedMods ?? []).concat(mods);
     return this;
   }
 
   addModGroups(...modGroups: ModGroup[]) {
-    this.modGroups = (this.modGroups ?? []).concat(modGroups);
+    this.affectedModGroups = (this.affectedModGroups ?? [])
+      .concat(modGroups);
     return this;
   }
 }

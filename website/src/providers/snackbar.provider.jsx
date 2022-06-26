@@ -1,4 +1,11 @@
-import { useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   Alert,
   Button,
@@ -7,11 +14,14 @@ import {
   Snackbar,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { SnackbarContext } from "../contexts";
 
 const severities = ["success", "info", "warning", "error"];
 
-export default function SnackbarProvider({ children }) {
+const SnackbarContext = createContext({
+  pushSnack: ({ message, severity, action }) => {},
+});
+
+function SnackbarProvider({ children }) {
   const [snackPack, setSnackPack] = useState([]);
   const [open, setOpen] = useState(false);
   const [snack, setSnack] = useState(undefined);
@@ -24,12 +34,12 @@ export default function SnackbarProvider({ children }) {
     }
   }, [snack, snackPack]);
 
-  const pushSnack = ({ message, severity, action }) => {
+  const pushSnack = useCallback(({ message, severity, action }) => {
     setSnackPack((prev) => [
       ...prev,
       { message: message, severity: severity, action: action },
     ]);
-  };
+  }, []);
 
   const handleLatest = () => {
     setOpen(false);
@@ -62,8 +72,10 @@ export default function SnackbarProvider({ children }) {
       </IconButton>
     );
 
+  const value = useMemo(() => ({ pushSnack }), [pushSnack]);
+
   return (
-    <SnackbarContext.Provider value={{ pushSnack: pushSnack }}>
+    <SnackbarContext.Provider value={value}>
       {snack && severities.includes(snack.severity) ? (
         <Snackbar
           open={open}
@@ -93,3 +105,14 @@ export default function SnackbarProvider({ children }) {
     </SnackbarContext.Provider>
   );
 }
+
+function useSnackbar() {
+  const context = useContext(SnackbarContext);
+  if (!(context ?? false)) {
+    throw new Error("useSnackbar must be used within an SnackbarProvider");
+  }
+
+  return context;
+}
+
+export { SnackbarProvider, useSnackbar };

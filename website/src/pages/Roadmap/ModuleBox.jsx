@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { Card, CardActionArea, CardContent, Dialog, Skeleton, Typography } from "@mui/material";
+import { Card, CardActionArea, CardContent, Dialog, Skeleton, Typography, IconButton, Stack } from "@mui/material";
 import { ModuleInfoContext } from "../../contexts";
-
+import CloseIcon from '@mui/icons-material/Close';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 export default function ModuleBox(props) {
-  const { moduleCode } = props;
+  const { moduleCode, index, handleDelete } = props;
 
   const [open, setOpen] = React.useState(false);
 
@@ -14,6 +15,24 @@ export default function ModuleBox(props) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  function getStyle(style, snapshot) {
+    if (!snapshot.isDropAnimating) {
+      return style;
+    }
+    const { moveTo } = snapshot.dropAnimation;
+    // move to the right spot
+    const translate = `translate(${moveTo.x}px, ${moveTo.y}px)`;
+  
+    // patching the existing style
+    return {
+      ...style,
+      transform: `${translate}`,
+      // slowing down the drop because we can
+      transition: `all ${0.2}s`,
+    };
+  }
+
 
   const generateContent = (moduleMap, isLoaded) => {
     const moduleInfo = isLoaded
@@ -25,21 +44,32 @@ export default function ModuleBox(props) {
         };
     return moduleInfo ? (
       <>
-        <Card>
-          <CardActionArea onClick={handleClickOpen}>
-            <CardContent sx={{ width: 340, height: 90 }}>
-              <Typography variant="caption" position='relative' bottom='5%'>
-                {moduleInfo.moduleCredit} MCs
-              </Typography>
-              <Typography variant="subtitle1" position='relative' bottom='5%'>
-                {moduleInfo.moduleCode}
-              </Typography>
-              <Typography variant="body2" position='relative' bottom='10%' noWrap >
-                {moduleInfo.title}
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
+        <Draggable draggableId={moduleCode} index={index} key={moduleCode}>
+        {(provided, snapshot) => (
+            <Card ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                style={getStyle(provided.draggableProps.style, snapshot)}>
+                <CardContent sx={{ position: "relative", width: 340, height: 90 }} onClick={handleClickOpen}>
+                
+                  {index === "-1"
+                  ? <IconButton sx={{ position: "absolute", top: 8, right: 25}} onClick = {() => handleDelete(moduleInfo.moduleCode)}>
+                      <CloseIcon />
+                    </IconButton>
+                  : <></>}
+                  <Typography variant="caption" position='relative' bottom='5%'>
+                    {moduleInfo.moduleCredit} MCs
+                  </Typography>
+                  <Typography variant="subtitle1" position='relative' bottom='5%'>
+                    {moduleInfo.moduleCode}
+                  </Typography>
+                  <Typography variant="body2" position='relative' bottom='10%' noWrap >
+                    {moduleInfo.title}
+                  </Typography>
+                </CardContent>
+            </Card>
+          )}
+        </Draggable>
         <Dialog onClose={handleClose} open={open} maxWidth = 'lg'>
           <Card sx={{
               display: 'flex',
@@ -48,7 +78,10 @@ export default function ModuleBox(props) {
               width: 'fit-content',
               padding: 2,
             }}>
-            <Typography variant="body2">
+            <IconButton sx={{ position: "absolute", top: 8, right: 8, zIndex: 2000}} onClick = {handleClose}>
+              <CloseIcon />
+            </IconButton>
+            <Typography position = "relative" bottom = '10%' variant="body2">
               {moduleInfo.department + ", " + moduleInfo.faculty}
             </Typography>
             <Typography variant="body">

@@ -1,10 +1,12 @@
 import { Sequelize } from 'sequelize-typescript';
 import { ConfigService } from '@nestjs/config';
+import { CONFIG, SEQUELIZE } from 'src/utils/constants';
 import { Course } from 'src/course/course.entity';
 import { CourseMod, CourseModGroup, ModGroupMod } from './entities/relations';
 import { Mod } from 'src/mod/mod.entity';
 import { ModGroup } from 'src/mod-group/mod-group.entity';
-import { CONFIG, SEQUELIZE } from 'src/utils/constants';
+import { Profile } from 'src/user/profile.entity';
+import { UserSettings } from 'src/user-settings/user-settings.entity';
 
 const configService = new ConfigService();
 
@@ -22,7 +24,9 @@ export const databaseProviders = [
         CourseModGroup,
         Mod,
         ModGroup,
-        ModGroupMod
+        ModGroupMod,
+        Profile,
+        UserSettings
       ]);
 
       await sequelize.sync();

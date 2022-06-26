@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import AppBar from "./AppBar";
 import NavDrawer from "./NavDrawer";
 import MainFrame from "./MainFrame";
@@ -24,10 +24,8 @@ export default function NavFrame(props) {
   };
 
   return (
-    <Box
-      sx={{ display: "flex", minHeight: "100vh" }}
-      bgcolor="background.paper"
-    >
+    <Box sx={{ display: "flex" }} bgcolor="background.paper">
+      <CssBaseline />
       <AppBar handleDrawerToggle={handleDrawerToggle} />
       <NavDrawer
         drawerWidth={DRAWER_WIDTH}

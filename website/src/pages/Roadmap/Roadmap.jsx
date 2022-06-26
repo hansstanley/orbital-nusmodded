@@ -1,7 +1,13 @@
-import { Typography } from "@mui/material";
-import { useContext } from "react";
 import ModuleStack from "./ModuleStack";
+import { ResponsiveStack } from "../../components";
+import { AuthGuard } from "../../components";
 
 export default function Roadmap() {
-  return <ModuleStack />;
+  return (
+    <AuthGuard>
+      <ResponsiveStack>
+        <ModuleStack />
+      </ResponsiveStack>
+    </AuthGuard>
+  );
 }

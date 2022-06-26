@@ -1,3 +1,3 @@
-import useWindowDimensions from "./windowDimensions";
+import useWindowDimensions from "./useWindowDimensions";
 
 export { useWindowDimensions };

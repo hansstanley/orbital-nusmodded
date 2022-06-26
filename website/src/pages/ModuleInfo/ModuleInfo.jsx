@@ -24,19 +24,19 @@ export default function ModuleInfo() {
     setPage(0);
   };
   const filterData = (mod) => {
-    if (mod.moduleCode.toLowerCase().includes(searchQuery)) {
+    if (mod.moduleCode.toLowerCase().includes(searchQuery.toLowerCase())) {
       return true;
     }
-    if (mod.title.toLowerCase().includes(searchQuery)) {
+    if (mod.title.toLowerCase().includes(searchQuery.toLowerCase())) {
       return true;
     }
     return false;
   };
 
   return (
-    <Stack spacing={2} minWidth = "100%">
+    <Stack spacing={2} minWidth="100%">
       <Stack direction="row" justifyContent="space-between">
-        <Paper sx={{ p: 1 }} elevation={3} >
+        <Paper sx={{ p: 1 }} elevation={3}>
           <TablePagination
             count={modules.filter(filterData).length}
             page={page}
@@ -54,7 +54,7 @@ export default function ModuleInfo() {
           .filter(filterData)
           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
           .map((mod) => (
-            <Paper key={mod.moduleCode} sx={{ p: 1}} elevation={3}>
+            <Paper key={mod.moduleCode} sx={{ p: 1 }} elevation={3}>
               <Typography variant="overline">{mod.faculty}</Typography>
               <Typography variant="h6">{mod.moduleCode}</Typography>
               <Typography variant="body1">

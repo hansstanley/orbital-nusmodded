@@ -1,4 +1,8 @@
+import { Type } from "class-transformer";
+
 export class PrereqTree {
-  and?: string | PrereqTree[];
-  or?: string | PrereqTree[];
+  @Type(() => PrereqTree)
+  and?: (string | PrereqTree)[];
+
+  or?: string[];
 }
