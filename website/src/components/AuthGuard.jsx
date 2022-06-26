@@ -33,8 +33,14 @@ export default function AuthGuard({ children }) {
         <Typography variant="h3" color="primary" sx={{ fontWeight: "bold" }}>
           NUSMODDED
         </Typography>
-        <Typography>Please login to use this feature</Typography>
-        {loading ? <CircularProgress /> : <AuthButtonGroup />}
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <>
+            <Typography>Please login to use this feature</Typography>
+            <AuthButtonGroup />
+          </>
+        )}
       </Stack>
     </Box>
   );
