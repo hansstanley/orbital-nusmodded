@@ -1,10 +1,15 @@
-import { Stack, Typography } from "@mui/material";
+import {
+  CircularProgress,
+  LinearProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import { useAuthSession } from "../providers";
 import AuthButtonGroup from "./AuthButtonGroup";
 
 export default function AuthGuard({ children }) {
-  const { isAuth } = useAuthSession();
+  const { loading, isAuth } = useAuthSession();
 
   return isAuth() ? (
     children
@@ -19,13 +24,17 @@ export default function AuthGuard({ children }) {
     >
       <Stack
         spacing={2}
-        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         <Typography variant="h3" color="primary" sx={{ fontWeight: "bold" }}>
           NUSMODDED
         </Typography>
         <Typography>Please login to use this feature</Typography>
-        <AuthButtonGroup />
+        {loading ? <CircularProgress /> : <AuthButtonGroup />}
       </Stack>
     </Box>
   );

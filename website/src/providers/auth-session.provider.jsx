@@ -13,6 +13,7 @@ import { Profile } from "../models";
 import { AUTH_EVENT, BACKEND_DOMAIN } from "../utils/constants";
 
 const AuthSessionContext = createContext({
+  loading: false,
   accessToken: null,
   profile: new Profile(),
   isAuth: () => false,
@@ -23,6 +24,7 @@ const AuthSessionContext = createContext({
 });
 
 function AuthSessionProvider({ children }) {
+  const [loading, setLoading] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [authEvent, setAuthEvent] = useState(null);
   const [user, setUser] = useState(supabase.auth.user());
@@ -46,29 +48,22 @@ function AuthSessionProvider({ children }) {
       .from("profiles")
       .update({ auth_token: authToken }, { returning: "minimal" })
       .match({ id: userId });
-    if (error) {
-      console.error("getAccessToken", error);
-      throw error;
-    }
+    if (error) throw error;
 
-    try {
-      const { status, data } = await axios.post(
-        "/auth/login",
-        {
-          username: username,
-          password: authToken,
-        },
-        { baseURL: BACKEND_DOMAIN }
-      );
+    const { status, data } = await axios.post(
+      "/auth/login",
+      {
+        username: username,
+        password: authToken,
+      },
+      { baseURL: BACKEND_DOMAIN }
+    );
 
-      if (status === 200 && data) {
-        setAccessToken(data.accessToken);
-        return data.accessToken;
-      } else {
-        throw new Error(`Unable to retrieve access token for ${username}`);
-      }
-    } catch (error) {
-      console.error("getAccessToken", error);
+    if (status === 200 && data) {
+      setAccessToken(data.accessToken);
+      return data.accessToken;
+    } else {
+      throw new Error(`Unable to retrieve access token for ${username}`);
     }
   };
 
@@ -169,8 +164,8 @@ function AuthSessionProvider({ children }) {
     switch (authEvent) {
       case AUTH_EVENT.SIGNED_IN:
         pushSnack({
-          message: `Signed in`,
-          severity: "info",
+          message: `Signed in!`,
+          severity: "success",
         });
         break;
       case AUTH_EVENT.SIGNED_OUT:
@@ -186,6 +181,8 @@ function AuthSessionProvider({ children }) {
   useEffect(() => {
     async function init() {
       if (user) {
+        setLoading(true);
+
         let userProfile = await getProfile(user.id);
         if (!userProfile) {
           userProfile = await createProfile(
@@ -198,10 +195,17 @@ function AuthSessionProvider({ children }) {
           .updateProperty("email", user.email);
         setProfile(userProfile);
 
-        await getAccessToken(user.id, userProfile.username);
+        try {
+          await getAccessToken(user.id, userProfile.username);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
       } else {
         setAccessToken(null);
         setProfile(null);
+        setLoading(false);
       }
     }
 
@@ -209,6 +213,7 @@ function AuthSessionProvider({ children }) {
   }, [user, createProfile, getProfile]);
 
   const value = {
+    loading,
     accessToken,
     profile,
     isAuth,
