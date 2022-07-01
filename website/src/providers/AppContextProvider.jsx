@@ -11,6 +11,7 @@ import { BackendProvider } from "./backend.provider";
 import { CourseProvider } from "./course.provider";
 import { ModProvider } from "./mod.provider";
 import { ModGroupProvider } from "./mod-group.provider";
+import { RoadmapProvider } from "./roadmap.provider";
 
 function combineComponents(...components) {
   return components.reduce(
@@ -38,6 +39,7 @@ const providers = [
   LandingProvider,
   DrawerContextProvider,
   CourseInfoProvider,
+  RoadmapProvider,
 ];
 
 export const AppContextProvider = combineComponents(...providers);

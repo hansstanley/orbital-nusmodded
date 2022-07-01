@@ -1,13 +1,10 @@
-import ModuleStack from "./ModuleStack";
-import { ResponsiveStack } from "../../components";
 import { AuthGuard } from "../../components";
+import RoadmapStack from "./RoadmapStack";
 
 export default function Roadmap() {
   return (
     <AuthGuard>
-      <ResponsiveStack>
-        <ModuleStack />
-      </ResponsiveStack>
+      <RoadmapStack />
     </AuthGuard>
   );
 }

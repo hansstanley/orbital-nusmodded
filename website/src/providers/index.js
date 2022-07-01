@@ -8,6 +8,7 @@ import LandingProvider from "./landing.provider";
 import { ModGroupProvider, useModGroup } from "./mod-group.provider";
 import { ModProvider, useMod } from "./mod.provider";
 import ModuleInfoProvider from "./moduleInfo.provider";
+import { RoadmapProvider, useRoadmap } from "./roadmap.provider";
 import { SnackbarProvider, useSnackbar } from "./snackbar.provider";
 import ThemeContextProvider from "./themeContext.provider";
 
@@ -22,6 +23,7 @@ export {
   ModGroupProvider,
   ModProvider,
   ModuleInfoProvider,
+  RoadmapProvider,
   SnackbarProvider,
   ThemeContextProvider,
 };
@@ -32,5 +34,6 @@ export {
   useCourse,
   useModGroup,
   useMod,
+  useRoadmap,
   useSnackbar,
 };
