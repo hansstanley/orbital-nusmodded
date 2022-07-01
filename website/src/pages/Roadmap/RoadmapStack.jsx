@@ -1,76 +1,62 @@
 import { useEffect, useMemo, useState } from "react";
-import { styled } from "@mui/material/styles";
-import {
-  Paper,
-  Stack,
-  Typography,
-  Divider,
-  Box,
-  Skeleton,
-  ButtonGroup,
-  Button,
-  IconButton,
-  Collapse,
-  Zoom,
-} from "@mui/material";
+import { Stack, Typography, Divider, Box, Skeleton, Chip } from "@mui/material";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
-import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import BookIcon from "@mui/icons-material/Book";
 import RightDrawer from "./RightDrawer";
-import { useBackend, useRoadmap } from "../../providers";
-import { useSnackbar } from "../../providers";
-import { ROADMAP_TEMPLATE, ROADMAP } from "../../utils/constants";
+import { useRoadmap } from "../../providers";
+import { ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
 import SemesterOrderer from "./SemesterOrderer";
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-}));
-
-function Semester({ sem, index }) {
+function Semester({ sem }) {
   const { id, year, semester, modules } = sem;
-  const [open, setOpen] = useState(false);
-
-  const toggleOpen = () => setOpen(!open);
 
   return (
     <Stack spacing={2} direction="row" alignItems="center">
-      <Button
-        variant="outlined"
-        endIcon={open ? <ArrowLeftIcon /> : <ArrowRightIcon />}
-        onClick={toggleOpen}
-      >
-        Y{year}S{semester}
-      </Button>
       <Divider orientation="vertical" />
-      <Droppable droppableId={id} direction="horizontal">
-        {(provided) => (
-          <Stack
-            spacing={1}
-            direction="row"
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-            {modules?.map((moduleCode, index) => (
-              <ModuleBox
-                moduleCode={moduleCode}
-                key={moduleCode}
-                index={index}
-                isDraggable={true}
-              />
-            ))}
-            {modules?.length ? null : (
-              <Typography>Drag modules here</Typography>
-            )}
-            {provided.placeholder}
-          </Stack>
-        )}
-      </Droppable>
+      <Stack spacing={2} alignItems="flex-start">
+        <Chip
+          label={`Year ${year || "?"} ${
+            Object.keys(SEMESTER_TITLE)
+              .map((key) => parseInt(key))
+              .includes(semester)
+              ? SEMESTER_TITLE[semester]
+              : "Semester ?"
+          }`}
+        />
+        <Droppable droppableId={id} direction="horizontal">
+          {(provided) => (
+            <Stack
+              spacing={1}
+              direction="row"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {modules?.map((moduleCode, index) => (
+                <ModuleBox
+                  moduleCode={moduleCode}
+                  key={moduleCode}
+                  index={index}
+                  isDraggable={true}
+                />
+              ))}
+              {modules?.length ? null : (
+                <Typography
+                  sx={{
+                    borderColor: "gray",
+                    borderRadius: 1,
+                    borderStyle: "dashed",
+                    p: 4,
+                  }}
+                >
+                  Drag modules here
+                </Typography>
+              )}
+              {provided.placeholder}
+            </Stack>
+          )}
+        </Droppable>
+      </Stack>
       <Divider orientation="vertical" />
     </Stack>
   );
@@ -85,8 +71,6 @@ export default function RoadmapStack() {
     getSemesterById,
     setModulesById,
   } = useRoadmap();
-  const { pushSnack } = useSnackbar();
-  const [roadMap, setRoadMap] = useState([]);
 
   const allMods = useMemo(
     () =>
@@ -136,7 +120,7 @@ export default function RoadmapStack() {
 
   return (
     <>
-      <Stack spacing={1.5} width="100%" overflow="auto">
+      <Stack spacing={2} width="100%" overflow="auto">
         <SemesterOrderer />
         <DragDropContext onDragEnd={onDragEnd}>
           {loading
@@ -147,9 +131,7 @@ export default function RoadmapStack() {
                   </Skeleton>
                 </Stack>
               ))
-            : getSemesters().map((sem, index) => (
-                <Semester key={sem.id} sem={sem} index={index} />
-              ))}
+            : getSemesters().map((sem) => <Semester key={sem.id} sem={sem} />)}
           <RightDrawer
             items={[
               {

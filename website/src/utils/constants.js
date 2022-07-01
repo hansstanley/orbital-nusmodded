@@ -22,6 +22,7 @@ export const SEMESTER_TITLE = {
 export const ROADMAP = {
   MY_MODS_ID: v5("MY_MODS", NIL),
   COURSE_MODS_ID: v5("COURSE_MODS", NIL),
+  SEMESTER_MAX_COUNT: 10,
   TEMPLATE: () => {
     const res = [];
     [1, 2, 3, 4].forEach((year) => {
@@ -38,60 +39,3 @@ export const ROADMAP = {
     return res;
   },
 };
-
-export const ROADMAP_TEMPLATE = [
-  {
-    id: 1,
-    year: 1,
-    modules: [],
-    semester: 1,
-  },
-  {
-    id: 2,
-    year: 1,
-    modules: [],
-    semester: 2,
-  },
-  {
-    id: 3,
-    year: 2,
-    modules: [],
-    semester: 1,
-  },
-  {
-    id: 4,
-    year: 2,
-    modules: [],
-    semester: 2,
-  },
-  {
-    id: 5,
-    year: 3,
-    modules: [],
-    semester: 1,
-  },
-  {
-    id: 6,
-    year: 3,
-    modules: [],
-    semester: 2,
-  },
-  {
-    id: 7,
-    year: 4,
-    modules: [],
-    semester: 1,
-  },
-  {
-    id: 8,
-    year: 4,
-    modules: [],
-    semester: 2,
-  },
-  {
-    id: -1,
-    year: null,
-    modules: [],
-    semester: null,
-  },
-];

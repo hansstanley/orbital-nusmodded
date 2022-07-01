@@ -3,23 +3,19 @@ import {
   Button,
   ButtonGroup,
   Card,
-  CardActions,
-  CardContent,
-  CardHeader,
   Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Divider,
-  IconButton,
   Stack,
   Typography,
 } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import AddIcon from "@mui/icons-material/Add";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { SEMESTER_TITLE } from "../../utils/constants";
+import { ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useRoadmap } from "../../providers";
 
@@ -49,24 +45,27 @@ export default function SemesterOrderer() {
       </Box>
       <Dialog open={open} onClose={handleClose} maxWidth="lg">
         <DialogContent>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="semester-orderer">
-              {(provided) => (
-                <Stack
-                  spacing={1}
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
-                  {getSemesters().map((sem, index) => (
-                    <SemesterBar key={sem.id} sem={sem} index={index} />
-                  ))}
-                  {provided.placeholder}
-                </Stack>
-              )}
-            </Droppable>
-          </DragDropContext>
+          <Stack spacing={1}>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="semester-orderer">
+                {(provided) => (
+                  <Stack
+                    spacing={1}
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                  >
+                    {getSemesters().map((sem, index) => (
+                      <SemesterBar key={sem.id} sem={sem} index={index} />
+                    ))}
+                    {provided.placeholder}
+                  </Stack>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </Stack>
         </DialogContent>
         <DialogActions>
+          <AddSemesterButton />
           <Button onClick={handleClose}>Done</Button>
         </DialogActions>
       </Dialog>
@@ -81,8 +80,11 @@ function SemesterBar({ sem = {}, index }) {
   const [open, setOpen] = useState(false);
 
   const title = useMemo(() => {
+    let yearPlaceholder = null;
+    let semesterPlaceholder = null;
+
     if (typeof year !== "number") {
-      return `Unknown year ${year}`;
+      yearPlaceholder = "?";
     }
 
     if (
@@ -90,10 +92,12 @@ function SemesterBar({ sem = {}, index }) {
         .map((key) => parseInt(key))
         .includes(semester)
     ) {
-      return `Unknown semester ${semester}`;
+      semesterPlaceholder = "Semester ?";
     }
 
-    return `Year ${year} ${SEMESTER_TITLE[semester]}`;
+    return `Year ${yearPlaceholder ?? year} ${
+      semesterPlaceholder ?? SEMESTER_TITLE[semester]
+    }`;
   }, [year, semester]);
 
   const handleOpen = () => setOpen(true);
@@ -110,7 +114,7 @@ function SemesterBar({ sem = {}, index }) {
           <Stack spacing={1}>
             <DialogContentText>Year of study:</DialogContentText>
             <ButtonGroup>
-              {[...Array(10).keys()]
+              {[...Array(ROADMAP.SEMESTER_MAX_COUNT).keys()]
                 .map((key) => (key += 1))
                 .map((key) => (
                   <Button
@@ -139,6 +143,7 @@ function SemesterBar({ sem = {}, index }) {
           </Stack>
         </DialogContent>
         <DialogActions>
+          <DeleteSemesterButton semesterId={id} />
           <Button onClick={handleClose}>Done</Button>
         </DialogActions>
       </Dialog>
@@ -172,6 +177,60 @@ function SemesterBar({ sem = {}, index }) {
           </Card>
         )}
       </Draggable>
+    </>
+  );
+}
+
+function AddSemesterButton() {
+  const { addSemester, getSemesters } = useRoadmap();
+
+  const disabled = getSemesters().length === ROADMAP.SEMESTER_MAX_COUNT;
+
+  const handleAdd = () => addSemester({ year: null, semester: null });
+
+  return (
+    <Button
+      variant="outlined"
+      startIcon={<AddIcon />}
+      disabled={disabled}
+      onClick={handleAdd}
+    >
+      Add semester
+    </Button>
+  );
+}
+
+function DeleteSemesterButton({ semesterId }) {
+  const { deleteSemesterById } = useRoadmap();
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const handleDelete = () => {
+    deleteSemesterById(semesterId);
+    handleClose();
+  };
+
+  return (
+    <>
+      <Button color="error" onClick={handleOpen}>
+        Delete
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Delete semester</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you wish to delete this semester?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button color="error" onClick={handleDelete}>
+            Delete
+          </Button>
+          <Button onClick={handleClose}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
