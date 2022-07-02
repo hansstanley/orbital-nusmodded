@@ -22,7 +22,7 @@ export const SEMESTER_TITLE = {
 export const ROADMAP = {
   MY_MODS_ID: v5("MY_MODS", NIL),
   COURSE_MODS_ID: v5("COURSE_MODS", NIL),
-  SEMESTER_MAX_COUNT: 10,
+  YEAR_MAX_COUNT: 10,
   TEMPLATE: () => {
     const res = [];
     [1, 2, 3, 4].forEach((year) => {

@@ -12,7 +12,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
@@ -22,6 +22,8 @@ import { useRoadmap } from "../../providers";
 export default function SemesterOrderer() {
   const { loading, getSemesters, dragSemesters } = useRoadmap();
   const [open, setOpen] = useState(false);
+  const [newSemesterId, setNewSemesterId] = useState(null);
+  const newSemesterRef = useRef(null);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -30,6 +32,13 @@ export default function SemesterOrderer() {
     if (!source || !destination) return;
 
     dragSemesters(source.index, destination.index);
+  };
+
+  const onAdd = (semesterId) => {
+    setNewSemesterId(semesterId);
+    setTimeout(() => {
+      newSemesterRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 500);
   };
 
   return (
@@ -55,7 +64,12 @@ export default function SemesterOrderer() {
                     {...provided.droppableProps}
                   >
                     {getSemesters().map((sem, index) => (
-                      <SemesterBar key={sem.id} sem={sem} index={index} />
+                      <SemesterBar
+                        key={sem.id}
+                        sem={sem}
+                        index={index}
+                        isNew={sem.id === newSemesterId}
+                      />
                     ))}
                     {provided.placeholder}
                   </Stack>
@@ -63,9 +77,10 @@ export default function SemesterOrderer() {
               </Droppable>
             </DragDropContext>
           </Stack>
+          <div ref={newSemesterRef} />
         </DialogContent>
         <DialogActions>
-          <AddSemesterButton />
+          <AddSemesterButton onAdd={onAdd} />
           <Button onClick={handleClose}>Done</Button>
         </DialogActions>
       </Dialog>
@@ -73,7 +88,7 @@ export default function SemesterOrderer() {
   );
 }
 
-function SemesterBar({ sem = {}, index }) {
+function SemesterBar({ sem = {}, index, isNew = false }) {
   const { id, year, semester, modules } = sem;
 
   const { setYearById, setSemesterById } = useRoadmap();
@@ -114,7 +129,7 @@ function SemesterBar({ sem = {}, index }) {
           <Stack spacing={1}>
             <DialogContentText>Year of study:</DialogContentText>
             <ButtonGroup>
-              {[...Array(ROADMAP.SEMESTER_MAX_COUNT).keys()]
+              {[...Array(ROADMAP.YEAR_MAX_COUNT).keys()]
                 .map((key) => (key += 1))
                 .map((key) => (
                   <Button
@@ -150,7 +165,7 @@ function SemesterBar({ sem = {}, index }) {
       <Draggable draggableId={`${id}`} index={index}>
         {(provided) => (
           <Card
-            sx={{ p: 1 }}
+            sx={isNew ? { p: 1, border: 2, borderColor: "green" } : { p: 1 }}
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
@@ -181,12 +196,18 @@ function SemesterBar({ sem = {}, index }) {
   );
 }
 
-function AddSemesterButton() {
+function AddSemesterButton({ onAdd = () => {} }) {
   const { addSemester, getSemesters } = useRoadmap();
 
-  const disabled = getSemesters().length === ROADMAP.SEMESTER_MAX_COUNT;
+  const semestersPerYear = Object.keys(SEMESTER_TITLE).length;
 
-  const handleAdd = () => addSemester({ year: null, semester: null });
+  const disabled =
+    getSemesters().length >= ROADMAP.YEAR_MAX_COUNT * semestersPerYear;
+
+  const handleAdd = () => {
+    const semesterId = addSemester({ year: null, semester: null });
+    onAdd(semesterId);
+  };
 
   return (
     <Button

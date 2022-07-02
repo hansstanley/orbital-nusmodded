@@ -113,6 +113,7 @@ function RoadmapProvider({ children }) {
       const newRoadmap = [...roadmap];
       newRoadmap.push({ id, year, semester, modules });
       setRoadmap(newRoadmap);
+      return id;
     },
     [roadmap]
   );
