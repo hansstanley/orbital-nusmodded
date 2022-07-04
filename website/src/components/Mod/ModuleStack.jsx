@@ -206,7 +206,7 @@ export default function ModuleStack({
               multiple
               onChange={handleAutocomplete}
               value={selected}
-              options={modArray}
+              options={modArray.filter(mod => !mods.map(x => x.moduleCode).includes(mod.moduleCode))}
               getOptionLabel={(option) => option.moduleCode}
               isOptionEqualToValue={(option, value) =>
                 option.moduleCode === value.moduleCode
