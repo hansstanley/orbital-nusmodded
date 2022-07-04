@@ -30,6 +30,7 @@ function AuthSessionProvider({ children }) {
   const [user, setUser] = useState(supabase.auth.user());
   const [profile, setProfile] = useState(null);
   const [aud, setAud] = useState(false);
+  const [admin, setAdmin] = useState(false);
   const { pushSnack } = useSnackbar();
 
   useEffect(() => {
@@ -78,12 +79,16 @@ function AuthSessionProvider({ children }) {
       return null;
     }
 
+    setAdmin(data.admin);
+
     const result = new Profile()
       .updateProperty("username", data.username)
       .updateProperty("avatarUrl", data.avatar_url)
       .updateProperty("roadmap", data.roadmap);
     return result;
   }, []);
+
+  const isAdmin = useCallback(() => admin, [admin]);
 
   const createProfile = useCallback(async (userId, username) => {
     const { data, error } = await supabase
@@ -217,6 +222,7 @@ function AuthSessionProvider({ children }) {
     accessToken,
     profile,
     isAuth,
+    isAdmin,
     handleSignup,
     handleSignin,
     handleSignout,

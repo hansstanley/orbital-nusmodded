@@ -4,7 +4,7 @@ import { useAuthSession, useCourse, useSnackbar } from "../../providers";
 import CourseFormDialog from "./CourseFormDialog";
 
 export default function AddCourseButton() {
-  const { isAuth } = useAuthSession();
+  const { isAuth, isAdmin } = useAuthSession();
   const { createCourse } = useCourse();
   const { pushSnack } = useSnackbar();
   const [open, setOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function AddCourseButton() {
   };
 
   return (
-    <>
+    isAdmin() ? <>
       <Button variant="outlined" onClick={handleOpen} disabled={!isAuth()}>
         Add course
       </Button>
@@ -56,6 +56,6 @@ export default function AddCourseButton() {
         handleSubmit={handleSubmit}
         handleClose={handleClose}
       />
-    </>
+    </> : <></>
   );
 }

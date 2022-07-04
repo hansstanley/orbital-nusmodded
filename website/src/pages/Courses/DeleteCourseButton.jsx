@@ -23,7 +23,7 @@ export default function DeleteCourseButton({
   variant = "text",
 }) {
   const navigate = useNavigate();
-  const { isAuth } = useAuthSession();
+  const { isAuth, isAdmin } = useAuthSession();
   const { deleteCourse } = useCourse();
   const { pushSnack } = useSnackbar();
   const [open, setOpen] = useState(false);
@@ -69,7 +69,7 @@ export default function DeleteCourseButton({
   };
 
   return (
-    <>
+    isAdmin() ? <>
       <Button
         color="error"
         variant={variant}
@@ -122,6 +122,6 @@ export default function DeleteCourseButton({
           )}
         </Box>
       </Dialog>
-    </>
+    </> : <></>
   );
 }

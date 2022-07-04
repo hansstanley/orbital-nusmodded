@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import { useModGroup, useSnackbar } from "../../providers";
+import { useAuthSession, useModGroup, useSnackbar } from "../../providers";
 import ModGroupBox from "./ModGroupBox";
 import ModGroupForm from "./ModGroupForm";
 import { stringToInt } from "../../utils/parsers";
@@ -19,7 +19,9 @@ export default function ModGroupStack({
   modGroups = [],
   handleBindModGroup = async (groupId) => {},
   handleUnbindModGroup = async (groupId) => {},
+  isCourse = false,
 }) {
+  const { isAdmin } = useAuthSession();
   const { createModGroup } = useModGroup();
   const { pushSnack } = useSnackbar();
   const [open, setOpen] = useState(false);
@@ -86,9 +88,10 @@ export default function ModGroupStack({
     <Stack spacing={1} width={320}>
       <Stack spacing={2} direction="row" justifyContent="space-between">
         <Typography variant="h6">{title}</Typography>
-        <IconButton color="primary" onClick={handleOpen}>
-          <AddIcon />
-        </IconButton>
+        {!isCourse || isAdmin() ?
+          <IconButton color="primary" onClick={handleOpen}>
+            <AddIcon />
+          </IconButton> : <></>}
       </Stack>
       <Divider />
       <Box>
@@ -98,7 +101,7 @@ export default function ModGroupStack({
               key={modGroup.id}
               modGroup={modGroup}
               actions={
-                <>
+                !isCourse || isAdmin() ? <>
                   <Button
                     color="error"
                     disabled={loading}
@@ -110,7 +113,7 @@ export default function ModGroupStack({
                     modGroup={modGroup}
                     handleBindModGroup={handleBindModGroup}
                   />
-                </>
+                </> : <></>
               }
             />
           ))

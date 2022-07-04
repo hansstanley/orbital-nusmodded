@@ -8,7 +8,7 @@ export default function EditCourseButton({
   course = new Course(),
   variant = "text",
 }) {
-  const { isAuth } = useAuthSession();
+  const { isAuth, isAdmin } = useAuthSession();
   const { updateCourse } = useCourse();
   const { pushSnack } = useSnackbar();
   const [open, setOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function EditCourseButton({
   };
 
   return (
-    <>
+    isAdmin() ? <>
       <Button
         variant={variant}
         onClick={handleOpen}
@@ -65,6 +65,6 @@ export default function EditCourseButton({
         handleSubmit={handleSubmit}
         handleClose={handleClose}
       />
-    </>
+    </> : <></>
   );
 }
