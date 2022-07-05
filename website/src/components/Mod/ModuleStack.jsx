@@ -24,7 +24,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { useAuthSession, useMod, useSnackbar } from "../../providers";
 import ModuleBox from "./ModuleBox";
 import { Droppable } from "react-beautiful-dnd";
-import ModGroupBox from "../../pages/Roadmap/";
+import ModGroupBox from "../../pages/Roadmap/ModGroupBox";
 
 export default function ModuleStack({
   title = "Modules",
@@ -153,62 +153,65 @@ export default function ModuleStack({
     }
   };
 
+  const modCode = (moduleCode) => {
+    if (moduleCode[0] !== "^") {
+      return moduleCode;
+    } else {
+      console.log( moduleCode.split("^")[3]);
+      return  moduleCode.split("^")[3];
+    }
+  }
+
   const moduleList = (
     <TransitionGroup component={Stack} spacing={1}>
       {sortMods().map((mod, index) => (
         <Collapse key={mod.moduleCode}>
-          {mod.moduleCode[0] !== "^" ?
-          <ModuleBox
-            key={mod.moduleCode}
-            index={index}
-            moduleCode={mod.moduleCode}
-            isDraggable={isDroppable}
-            actions={
-              !isCourse || isAdmin() ?
-              <>
-                {isSelect ? 
-                <Button
-                  color="error"
-                  disabled={!isAuth() || loading}
-                  onClick={handleSelect(mod.moduleCode)}
-                >
-                  Select
-                </Button> : <></>}
-                <Button
-                  color="error"
-                  disabled={!isAuth() || loading}
-                  onClick={handleDelete(mod.moduleCode)}
-                >
-                  Delete
-                </Button>
-              </> : <></>
-            }
-          /> :
-          <ModGroupBox
-            name={mod.moduleCode}
-            key={mod.moduleCode}
-            index={index}
-            isDraggable={true}
-            actions={
-              !isCourse || isAdmin() ?
-              <>
-                {isSelect ? 
-                <Button
-                  color="error"
-                  disabled={!isAuth() || loading}
-                  onClick={handleSelect(mod.moduleCode)}
-                >
-                  Select
-                </Button> : <></>}
-                <Button
-                  color="error"
-                  disabled={!isAuth() || loading}
-                  onClick={handleDelete(mod.moduleCode)}
-                >
-                  Delete
-                </Button>
-              </> : <></>}
-          />}
+          {mod.moduleCode[0] !== "^" ? 
+            <ModuleBox
+              key={modCode(mod.moduleCode)}
+              index={index}
+              moduleCode={modCode(mod.moduleCode)}
+              isDraggable={isDroppable}
+              actions={
+                !isCourse || isAdmin() ?
+                <>
+                  {isSelect ? 
+                  <Button
+                    color="error"
+                    disabled={!isAuth() || loading}
+                    onClick={handleSelect(mod.moduleCode)}
+                  >
+                    Select
+                  </Button> : <></>}
+                  <Button
+                    color="error"
+                    disabled={!isAuth() || loading}
+                    onClick={handleDelete(mod.moduleCode)}
+                  >
+                    Delete
+                  </Button>
+                </> : <></>
+              }
+            /> :
+            <ModGroupBox 
+              name={mod.moduleCode}
+              key={mod.moduleCode}
+              index={index}
+              isDraggable={true}
+              actions={
+                !isCourse || isAdmin() ?
+                <>
+                  <Button
+                    color="error"
+                    disabled={!isAuth() || loading}
+                    onClick={handleDelete(mod.moduleCode)}
+                  >
+                    Delete
+                  </Button>
+                </> : <></>
+              }
+              />
+              }
         </Collapse>
       ))}
     </TransitionGroup>
