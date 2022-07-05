@@ -25,10 +25,13 @@ import { ModGroup } from "../../models";
 import { useModGroup, useSnackbar } from "../../providers";
 import ModuleStack from "../Mod/ModuleStack";
 import ResponsiveStack from "../ResponsiveStack";
+import { Draggable } from "react-beautiful-dnd";
 
 export default function ModGroupBox({
   modGroup = new ModGroup(),
   actions = null,
+  isDraggable = false,
+  index,
 }) {
   const { getModGroupMods, bindModGroupMods, unbindModGroupMods } =
     useModGroup();
@@ -74,34 +77,58 @@ export default function ModGroupBox({
     return count;
   };
 
-  return (
-    <Accordion key={modGroup.id}>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography>{modGroup.name}</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Stack spacing={1}>
-          <Typography variant="body2">{modGroup.description}</Typography>
-          <Divider />
-          <Stack direction="row" flexWrap="wrap">
-            {mods.length ? (
-              mods.map((mod) => (
-                <Chip
-                  key={mod.moduleCode}
-                  label={mod.moduleCode}
-                  sx={{ mr: 1, mb: 1 }}
-                />
-              ))
-            ) : (
-              <Typography variant="body2">No modules.</Typography>
-            )}
+  const content = (
+    <>
+      <Accordion key={modGroup.id}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography>{modGroup.name}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Stack spacing={1}>
+            <Typography variant="body2">{modGroup.description}</Typography>
+            <Divider />
+            <Stack direction="row" flexWrap="wrap">
+              {mods.length ? (
+                mods.map((mod) => (
+                  <Chip
+                    key={mod.moduleCode}
+                    label={mod.moduleCode}
+                    sx={{ mr: 1, mb: 1 }}
+                  />
+                ))
+              ) : (
+                <Typography variant="body2">No modules.</Typography>
+              )}
+            </Stack>
           </Stack>
-        </Stack>
-      </AccordionDetails>
-      <AccordionActions>
-        {actions}
-        <Button onClick={handleOpen}>View</Button>
-      </AccordionActions>
+        </AccordionDetails>
+        <AccordionActions>
+          {actions}
+          <Button onClick={handleOpen}>View</Button>
+        </AccordionActions>
+      </Accordion>
+    </>
+  );
+
+  return (
+    <>
+      {isDraggable ? (
+        <Draggable draggableId={`${modGroup.id}`} index={index} key={`${modGroup.id}`}>
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >
+              {content}
+            </div>
+          )}
+        </Draggable>
+      ) : (
+        <>
+          {content}
+        </>
+      )}
       <Dialog open={open} onClose={handleClose} maxWidth="md">
         <DialogTitle>{modGroup ? modGroup.name : <Skeleton />}</DialogTitle>
         <DialogContent dividers>
@@ -142,6 +169,6 @@ export default function ModGroupBox({
           <Button onClick={handleClose}>Close</Button>
         </DialogActions>
       </Dialog>
-    </Accordion>
+    </>
   );
 }

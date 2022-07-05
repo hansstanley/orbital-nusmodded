@@ -24,6 +24,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { useAuthSession, useMod, useSnackbar } from "../../providers";
 import ModuleBox from "./ModuleBox";
 import { Droppable } from "react-beautiful-dnd";
+import ModGroupBox from "../../pages/Roadmap/";
 
 export default function ModuleStack({
   title = "Modules",
@@ -32,7 +33,9 @@ export default function ModuleStack({
   droppableId,
   handleAddMods = async (moduleCodes = []) => [],
   handleDeleteMod = async (moduleCode) => {},
+  handleSelectMod = async (moduleCode) => {},
   isCourse = false,
+  isSelect = false,
 }) {
   const { isAuth, isAdmin } = useAuthSession();
   const { getModArray } = useMod();
@@ -130,10 +133,31 @@ export default function ModuleStack({
     }
   };
 
+  const handleSelect = (moduleCode) => async () => {
+    setLoading(true);
+
+    try {
+      await handleSelectMod(moduleCode);
+      pushSnack({
+        message: `${moduleCode} selected!`,
+        severity: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: error.message || `Unable to select ${moduleCode}`,
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const moduleList = (
     <TransitionGroup component={Stack} spacing={1}>
       {sortMods().map((mod, index) => (
         <Collapse key={mod.moduleCode}>
+          {mod.moduleCode[0] !== "^" ?
           <ModuleBox
             key={mod.moduleCode}
             index={index}
@@ -141,15 +165,50 @@ export default function ModuleStack({
             isDraggable={isDroppable}
             actions={
               !isCourse || isAdmin() ?
-              <Button
-                color="error"
-                disabled={!isAuth() || loading}
-                onClick={handleDelete(mod.moduleCode)}
-              >
-                Delete
-              </Button> : <></>
+              <>
+                {isSelect ? 
+                <Button
+                  color="error"
+                  disabled={!isAuth() || loading}
+                  onClick={handleSelect(mod.moduleCode)}
+                >
+                  Select
+                </Button> : <></>}
+                <Button
+                  color="error"
+                  disabled={!isAuth() || loading}
+                  onClick={handleDelete(mod.moduleCode)}
+                >
+                  Delete
+                </Button>
+              </> : <></>
             }
-          />
+          /> :
+          <ModGroupBox
+            name={mod.moduleCode}
+            key={mod.moduleCode}
+            index={index}
+            isDraggable={true}
+            actions={
+              !isCourse || isAdmin() ?
+              <>
+                {isSelect ? 
+                <Button
+                  color="error"
+                  disabled={!isAuth() || loading}
+                  onClick={handleSelect(mod.moduleCode)}
+                >
+                  Select
+                </Button> : <></>}
+                <Button
+                  color="error"
+                  disabled={!isAuth() || loading}
+                  onClick={handleDelete(mod.moduleCode)}
+                >
+                  Delete
+                </Button>
+              </> : <></>}
+          />}
         </Collapse>
       ))}
     </TransitionGroup>

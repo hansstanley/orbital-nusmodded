@@ -5,6 +5,7 @@ import { ROADMAP } from "../utils/constants";
 import { useAuthSession } from "./auth-session.provider";
 import { useBackend } from "./backend.provider";
 import { useSnackbar } from "./snackbar.provider";
+import { useCourse } from "./course.provider";
 
 const RoadmapContext = createContext({
   loading: false,
@@ -25,8 +26,13 @@ function RoadmapProvider({ children }) {
   const { isAuth } = useAuthSession();
   const { makeRequest } = useBackend();
   const { pushSnack } = useSnackbar();
+  const {
+    getCourseModGroups,
+    getCourseId,
+  } = useCourse();
   const [loading, setLoading] = useState(false);
   const [roadmap, setRoadmap] = useState([]);
+  const [modGroups, setModGroups] = useState([]);
 
   useEffect(() => {
     function maintainRoadmap(roadmap = []) {
@@ -200,28 +206,81 @@ function RoadmapProvider({ children }) {
     [getSemesters, getNonSemesters]
   );
 
-  const dragMods = useCallback(
-    (srcIndex, srcDroppableId, destIndex, destDroppableId) => {
-      const srcDroppable = getSemesterById(srcDroppableId);
-      const destDroppable = getSemesterById(destDroppableId);
+  useEffect(() => {
+    async function loadModGroups(courseId) {
+      const data = await getCourseModGroups(courseId);
+      setModGroups(data);
+    }
+    loadModGroups(getCourseId());
+  }, [getCourseModGroups, getCourseId]);
 
-      const [dragged] = srcDroppable.modules.splice(srcIndex, 1);
-      destDroppable.modules.splice(destIndex, 0, dragged);
-
+  const updateModuleGroup = useCallback(
+    (arr, moduleCode) => {
+      const prevId = "^" + arr[1] + "^" + arr[2] + "^" + arr[3];
+      const newId = "^" + arr[1] + "^" + arr[2] + "^" + moduleCode;
+      const newModules = roadmap.find(sem => sem.modules.includes(prevId));
+      newModules.modules[newModules.modules.indexOf(prevId)] = newId;
+      
       const newRoadmap = roadmap.map((sem) => {
-        switch (sem.id) {
-          case srcDroppable.id:
-            return srcDroppable;
-          case destDroppable.id:
-            return destDroppable;
-          default:
-            return sem;
+        if (sem.modules.includes(prevId)) {
+          return newModules;
+        } else {
+          return sem;
         }
       });
+      console.log(newRoadmap);
+    setRoadmap(newRoadmap);
+  },
+  [roadmap]
+);
+
+  const dragMods = useCallback(
+    (srcIndex, srcDroppableId, destIndex, destDroppableId) => {
+
+
+      function getModGroups() {
+        async function loadModGroups(courseId) {
+          const data = await getCourseModGroups(courseId);
+          setModGroups(data);
+        }
+        loadModGroups(getCourseId());
+        return modGroups;
+      }
+
+      const srcDroppable = srcDroppableId !== "modgroup" ? getSemesterById(srcDroppableId) : getModGroups();
+      const destDroppable = getSemesterById(destDroppableId);
+      function modGroupId(name) {
+        let temp = name;
+        roadmap.map(sem => sem.modules.forEach(mod => {if(mod.includes(temp)) {if(mod > name) name = mod;}} ));
+        return name === temp ? "^" + name + "^1^" : "^" + temp + "^" + (parseInt(name[name.length-1]) + 1) + "^";
+      }
+
+      const [dragged] = srcDroppableId !== "modgroup" ? srcDroppable.modules.splice(srcIndex, 1) : srcDroppable.splice(srcIndex, 1);
+      srcDroppableId !== "modgroup" ? destDroppable.modules.splice(destIndex, 0, dragged) : destDroppable.modules.splice(destIndex, 0, modGroupId(dragged.name));
+
+      const newRoadmap = srcDroppableId !== "modgroup" ? 
+        roadmap.map((sem) => {
+          switch (sem.id) {
+            case srcDroppable.id:
+              return srcDroppable;
+            case destDroppable.id:
+              return destDroppable;
+            default:
+              return sem;
+          }
+        }) : 
+        roadmap.map((sem) => {
+          switch (sem.id) {
+            case destDroppable.id:
+              return destDroppable;
+            default:
+              return sem;
+          }
+        });
 
       setRoadmap(newRoadmap);
     },
-    [roadmap, getSemesterById]
+    [roadmap, getSemesterById, getCourseId, getCourseModGroups, modGroups]
   );
 
   const values = {
@@ -237,6 +296,7 @@ function RoadmapProvider({ children }) {
     setModulesById,
     dragSemesters,
     dragMods,
+    updateModuleGroup,
   };
 
   return (

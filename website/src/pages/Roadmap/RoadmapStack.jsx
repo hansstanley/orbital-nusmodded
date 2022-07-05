@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { Stack, Typography, Divider, Box, Skeleton, Chip } from "@mui/material";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
+import { ModGroupStack } from "../../components/ModGroup";
+import ModGroupBox from "./ModGroupBox";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import BookIcon from "@mui/icons-material/Book";
+import BackpackIcon from "@mui/icons-material/Backpack";
 import RightDrawer from "./RightDrawer";
-import { useRoadmap } from "../../providers";
+import { useRoadmap, useCourse } from "../../providers";
 import { ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
 import SemesterOrderer from "./SemesterOrderer";
+import RoadmapGenerator from "./RoadmapGenerator";
 
 function Semester({ sem }) {
   const { id, year, semester, modules } = sem;
@@ -33,8 +37,15 @@ function Semester({ sem }) {
               ref={provided.innerRef}
             >
               {modules?.map((moduleCode, index) => (
+                moduleCode[0] !== "^" ?
                 <ModuleBox
                   moduleCode={moduleCode}
+                  key={moduleCode}
+                  index={index}
+                  isDraggable={true}
+                /> :
+                <ModGroupBox
+                  name={moduleCode}
                   key={moduleCode}
                   index={index}
                   isDraggable={true}
@@ -71,6 +82,13 @@ export default function RoadmapStack() {
     getSemesterById,
     setModulesById,
   } = useRoadmap();
+
+  const {
+    getCourseModGroups,
+    getCourseId,
+  } = useCourse();
+
+  const [modGroups, setModGroups] = useState([]);
 
   const allMods = useMemo(
     () =>
@@ -118,6 +136,14 @@ export default function RoadmapStack() {
     setModulesById(ROADMAP.MY_MODS_ID, holdingCodes);
   };
 
+  useEffect(() => {
+    async function loadModGroups(courseId) {
+      const data = await getCourseModGroups(courseId);
+      setModGroups(data);
+    }
+    loadModGroups(getCourseId());
+  }, [getCourseModGroups, getCourseId]);
+
   return (
     <>
       <Stack spacing={2} width="100%" overflow="auto">
@@ -138,6 +164,10 @@ export default function RoadmapStack() {
                 icon: <BookIcon />,
                 label: "My modules",
               },
+              {
+                icon: <BackpackIcon />,
+                label: "My module groups",
+              }
             ]}
           >
             <ModStack
@@ -147,10 +177,17 @@ export default function RoadmapStack() {
               handleAddMods={handleAddMyMods}
               handleDeleteMod={handleDeleteMyMod}
             />
+            <ModGroupStack
+              modGroups={modGroups}
+              isDroppable={true}
+              droppableId={"modgroup"}
+              isCourse = {true}
+            />
             <div />
           </RightDrawer>
         </DragDropContext>
       </Stack>
+      {/* <RoadmapGenerator /> */}
     </>
   );
 }
