@@ -39,7 +39,7 @@ export default function ModGroupBox({
   const [modGroup, setModGroup] = useState(null);
   const [modGroupMods, setModGroupMods] = useState(null);
   const { getModGroupMods, getModGroupArray } = useModGroup();
-  const { updateModuleGroup } = useRoadmap();
+  const { updateModuleGroup, getAllMods } = useRoadmap();
 
   useEffect(() => {
     async function init() {
@@ -150,7 +150,7 @@ export default function ModGroupBox({
               </Typography>
             </Stack>
             <ModuleStack
-              mods={modGroupMods}
+              mods={modGroupMods.filter(mod => !getAllMods().map(mod => mod[0] === "^" ? mod.split("^")[3] : mod).includes(mod.moduleCode))}
               handleSelectMod={handleSelectMod}
               isCourse={true}
               isSelect={true}

@@ -81,6 +81,7 @@ export default function RoadmapStack() {
     getSemesters,
     getSemesterById,
     setModulesById,
+    getAllMods,
   } = useRoadmap();
 
   const {
@@ -90,14 +91,7 @@ export default function RoadmapStack() {
 
   const [modGroups, setModGroups] = useState([]);
 
-  const allMods = useMemo(
-    () =>
-      roadmap.reduce(
-        (prev, currSem) => prev.concat(currSem?.modules || []),
-        []
-      ),
-    [roadmap]
-  );
+  const allMods = getAllMods();
 
   const myMods = useMemo(
     () =>
@@ -141,7 +135,9 @@ export default function RoadmapStack() {
       const data = await getCourseModGroups(courseId);
       setModGroups(data);
     }
-    loadModGroups(getCourseId());
+    if (getCourseId() !== "") {
+      loadModGroups(getCourseId());
+    }
   }, [getCourseModGroups, getCourseId]);
 
   return (

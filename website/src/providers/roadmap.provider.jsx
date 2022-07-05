@@ -211,7 +211,9 @@ function RoadmapProvider({ children }) {
       const data = await getCourseModGroups(courseId);
       setModGroups(data);
     }
-    loadModGroups(getCourseId());
+    if (getCourseId() !== "") {
+      loadModGroups(getCourseId());
+    }
   }, [getCourseModGroups, getCourseId]);
 
   const updateModuleGroup = useCallback(
@@ -228,11 +230,19 @@ function RoadmapProvider({ children }) {
           return sem;
         }
       });
-      console.log(newRoadmap);
     setRoadmap(newRoadmap);
   },
   [roadmap]
 );
+
+  const getAllMods = useCallback(
+    () =>
+      roadmap.reduce(
+        (prev, currSem) => prev.concat(currSem?.modules || []),
+        []
+      ),
+    [roadmap]
+  );
 
   const dragMods = useCallback(
     (srcIndex, srcDroppableId, destIndex, destDroppableId) => {
@@ -297,6 +307,7 @@ function RoadmapProvider({ children }) {
     dragSemesters,
     dragMods,
     updateModuleGroup,
+    getAllMods,
   };
 
   return (

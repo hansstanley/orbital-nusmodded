@@ -21,7 +21,7 @@ import {
 import { TransitionGroup } from "react-transition-group";
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
-import { useAuthSession, useMod, useSnackbar } from "../../providers";
+import { useAuthSession, useMod, useSnackbar, useRoadmap } from "../../providers";
 import ModuleBox from "./ModuleBox";
 import { Droppable } from "react-beautiful-dnd";
 import ModGroupBox from "../../pages/Roadmap/ModGroupBox";
@@ -40,6 +40,7 @@ export default function ModuleStack({
   const { isAuth, isAdmin } = useAuthSession();
   const { getModArray } = useMod();
   const { pushSnack } = useSnackbar();
+  const { getAllMods } = useRoadmap();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modArray, setModArray] = useState([]);
@@ -173,9 +174,8 @@ export default function ModuleStack({
               moduleCode={modCode(mod.moduleCode)}
               isDraggable={isDroppable}
               actions={
-                !isCourse || isAdmin() ?
                 <>
-                  {isSelect ? 
+                {isSelect ? 
                   <Button
                     color="error"
                     disabled={!isAuth() || loading}
@@ -183,14 +183,15 @@ export default function ModuleStack({
                   >
                     Select
                   </Button> : <></>}
+                {!isCourse || isAdmin() ?
                   <Button
                     color="error"
                     disabled={!isAuth() || loading}
                     onClick={handleDelete(mod.moduleCode)}
                   >
                     Delete
-                  </Button>
-                </> : <></>
+                  </Button> : <></>}
+                </> 
               }
             /> :
             <ModGroupBox 
@@ -268,7 +269,7 @@ export default function ModuleStack({
               multiple
               onChange={handleAutocomplete}
               value={selected}
-              options={modArray.filter(mod => !mods.map(x => x.moduleCode).includes(mod.moduleCode))}
+              options={modArray.filter(mod => !getAllMods().map(mod => mod[0] === "^" ? mod.split("^")[3] : mod).includes(mod.moduleCode))}
               getOptionLabel={(option) => option.moduleCode}
               isOptionEqualToValue={(option, value) =>
                 option.moduleCode === value.moduleCode
