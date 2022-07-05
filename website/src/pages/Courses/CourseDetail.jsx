@@ -168,11 +168,13 @@ export default function CourseDetail() {
           mods={mods}
           handleAddMods={handleAddMods}
           handleDeleteMod={handleDeleteMod}
+          isCourse = {true}
         />
         <ModGroupStack
           modGroups={modGroups}
           handleBindModGroup={handleBindModGroup}
           handleUnbindModGroup={handleUnbindModGroup}
+          isCourse = {true}
         />
       </ResponsiveStack>
       <Divider />

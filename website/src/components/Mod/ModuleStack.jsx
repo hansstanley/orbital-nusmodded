@@ -32,8 +32,9 @@ export default function ModuleStack({
   droppableId,
   handleAddMods = async (moduleCodes = []) => [],
   handleDeleteMod = async (moduleCode) => {},
+  isCourse = false,
 }) {
-  const { isAuth } = useAuthSession();
+  const { isAuth, isAdmin } = useAuthSession();
   const { getModArray } = useMod();
   const { pushSnack } = useSnackbar();
   const [open, setOpen] = useState(false);
@@ -139,13 +140,14 @@ export default function ModuleStack({
             moduleCode={mod.moduleCode}
             isDraggable={isDroppable}
             actions={
+              !isCourse || isAdmin() ?
               <Button
                 color="error"
                 disabled={!isAuth() || loading}
                 onClick={handleDelete(mod.moduleCode)}
               >
                 Delete
-              </Button>
+              </Button> : <></>
             }
           />
         </Collapse>
@@ -162,16 +164,17 @@ export default function ModuleStack({
         alignItems="center"
       >
         <Typography variant="h6">{title}</Typography>
-        <Zoom in={!open}>
-          <IconButton
-            size="inherit"
-            color="primary"
-            onClick={handleOpen}
-            disabled={!isAuth()}
-          >
-            <AddIcon />
-          </IconButton>
-        </Zoom>
+        {!isCourse || isAdmin() ?
+          <Zoom in={!open}>
+            <IconButton
+              size="inherit"
+              color="primary"
+              onClick={handleOpen}
+              disabled={!isAuth()}
+            >
+              <AddIcon />
+            </IconButton>
+          </Zoom> : <></>}
       </Stack>
       <TextField
         fullWidth
@@ -203,7 +206,7 @@ export default function ModuleStack({
               multiple
               onChange={handleAutocomplete}
               value={selected}
-              options={modArray}
+              options={modArray.filter(mod => !mods.map(x => x.moduleCode).includes(mod.moduleCode))}
               getOptionLabel={(option) => option.moduleCode}
               isOptionEqualToValue={(option, value) =>
                 option.moduleCode === value.moduleCode

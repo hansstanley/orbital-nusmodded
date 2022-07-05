@@ -134,6 +134,7 @@ export default function ModGroupBox({
               mods={mods}
               handleAddMods={handleAddMods}
               handleDeleteMod={handleDeleteMod}
+              isCourse={true}
             />
           </ResponsiveStack>
         </DialogContent>
