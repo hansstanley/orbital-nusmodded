@@ -82,6 +82,7 @@ export default function RoadmapStack() {
     getSemesterById,
     setModulesById,
     getAllMods,
+    checkSemesters,
   } = useRoadmap();
 
   const {
@@ -102,14 +103,24 @@ export default function RoadmapStack() {
   );
 
   const onDragEnd = ({ source, destination, draggableId }) => {
-    if (!source || !destination) return;
-
+    if (!source || !destination) return;  
     dragMods(
       source.index,
       source.droppableId,
       destination.index,
       destination.droppableId
     );
+
+    if (checkSemesters(getSemesters())) {
+      dragMods(
+        destination.index,
+        destination.droppableId,
+        source.index,
+        source.droppableId
+      );
+    }
+
+    
   };
 
   const handleAddMyMods = (moduleCodes = []) => {

@@ -6,6 +6,8 @@ import { useAuthSession } from "./auth-session.provider";
 import { useBackend } from "./backend.provider";
 import { useSnackbar } from "./snackbar.provider";
 import { useCourse } from "./course.provider";
+import { useMod } from "./mod.provider";
+import { ModuleInfoContext } from "../contexts";
 
 const RoadmapContext = createContext({
   loading: false,
@@ -32,7 +34,10 @@ function RoadmapProvider({ children }) {
   } = useCourse();
   const [loading, setLoading] = useState(false);
   const [roadmap, setRoadmap] = useState([]);
+  const [MCLimit, setMCLimit] = useState(0);
+  const [MCExceed, setMCExceed] = useState(false);
   const [modGroups, setModGroups] = useState([]);
+  const { modules, isLoaded } = useContext(ModuleInfoContext);
 
   useEffect(() => {
     function maintainRoadmap(roadmap = []) {
@@ -72,10 +77,16 @@ function RoadmapProvider({ children }) {
         } else {
           throw new Error(`Failed to retrieve roadmap with status ${status}`);
         }
+
+        if (status === 200) {
+          setMCLimit(data?.MC_LIMIT);
+        } else {
+          throw new Error(`Failed to retrieve MC limit with status ${status}`);
+        }
       } catch (error) {
         console.error(error);
         pushSnack({
-          message: "Unable to retrieve roadmap",
+          message: "Unable to retrieve roadmap/MC limit",
           severity: "error",
         });
       } finally {
@@ -242,7 +253,27 @@ function RoadmapProvider({ children }) {
         []
       ),
     [roadmap]
-  );
+  );  
+
+  const checkSemesters = useCallback(
+    (roadmap) => {
+      if(isLoaded) {
+        roadmap = roadmap.map(sem => sem.modules.map(mod => mod[0] === "^" ? mod.split("^")[3] : mod));
+        roadmap = roadmap.map(sem => sem.map(mod => modules.find(x => x.moduleCode === mod).moduleCredit));
+        roadmap = roadmap.map(sem => sem.reduce((a,b)=>a+parseInt(b), 0));
+        roadmap = roadmap.map(sem => sem > MCLimit);
+      }
+      if (roadmap.includes(true)) {
+        pushSnack({
+          message: "Semester exceeds MC Limit!",
+          severity: "error",
+        });
+        return true;
+      }
+      return false;
+    },
+    [MCLimit, isLoaded, modules, pushSnack]
+  )
 
   const dragMods = useCallback(
     (srcIndex, srcDroppableId, destIndex, destDroppableId) => {
@@ -287,8 +318,8 @@ function RoadmapProvider({ children }) {
               return sem;
           }
         });
-
-      setRoadmap(newRoadmap);
+        
+        setRoadmap(newRoadmap);
     },
     [roadmap, getSemesterById, getCourseId, getCourseModGroups, modGroups]
   );
@@ -308,6 +339,7 @@ function RoadmapProvider({ children }) {
     dragMods,
     updateModuleGroup,
     getAllMods,
+    checkSemesters,
   };
 
   return (
