@@ -89,6 +89,13 @@ export default function ModuleStack({
     try {
       const added = await handleAddMods(selected.map((mod) => mod.moduleCode));
       handleClose();
+      const notAdded = selected.map((mod) => mod.moduleCode).filter(mod => !added.includes(mod));
+      if(notAdded.length) {
+        pushSnack({
+          message: `${notAdded.join(", ")} already exists in the roadmap!`,
+          severity: "error",
+        });
+      }
       if (Array.isArray(added) && added.length) {
         pushSnack({
           message: `${added.join(", ")} added!`,
@@ -138,11 +145,19 @@ export default function ModuleStack({
     setLoading(true);
 
     try {
-      await handleSelectMod(moduleCode);
-      pushSnack({
-        message: `${moduleCode} selected!`,
-        severity: "success",
-      });
+      const mod = await handleSelectMod(moduleCode);
+      if (mod === moduleCode) {
+        pushSnack({
+          message: `${moduleCode} selected!`,
+          severity: "success",
+        });
+      } else {
+        pushSnack({
+          message: `${moduleCode} already exists in the roadmap at ${mod}! `,
+          severity: "error",
+        });
+      }
+      
     } catch (error) {
       console.error(error);
       pushSnack({
@@ -269,7 +284,7 @@ export default function ModuleStack({
               multiple
               onChange={handleAutocomplete}
               value={selected}
-              options={modArray.filter(mod => !getAllMods().map(mod => mod[0] === "^" ? mod.split("^")[3] : mod).includes(mod.moduleCode))}
+              options={modArray}
               getOptionLabel={(option) => option.moduleCode}
               isOptionEqualToValue={(option, value) =>
                 option.moduleCode === value.moduleCode

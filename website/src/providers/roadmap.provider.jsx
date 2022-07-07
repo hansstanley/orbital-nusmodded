@@ -251,7 +251,7 @@ function RoadmapProvider({ children }) {
       roadmap.reduce(
         (prev, currSem) => prev.concat(currSem?.modules || []),
         []
-      ),
+      ).map(mod => mod[0] === "^" ? mod.split("^")[3] : mod),
     [roadmap]
   );  
 

@@ -39,7 +39,7 @@ export default function ModGroupBox({
   const [modGroup, setModGroup] = useState(null);
   const [modGroupMods, setModGroupMods] = useState(null);
   const { getModGroupMods, getModGroupArray } = useModGroup();
-  const { updateModuleGroup, getAllMods } = useRoadmap();
+  const { updateModuleGroup, getAllMods, roadmap } = useRoadmap();
 
   useEffect(() => {
     async function init() {
@@ -86,13 +86,20 @@ export default function ModGroupBox({
   );
 
   const handleSelectMod = async (moduleCode) => {
+    if (getAllMods().includes(moduleCode)) {
+      const semWithMod = roadmap.find(sem => sem.modules.map(mod => mod[0] === "^" ? mod.split("^")[3] : mod).includes(moduleCode));
+      if (!semWithMod.year) {
+        return "My Modules";
+      }
+      return "Y" + semWithMod.year + "S" + semWithMod.semester;
+    }
     const mod = await getModInfo(moduleCode);
     setMod(mod);
     updateModuleGroup(arr, moduleCode);
     let newArr = arr;
     newArr[3] = moduleCode;
     setArr(newArr);
-    return mod;
+    return moduleCode;
   }
 
   const dialog = (
@@ -150,7 +157,7 @@ export default function ModGroupBox({
               </Typography>
             </Stack>
             <ModuleStack
-              mods={modGroupMods.filter(mod => !getAllMods().map(mod => mod[0] === "^" ? mod.split("^")[3] : mod).includes(mod.moduleCode))}
+              mods={modGroupMods}
               handleSelectMod={handleSelectMod}
               isCourse={true}
               isSelect={true}

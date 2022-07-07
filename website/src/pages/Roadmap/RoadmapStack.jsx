@@ -76,7 +76,6 @@ function Semester({ sem }) {
 export default function RoadmapStack() {
   const {
     loading,
-    roadmap,
     dragMods,
     getSemesters,
     getSemesterById,
