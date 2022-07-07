@@ -123,11 +123,10 @@ export default function ModuleStack({
 
   const handleDelete = (moduleCode) => async () => {
     setLoading(true);
-
     try {
       await handleDeleteMod(moduleCode);
       pushSnack({
-        message: `${moduleCode} deleted!`,
+        message: `${moduleCode[0] === "^" ? moduleCode.split("^")[3] : moduleCode} deleted!`,
         severity: "success",
       });
     } catch (error) {
@@ -173,8 +172,7 @@ export default function ModuleStack({
     if (moduleCode[0] !== "^") {
       return moduleCode;
     } else {
-      console.log( moduleCode.split("^")[3]);
-      return  moduleCode.split("^")[3];
+      return moduleCode.split("^")[3];
     }
   }
 

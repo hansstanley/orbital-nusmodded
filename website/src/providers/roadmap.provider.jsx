@@ -32,6 +32,10 @@ function RoadmapProvider({ children }) {
     getCourseModGroups,
     getCourseId,
   } = useCourse();
+  const {
+    getModInfo,
+    modMap,
+  } = useMod();
   const [loading, setLoading] = useState(false);
   const [roadmap, setRoadmap] = useState([]);
   const [MCLimit, setMCLimit] = useState(0);
@@ -255,7 +259,7 @@ function RoadmapProvider({ children }) {
     [roadmap]
   );  
 
-  const checkSemesters = useCallback(
+  const checkSemestersMC = useCallback(
     (roadmap) => {
       if(isLoaded) {
         roadmap = roadmap.map(sem => sem.modules.map(mod => mod[0] === "^" ? mod.split("^")[3] : mod));
@@ -273,6 +277,56 @@ function RoadmapProvider({ children }) {
       return false;
     },
     [MCLimit, isLoaded, modules, pushSnack]
+  )
+
+  const checkSemestersPrereq = useCallback(
+    (roadmap, module) => {
+      const ignored = ["MA1301"];
+      const moduleCode = module[0] === "^" ? module.split("^")[3] : module;
+      const prereq = modMap.get(moduleCode).prereqTree;
+      let check = [];
+      let pushSnackMessage = [];
+      if (roadmap[roadmap.findIndex(sem => sem.modules.includes(module))].index === ROADMAP.MY_MODS_ID) return false;
+      const newArr = roadmap.slice(0, roadmap.findIndex(sem => sem.modules.includes(module))).reduce((a,b)=>a.concat(b.modules), []);
+      if(!prereq) return;
+      if (!prereq.and) {
+        if (!prereq.or) {
+          check = [ignored.some(x => x.indexOf(prereq) >= 0) || newArr.some(x => x.indexOf(prereq) >= 0)];
+        } else {
+          check = prereq.or.map(mod => ignored.some(x => x.indexOf(mod) >= 0) || newArr.some(x => x.indexOf(mod) >= 0));
+        }
+        if (!check.includes(true)) {
+          pushSnackMessage[0] = !prereq.or ? prereq : "(" + prereq.or.join(" or ") + ")";
+        }
+      } else {
+        check = prereq.and.map(and => {
+          if (!and.or) {
+            const tf = ignored.some(x => x.indexOf(and) >= 0) || newArr.some(x => x.indexOf(and) >= 0);
+            if (!tf) {
+              pushSnackMessage.push(and);
+            }
+            return tf;
+          } else {
+            const tf = and.or.map(mod => ignored.some(x => x.indexOf(mod) >= 0) || newArr.some(x => x.indexOf(mod) >= 0)).includes(true);
+            if (!tf) {
+              pushSnackMessage.push("(" + and.or.join(" or ") + ")");
+            }
+            return tf;
+          }
+        });
+      }
+      // console.log(pushSnackMessage.join(" and "));
+
+      if (pushSnackMessage.join(" and ")) {
+        pushSnack({
+          message: "These prerequisites for " + moduleCode + " are not fulfilled: " + pushSnackMessage.join(" and "),
+          severity: "error",
+        });
+        return true;
+      }
+      return false;
+    },
+    [modMap, pushSnack]
   )
 
   const dragMods = useCallback(
@@ -339,7 +393,8 @@ function RoadmapProvider({ children }) {
     dragMods,
     updateModuleGroup,
     getAllMods,
-    checkSemesters,
+    checkSemestersMC,
+    checkSemestersPrereq,
   };
 
   return (

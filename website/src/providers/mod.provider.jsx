@@ -46,6 +46,7 @@ function ModProvider({ children }) {
   const values = {
     getModArray,
     getModInfo,
+    modMap,
   };
 
   return <ModContext.Provider value={values}>{children}</ModContext.Provider>;
