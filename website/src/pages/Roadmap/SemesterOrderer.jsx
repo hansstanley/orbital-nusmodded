@@ -183,7 +183,7 @@ function SemesterBar({ sem = {}, index, isNew = false }) {
                 sx={{ border: 1, borderRadius: 6, borderColor: "gray" }}
               >
                 {modules.map((code) => (
-                  <Chip key={code} label={code} />
+                  <Chip key={code} label={code[0] === "^" ? code.split("^")[3] : code} />
                 ))}
                 {modules.length ? null : <Chip label="No modules" />}
               </Stack>
