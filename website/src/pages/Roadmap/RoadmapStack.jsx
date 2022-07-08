@@ -83,6 +83,7 @@ export default function RoadmapStack() {
     getAllMods,
     checkSemestersMC,
     checkSemestersPrereq,
+    checkSemestersPreclusion,
   } = useRoadmap();
 
   const {
@@ -112,7 +113,7 @@ export default function RoadmapStack() {
     );
 
 
-    if (checkSemestersMC(getSemesters()) || checkSemestersPrereq(getSemesters(), draggableId)) {
+    if (checkSemestersMC(getSemesters()) || checkSemestersPrereq(getSemesters(), draggableId) || checkSemestersPreclusion(getSemesters(), draggableId)) {
       dragMods(
         destination.index,
         destination.droppableId,

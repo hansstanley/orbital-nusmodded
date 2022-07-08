@@ -281,22 +281,44 @@ function RoadmapProvider({ children }) {
 
   const checkSemestersPrereq = useCallback(
     (roadmap, module) => {
-      const ignored = ["MA1301"];
       const moduleCode = module[0] === "^" ? module.split("^")[3] : module;
+      if (roadmap[roadmap.findIndex(sem => sem.modules.includes(module))].index === ROADMAP.MY_MODS_ID) return false;
+      const ignored = ["MA1301", "ES1000"];
       const prereq = modMap.get(moduleCode).prereqTree;
       let check = [];
       let pushSnackMessage = [];
-      if (roadmap[roadmap.findIndex(sem => sem.modules.includes(module))].index === ROADMAP.MY_MODS_ID) return false;
-      const newArr = roadmap.slice(0, roadmap.findIndex(sem => sem.modules.includes(module))).reduce((a,b)=>a.concat(b.modules), []);
+      const newArr = roadmap.slice(0, roadmap.findIndex(sem => sem.modules.includes(module))).reduce((a,b)=>a.concat(b.modules), [])
+        .map(mod => mod[0] === "^" ? mod.split("^")[3] : mod === "CS1101S" ? "CS1010" : mod);
       if(!prereq) return;
+
       if (!prereq.and) {
         if (!prereq.or) {
-          check = [ignored.some(x => x.indexOf(prereq) >= 0) || newArr.some(x => x.indexOf(prereq) >= 0)];
+          check.push(ignored.some(x => x.indexOf(prereq) >= 0) || newArr.some(x => x.indexOf(prereq) >= 0));
+          console.log(check);
+          if (!check.includes(true)) {
+            pushSnackMessage.push(prereq);
+          }
         } else {
-          check = prereq.or.map(mod => ignored.some(x => x.indexOf(mod) >= 0) || newArr.some(x => x.indexOf(mod) >= 0));
-        }
-        if (!check.includes(true)) {
-          pushSnackMessage[0] = !prereq.or ? prereq : "(" + prereq.or.join(" or ") + ")";
+          check = prereq.or.map(or => {
+            if (!or.and) {
+              const tf = ignored.some(x => x.indexOf(or) >= 0) || newArr.some(x => x.indexOf(or) >= 0)
+              if (!tf) {
+                pushSnackMessage.push(or);
+              }
+              return tf;
+            } else {
+              const tf = or.and.map(mod => ignored.some(x => x.indexOf(mod) >= 0) || newArr.some(x => x.indexOf(mod) >= 0)).includes(true);
+              if (!tf) {
+                pushSnackMessage.push("(" + or.and.join(" and ") + ")");
+              }
+              return tf;
+            }
+          })
+          if (!check.includes(true)) {
+            pushSnackMessage = ["(" + pushSnackMessage.join(" or ") + ")"];
+          } else {
+            pushSnackMessage = [];
+          }
         }
       } else {
         check = prereq.and.map(and => {
@@ -328,6 +350,31 @@ function RoadmapProvider({ children }) {
     },
     [modMap, pushSnack]
   )
+
+  const checkSemestersPreclusion = useCallback(
+    (roadmap, module) => {
+      const moduleCode = module[0] === "^" ? module.split("^")[3] : module;
+      if (!modMap.get(moduleCode).preclusion) return false;
+      if (roadmap[roadmap.findIndex(sem => sem.modules.includes(module))].index === ROADMAP.MY_MODS_ID) return false;
+      const regex = /[a-zA-Z]+[0-9]/;
+      const preclusion = modMap.get(moduleCode).preclusion.split(" ").map(mod => mod.replace(/[^a-zA-Z0-9 ]/g, '')).filter(input => regex.test(input));
+      const newArr = roadmap.reduce((a,b)=>a.concat(b.modules), []).map(mod => mod[0] === "^" ? mod.split("^")[3] : mod);
+    
+      if(!preclusion) return;
+
+      if (newArr.some(x => preclusion.includes(x) && x !== moduleCode)) {
+        pushSnack({
+          message: "The preclusion for " + moduleCode + " is already in the roadmap: " + newArr.find(x => preclusion.includes(x) && x !== moduleCode),
+          severity: "error",
+        });
+        return true;
+      }
+      return false;
+    },
+    [modMap, pushSnack]
+  )
+
+
 
   const dragMods = useCallback(
     (srcIndex, srcDroppableId, destIndex, destDroppableId) => {
@@ -395,6 +442,7 @@ function RoadmapProvider({ children }) {
     getAllMods,
     checkSemestersMC,
     checkSemestersPrereq,
+    checkSemestersPreclusion,
   };
 
   return (
