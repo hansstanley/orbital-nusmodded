@@ -263,7 +263,7 @@ function RoadmapProvider({ children }) {
     (roadmap) => {
       if(isLoaded) {
         roadmap = roadmap.map(sem => sem.modules.map(mod => mod[0] === "^" ? mod.split("^")[3] : mod));
-        roadmap = roadmap.map(sem => sem.map(mod => modules.find(x => x.moduleCode === mod).moduleCredit));
+        roadmap = roadmap.map(sem => sem.map(mod => mod !== "" ? modules.find(x => x.moduleCode === mod).moduleCredit : 0));
         roadmap = roadmap.map(sem => sem.reduce((a,b)=>a+parseInt(b), 0));
         roadmap = roadmap.map(sem => sem > MCLimit);
       }
@@ -282,7 +282,7 @@ function RoadmapProvider({ children }) {
   const checkSemestersPrereq = useCallback(
     (roadmap, module) => {
       const moduleCode = module[0] === "^" ? module.split("^")[3] : module;
-      if (roadmap[roadmap.findIndex(sem => sem.modules.includes(module))].index === ROADMAP.MY_MODS_ID) return false;
+      if (roadmap[roadmap.findIndex(sem => sem.modules.includes(module))].index === ROADMAP.MY_MODS_ID || moduleCode === "") return false;
       const ignored = ["MA1301", "ES1000"];
       const prereq = modMap.get(moduleCode).prereqTree;
       let check = [];
@@ -354,10 +354,9 @@ function RoadmapProvider({ children }) {
   const checkSemestersPreclusion = useCallback(
     (roadmap, module) => {
       const moduleCode = module[0] === "^" ? module.split("^")[3] : module;
-      if (!modMap.get(moduleCode).preclusion) return false;
+      if ( moduleCode === "" || !modMap.get(moduleCode).preclusion) return false;
       if (roadmap[roadmap.findIndex(sem => sem.modules.includes(module))].index === ROADMAP.MY_MODS_ID) return false;
-      const regex = /[a-zA-Z]+[0-9]/;
-      const preclusion = modMap.get(moduleCode).preclusion.split(" ").map(mod => mod.replace(/[^a-zA-Z0-9 ]/g, '')).filter(input => regex.test(input));
+      const preclusion = modMap.get(moduleCode).preclusion.split(" ").map(mod => mod.replace(/[^a-zA-Z0-9 ]/g, '')).filter(input => /[a-zA-Z]+[0-9]/.test(input));
       const newArr = roadmap.reduce((a,b)=>a.concat(b.modules), []).map(mod => mod[0] === "^" ? mod.split("^")[3] : mod);
     
       if(!preclusion) return;
