@@ -17,6 +17,7 @@ const AuthSessionContext = createContext({
   accessToken: null,
   profile: new Profile(),
   isAuth: () => false,
+  isAdmin: () => false,
   handleSignup: async ({ username, email, password }) => {},
   handleSignin: async ({ email, password }) => {},
   handleSignout: async () => {},
@@ -88,7 +89,7 @@ function AuthSessionProvider({ children }) {
     return result;
   }, []);
 
-  const isAdmin = useCallback(() => admin, [admin]);
+  const isAdmin = useCallback(() => !!admin, [admin]);
 
   const createProfile = useCallback(async (userId, username) => {
     const { data, error } = await supabase

@@ -1,14 +1,7 @@
 import {
-  Button,
-  Box,
-  Drawer,
-  CssBaseline,
-  Typography,
   Divider,
   IconButton,
-  Paper,
   Card,
-  Collapse,
   Slide,
   CardHeader,
   CardContent,
@@ -17,31 +10,26 @@ import {
   SpeedDialAction,
 } from "@mui/material";
 import { useState } from "react";
-import MuiAppBar from "@mui/material/AppBar";
 import BlockIcon from "@mui/icons-material/Block";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import EditIcon from "@mui/icons-material/Edit";
-import AddModules from "./AddModules";
-import { ModuleStack as ModStack } from "../../components/Mod";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import RoadmapFab from "./RoadmapFab";
-import { maxHeight } from "@mui/system";
 
-const drawerWidth = 350;
-
+/**
+ * Drawer for roadmap modifications.
+ *
+ * @param {object} props
+ * @returns A slide-in drawer from the right.
+ */
 export default function RightDrawer({
-  items = [], // { icon, label, content }
+  items = [], // { icon, label }
   children,
-  roadMap,
-  handleAdd,
-  handleDelete,
-  loadingProfile,
-  allMods,
 }) {
+  const [expand, setExpand] = useState(false);
   const [open, setOpen] = useState(false);
   const [drawerIndex, setDrawerIndex] = useState(0);
   const [drawerTitle, setDrawerTitle] = useState(null);
+
+  const toggleSpeedDial = () => setExpand(!expand);
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
@@ -58,6 +46,8 @@ export default function RightDrawer({
         ariaLabel="Roadmap SpeedDial"
         icon={<SpeedDialIcon />}
         sx={{ position: "absolute", bottom: 32, right: 32 }}
+        open={expand}
+        onClick={toggleSpeedDial}
         hidden={open}
       >
         {items.map((item, index) => (
@@ -95,24 +85,7 @@ export default function RightDrawer({
             }
           />
           <Divider />
-          <CardContent>
-            {children[drawerIndex] || "Nothing here."}
-            {/* <Droppable droppableId={"-1"}>
-              {(provided, snapshot) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  <AddModules
-                    sx={{ zIndex: 2000 }}
-                    roadMap={roadMap}
-                    handleAdd={handleAdd}
-                    loadingProfile={loadingProfile}
-                    allMods={allMods}
-                    handleDelete={handleDelete}
-                  />
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable> */}
-          </CardContent>
+          <CardContent>{children[drawerIndex] || "Nothing here."}</CardContent>
         </Card>
       </Slide>
     </>

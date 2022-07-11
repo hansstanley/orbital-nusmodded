@@ -8,13 +8,13 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  LinearProgress,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { LoadingBar } from "../../components";
 import { Course } from "../../models";
 import { useAuthSession, useCourse, useSnackbar } from "../../providers";
 
@@ -68,8 +68,8 @@ export default function DeleteCourseButton({
     }
   };
 
-  return (
-    isAdmin() ? <>
+  return isAdmin() ? (
+    <>
       <Button
         color="error"
         variant={variant}
@@ -115,13 +115,9 @@ export default function DeleteCourseButton({
               Delete {course.title}
             </Button>
           </DialogActions>
-          {loading ? (
-            <LinearProgress />
-          ) : (
-            <LinearProgress variant="determinate" value={100} />
-          )}
+          <LoadingBar loading={loading} />
         </Box>
       </Dialog>
-    </> : <></>
-  );
+    </>
+  ) : null;
 }

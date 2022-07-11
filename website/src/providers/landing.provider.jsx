@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { LandingContext } from "../contexts";
 
-export default function LandingProvider(props) {
-  const { children } = props;
+export default function LandingProvider({ children }) {
   const location = useLocation();
   const [landing, setLanding] = useState(true);
 

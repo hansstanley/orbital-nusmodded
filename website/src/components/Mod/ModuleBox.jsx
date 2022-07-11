@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  Box,
   Button,
   Card,
   CardActionArea,
@@ -20,6 +19,13 @@ import {
 import { useMod, useSnackbar } from "../../providers";
 import { Draggable } from "react-beautiful-dnd";
 
+/**
+ * A module box that has a detailed information dialog
+ * and can be set up as a Draggable.
+ *
+ * @param {object} props
+ * @returns A module box component.
+ */
 export default function ModuleBox({
   moduleCode,
   actions = null,
@@ -58,9 +64,10 @@ export default function ModuleBox({
   const handleOpenDialog = () => setDialogOpen(!loading);
   const handleCloseDialog = () => setDialogOpen(false);
 
+  // Placeholder for unknown module codes.
   const unknown = (
     <CardContent>
-      <Typography variant="body2">{`Unknown module ${moduleCode}`}</Typography>
+      <Typography variant="body2">Unknown module {moduleCode}</Typography>
     </CardContent>
   );
 

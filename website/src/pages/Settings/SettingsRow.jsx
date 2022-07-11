@@ -4,12 +4,12 @@ import {
   CircularProgress,
   Collapse,
   Divider,
-  LinearProgress,
   Stack,
   Typography,
   Zoom,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { LoadingBar } from "../../components";
 
 export default function SettingsRow({
   title,
@@ -27,6 +27,10 @@ export default function SettingsRow({
       }, 3000);
     }
   }, [showSuccess]);
+
+  useEffect(() => {
+    if (loading) setSuccess(false);
+  }, [loading]);
 
   return (
     <>
@@ -56,15 +60,7 @@ export default function SettingsRow({
         <Collapse in={success}>
           <Alert severity="success">Saved!</Alert>
         </Collapse>
-        {loading ? (
-          <LinearProgress />
-        ) : (
-          <LinearProgress
-            variant="determinate"
-            value={100}
-            sx={{ borderRadius: 1 }}
-          />
-        )}
+        <LoadingBar loading={loading} isRounded />
       </Stack>
     </>
   );

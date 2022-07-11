@@ -46,8 +46,8 @@ export default function EditCourseButton({
     }
   };
 
-  return (
-    isAdmin() ? <>
+  return isAdmin() ? (
+    <>
       <Button
         variant={variant}
         onClick={handleOpen}
@@ -65,6 +65,6 @@ export default function EditCourseButton({
         handleSubmit={handleSubmit}
         handleClose={handleClose}
       />
-    </> : <></>
-  );
+    </>
+  ) : null;
 }

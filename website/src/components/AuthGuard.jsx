@@ -1,19 +1,18 @@
-import {
-  CircularProgress,
-  LinearProgress,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { CircularProgress, Stack, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useAuthSession } from "../providers";
 import AuthButtonGroup from "./AuthButtonGroup";
 
 export default function AuthGuard({ children }) {
-  const { loading, isAuth } = useAuthSession();
+  const { isAuth } = useAuthSession();
 
-  return isAuth() ? (
-    children
-  ) : (
+  return isAuth() ? children : <GuardPage />;
+}
+
+function GuardPage() {
+  const { loading } = useAuthSession();
+
+  return (
     <Box
       sx={{
         display: "flex",

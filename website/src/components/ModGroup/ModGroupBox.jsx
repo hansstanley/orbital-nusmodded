@@ -3,12 +3,7 @@ import {
   AccordionActions,
   AccordionDetails,
   AccordionSummary,
-  Box,
   Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
   Chip,
   Dialog,
   DialogActions,
@@ -20,12 +15,12 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { Draggable } from "react-beautiful-dnd";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ModGroup } from "../../models";
 import { useModGroup, useSnackbar } from "../../providers";
 import ModuleStack from "../Mod/ModuleStack";
 import ResponsiveStack from "../ResponsiveStack";
-import { Draggable } from "react-beautiful-dnd";
 
 export default function ModGroupBox({
   modGroup = new ModGroup(),
@@ -58,7 +53,7 @@ export default function ModGroupBox({
     }
 
     if (refreshMods && modGroup.id) loadMods();
-  }, [refreshMods, modGroup, getModGroupMods]);
+  }, [refreshMods, modGroup, getModGroupMods, pushSnack]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -77,43 +72,48 @@ export default function ModGroupBox({
     return count;
   };
 
+  const handleModChips = () =>
+    mods.length ? (
+      mods.map((mod) => (
+        <Chip
+          key={mod.moduleCode}
+          label={mod.moduleCode}
+          sx={{ mr: 1, mb: 1 }}
+        />
+      ))
+    ) : (
+      <Typography variant="body2">No modules.</Typography>
+    );
+
   const content = (
-    <>
-      <Accordion key={modGroup.id}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>{modGroup.name}</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Stack spacing={1}>
-            <Typography variant="body2">{modGroup.description}</Typography>
-            <Divider />
-            <Stack direction="row" flexWrap="wrap">
-              {mods.length ? (
-                mods.map((mod) => (
-                  <Chip
-                    key={mod.moduleCode}
-                    label={mod.moduleCode}
-                    sx={{ mr: 1, mb: 1 }}
-                  />
-                ))
-              ) : (
-                <Typography variant="body2">No modules.</Typography>
-              )}
-            </Stack>
+    <Accordion key={modGroup.id}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Typography>{modGroup.name}</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Stack spacing={1}>
+          <Typography variant="body2">{modGroup.description}</Typography>
+          <Divider />
+          <Stack direction="row" flexWrap="wrap">
+            {handleModChips()}
           </Stack>
-        </AccordionDetails>
-        <AccordionActions>
-          {actions}
-          <Button onClick={handleOpen}>View</Button>
-        </AccordionActions>
-      </Accordion>
-    </>
+        </Stack>
+      </AccordionDetails>
+      <AccordionActions>
+        {actions}
+        <Button onClick={handleOpen}>View</Button>
+      </AccordionActions>
+    </Accordion>
   );
 
   return (
     <>
       {isDraggable ? (
-        <Draggable draggableId={`${modGroup.id}`} index={index} key={`${modGroup.id}`}>
+        <Draggable
+          draggableId={`${modGroup.id}`}
+          index={index}
+          key={`${modGroup.id}`}
+        >
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
@@ -125,9 +125,7 @@ export default function ModGroupBox({
           )}
         </Draggable>
       ) : (
-        <>
-          {content}
-        </>
+        content
       )}
       <Dialog open={open} onClose={handleClose} maxWidth="md">
         <DialogTitle>{modGroup ? modGroup.name : <Skeleton />}</DialogTitle>

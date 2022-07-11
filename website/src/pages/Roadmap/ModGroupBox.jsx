@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  Box,
   Button,
   Card,
   CardActionArea,
@@ -49,7 +48,7 @@ export default function ModGroupBox({
         setArr(arr);
         const modGroupName = arr[1];
         const modGroupArray = getModGroupArray();
-        const modGroup = modGroupArray.find(mg => mg.name === modGroupName);
+        const modGroup = modGroupArray.find((mg) => mg.name === modGroupName);
         const data = await getModGroupMods(modGroup.id);
         setModGroupMods(data);
         setModGroup(modGroup);
@@ -87,7 +86,11 @@ export default function ModGroupBox({
 
   const handleSelectMod = async (moduleCode) => {
     if (getAllMods().includes(moduleCode)) {
-      const semWithMod = roadmap.find(sem => sem.modules.map(mod => mod[0] === "^" ? mod.split("^")[3] : mod).includes(moduleCode));
+      const semWithMod = roadmap.find((sem) =>
+        sem.modules
+          .map((mod) => (mod[0] === "^" ? mod.split("^")[3] : mod))
+          .includes(moduleCode)
+      );
       if (!semWithMod.year) {
         return "My Modules";
       }
@@ -100,74 +103,86 @@ export default function ModGroupBox({
     newArr[3] = moduleCode;
     setArr(newArr);
     return moduleCode;
-  }
+  };
 
   const dialog = (
     <>
-      {mod ? <Dialog onClose={handleCloseDialog} open={dialogOpen} maxWidth="md">
-        <DialogTitle minWidth="240">
-          {loading ? <Skeleton /> : `${mod.moduleCode} ${mod.title}`}
-        </DialogTitle>
-        <Divider />
-        <DialogContent>
-          <Stack spacing={1}>
-            <DialogContentText>
-              {loading ? <Skeleton /> : mod.moduleCredit} MC
-            </DialogContentText>
-            <DialogContentText variant="subtitle1">
-              {loading ? <Skeleton /> : `${mod.department}, ${mod.faculty}`}
-            </DialogContentText>
-            <Divider />
-            <DialogContentText>
-              {loading ? <Skeleton /> : mod.description || "No description."}
-            </DialogContentText>
-          </Stack>
-        </DialogContent>
-        <Divider />
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Close</Button>
-        </DialogActions>
-      </Dialog> : <></>}
-      {modGroup ? <Dialog open={dialogModGroupOpen} onClose={handleCloseSelectDialog} maxWidth="md">
-        <DialogTitle>{modGroup ? modGroup.name : <Skeleton />}</DialogTitle>
-        <DialogContent dividers>
-          <ResponsiveStack>
-            <Stack spacing={1} divider={<Divider />}>
-              {modGroup.global ? (
-                <Typography variant="body2">
-                  This is a global module group.
-                </Typography>
-              ) : null}
-              {modGroup.minimum ? (
-                <Typography variant="body2">
-                  Minimum: {modGroup.minimum} MCs
-                </Typography>
-              ) : null}
-              {modGroup.maximum ? (
-                <Typography variant="body2">
-                  Maximum: {modGroup.maximum} MCs
-                </Typography>
-              ) : null}
-              <Typography>
-                {modGroup ? (
-                  modGroup.description
-                ) : (
-                  <Skeleton variant="rectangular" />
-                )}
-              </Typography>
+      {mod ? (
+        <Dialog onClose={handleCloseDialog} open={dialogOpen} maxWidth="md">
+          <DialogTitle minWidth="240">
+            {loading ? <Skeleton /> : `${mod.moduleCode} ${mod.title}`}
+          </DialogTitle>
+          <Divider />
+          <DialogContent>
+            <Stack spacing={1}>
+              <DialogContentText>
+                {loading ? <Skeleton /> : mod.moduleCredit} MC
+              </DialogContentText>
+              <DialogContentText variant="subtitle1">
+                {loading ? <Skeleton /> : `${mod.department}, ${mod.faculty}`}
+              </DialogContentText>
+              <Divider />
+              <DialogContentText>
+                {loading ? <Skeleton /> : mod.description || "No description."}
+              </DialogContentText>
             </Stack>
-            <ModuleStack
-              mods={modGroupMods}
-              handleSelectMod={handleSelectMod}
-              isCourse={true}
-              isSelect={true}
-            />
-          </ResponsiveStack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseSelectDialog}>Close</Button>
-        </DialogActions>
-      </Dialog> : <></>}
+          </DialogContent>
+          <Divider />
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Close</Button>
+          </DialogActions>
+        </Dialog>
+      ) : (
+        <></>
+      )}
+      {modGroup ? (
+        <Dialog
+          open={dialogModGroupOpen}
+          onClose={handleCloseSelectDialog}
+          maxWidth="md"
+        >
+          <DialogTitle>{modGroup ? modGroup.name : <Skeleton />}</DialogTitle>
+          <DialogContent dividers>
+            <ResponsiveStack>
+              <Stack spacing={1} divider={<Divider />}>
+                {modGroup.global ? (
+                  <Typography variant="body2">
+                    This is a global module group.
+                  </Typography>
+                ) : null}
+                {modGroup.minimum ? (
+                  <Typography variant="body2">
+                    Minimum: {modGroup.minimum} MCs
+                  </Typography>
+                ) : null}
+                {modGroup.maximum ? (
+                  <Typography variant="body2">
+                    Maximum: {modGroup.maximum} MCs
+                  </Typography>
+                ) : null}
+                <Typography>
+                  {modGroup ? (
+                    modGroup.description
+                  ) : (
+                    <Skeleton variant="rectangular" />
+                  )}
+                </Typography>
+              </Stack>
+              <ModuleStack
+                mods={modGroupMods}
+                handleSelectMod={handleSelectMod}
+                isCourse={true}
+                isSelect={true}
+              />
+            </ResponsiveStack>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseSelectDialog}>Close</Button>
+          </DialogActions>
+        </Dialog>
+      ) : (
+        <></>
+      )}
     </>
   );
 
@@ -175,12 +190,15 @@ export default function ModGroupBox({
     <>
       {!loading && !modGroup ? (
         unknown
-      ) : (
-        mod ?
+      ) : mod ? (
         <CardActionArea onClick={toggleOpen} disabled={isDraggable}>
           <CardContent>
             <Typography variant="subtitle2">
-              {loading ? <Skeleton /> : `${mod.moduleCredit} MC, from ${modGroup.name}`}
+              {loading ? (
+                <Skeleton />
+              ) : (
+                `${mod.moduleCredit} MC, from ${modGroup.name}`
+              )}
             </Typography>
             <Typography variant="subtitle1">
               {loading ? <Skeleton /> : mod.moduleCode}
@@ -189,7 +207,8 @@ export default function ModGroupBox({
               {loading ? <Skeleton /> : mod.title}
             </Typography>
           </CardContent>
-        </CardActionArea> :
+        </CardActionArea>
+      ) : (
         <CardActionArea onClick={toggleOpen} disabled={isDraggable}>
           <CardContent>
             <Typography variant="subtitle2">
@@ -199,7 +218,11 @@ export default function ModGroupBox({
               {loading ? <Skeleton /> : `${modGroup.name}`}
             </Typography>
             <Typography variant="body2">
-              {loading ? <Skeleton /> : `Click to select a module from ${modGroup.name}`}
+              {loading ? (
+                <Skeleton />
+              ) : (
+                `Click to select a module from ${modGroup.name}`
+              )}
             </Typography>
           </CardContent>
         </CardActionArea>
@@ -207,12 +230,14 @@ export default function ModGroupBox({
       <Collapse in={open}>
         <Divider />
         <CardActions sx={{ justifyContent: "space-between" }}>
-          {mod ?
+          {mod ? (
             <>
               <Button onClick={handleOpenDialog}>{"View"}</Button>
               <Button onClick={handleOpenSelectDialog}>{"Select"}</Button>
-            </> :
-            <Button onClick={handleOpenSelectDialog}>{"Select"}</Button>}
+            </>
+          ) : (
+            <Button onClick={handleOpenSelectDialog}>{"Select"}</Button>
+          )}
           {actions}
         </CardActions>
       </Collapse>
@@ -225,7 +250,7 @@ export default function ModGroupBox({
         <Draggable draggableId={name} index={index} key={name}>
           {(provided, snapshot) => (
             <Card
-              sx={{ width: 320}}
+              sx={{ width: 320 }}
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}

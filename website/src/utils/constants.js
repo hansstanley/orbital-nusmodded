@@ -39,3 +39,12 @@ export const ROADMAP = {
     return res;
   },
 };
+
+export const SETTINGS = {
+  COURSE: {
+    ID: "COURSE_ID",
+  },
+  MC_LIMIT: {
+    ID: "MC_LIMIT",
+  },
+};

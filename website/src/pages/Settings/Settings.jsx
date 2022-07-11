@@ -5,9 +5,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
 import { AuthGuard } from "../../components";
 import {
   useAuthSession,
@@ -15,21 +13,12 @@ import {
   useCourse,
   useSnackbar,
 } from "../../providers";
+import { SETTINGS } from "../../utils/constants";
 import SettingsRow from "./SettingsRow";
 
-// const minYearWidth = 1;
-// const [minYear, maxYear] = [1, 6];
-// const yearMarks = [
-//   { value: 1, label: "1" },
-//   { value: 2, label: "2" },
-//   { value: 3, label: "3" },
-//   { value: 4, label: "4" },
-//   { value: 5, label: "5" },
-//   { value: 6, label: "6" },
-// ];
 const rowIds = {
-  course: "COURSE_ID",
-  maxMCs: "MC_LIMIT",
+  course: SETTINGS.COURSE.ID,
+  maxMCs: SETTINGS.MC_LIMIT.ID,
 };
 
 export default function Settings() {
@@ -39,9 +28,6 @@ export default function Settings() {
   const { pushSnack } = useSnackbar();
   const [loadingRow, setLoadingRow] = useState([]);
   const [successRow, setSuccessRow] = useState(null);
-  // const [allMods, setAllMods] = useState([]);
-  // const [cookies, setCookies] = useCookies(["yearWidth"]);
-  // const [yearWidth, setYearWidth] = useState(cookies.yearWidth ?? [1, 4]);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [maxMCs, setMaxMCs] = useState(23);
   const arrMCs = [...Array(39).keys()].map((x) => (x += 12));
@@ -76,7 +62,7 @@ export default function Settings() {
     if (isAuth()) init();
   }, [isAuth, makeRequest, pushSnack]);
 
-  const sortCourses = React.useCallback(() => {
+  const sortCourses = useCallback(() => {
     let courses = getCourseArray();
 
     return courses;
@@ -139,24 +125,6 @@ export default function Settings() {
       setLoadingRow((prev) => prev.filter((id) => id !== rowIds.maxMCs));
     }
   };
-
-  // const handleYearWidthChange = (event, newYearWidth, activeThumb) => {
-  //   if (!Array.isArray(newYearWidth)) return;
-
-  //   if (newYearWidth[1] - newYearWidth[0] < minYearWidth) {
-  //     if (activeThumb === minYear) {
-  //       const clamped = Math.min(newYearWidth[0], maxYear - minYearWidth);
-  //       setYearWidth([clamped, clamped + minYearWidth]);
-  //     } else {
-  //       const clamped = Math.max(newYearWidth[1], minYearWidth);
-  //       setYearWidth([clamped - minYearWidth, clamped]);
-  //     }
-  //   } else {
-  //     setYearWidth(newYearWidth);
-  //   }
-
-  //   setCookies("yearWidth", yearWidth, { path: "/" });
-  // };
 
   const settingsRows = [
     {

@@ -7,9 +7,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  LinearProgress,
   TextField,
 } from "@mui/material";
+import { LoadingBar } from "../../components";
 import { Course } from "../../models";
 
 export default function CourseFormDialog({
@@ -71,11 +71,7 @@ export default function CourseFormDialog({
           </Button>
           <Button onClick={handleClose}>Cancel</Button>
         </DialogActions>
-        {loading ? (
-          <LinearProgress />
-        ) : (
-          <LinearProgress variant="determinate" value={100} />
-        )}
+        <LoadingBar loading={loading} />
       </Box>
     </Dialog>
   );

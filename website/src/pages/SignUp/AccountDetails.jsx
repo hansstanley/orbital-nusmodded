@@ -3,12 +3,13 @@ import {
   Avatar,
   Button,
   TextField,
-  Grid,
   Box,
   Typography,
+  Collapse,
+  Alert,
+  Stack,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { supabase } from "../../services";
 import { useAuthSession } from "../../providers";
 
 export default function SignUp({ handleNext }) {
@@ -22,7 +23,9 @@ export default function SignUp({ handleNext }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    if(data.get("username").length < 3) {
+
+    setValidateInput("");
+    if (data.get("username").length < 3) {
       setValidateInput("Username is too short! (minimum 3 characters)");
     } else if (emailCheck.test(data.get("email"))) {
       if (data.get("password") === data.get("confirmPassword")) {
@@ -33,17 +36,6 @@ export default function SignUp({ handleNext }) {
             email: data.get("email"),
             password: data.get("password"),
           });
-          // const { user, session, error } = await supabase.auth.signUp(
-          //   {
-          //     email: data.get("email"),
-          //     password: data.get("password"),
-          //   },
-          //   {
-          //     data: {
-          //       username: data.get("username"),
-          //     },
-          //   }
-          // );
           setLoading(false);
           console.log("successfully signed up!", user);
           handleNext();
@@ -72,82 +64,61 @@ export default function SignUp({ handleNext }) {
     }
   };
 
+  const hasValidateInput = typeof validateInput === "string" && !!validateInput;
+
   return (
-    <Box
-      sx={{
-        marginTop: 8,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <Avatar sx={{ m: 1 }}>
-        <LockOutlinedIcon />
-      </Avatar>
-      <Typography component="h1" variant="h5">
-        Sign up
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              name="username"
-              required
-              fullWidth
-              id="username"
-              label="Username"
-              autoFocus
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              id="email"
-              type="email"
-              label="Email Address"
-              name="email"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              name="confirmPassword"
-              label="Confirm Password"
-              type="password"
-              id="confirmPassword"
-            />
-          </Grid>
-        </Grid>
-        <Button
-          disabled={loading}
-          type="submit"
+    <Box sx={{ width: { xs: "100%", sm: 360 } }}>
+      <Stack
+        component="form"
+        onSubmit={handleSubmit}
+        spacing={2}
+        alignItems="center"
+      >
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Avatar>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography variant="h6">Sign up</Typography>
+        </Stack>
+        <TextField
+          name="username"
+          required
           fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-        >
+          id="username"
+          label="Username"
+          autoFocus
+        />
+        <TextField
+          required
+          fullWidth
+          id="email"
+          type="email"
+          label="Email Address"
+          name="email"
+        />
+        <TextField
+          required
+          fullWidth
+          name="password"
+          label="Password"
+          type="password"
+          id="password"
+        />
+        <TextField
+          required
+          fullWidth
+          name="confirmPassword"
+          label="Confirm Password"
+          type="password"
+          id="confirmPassword"
+        />
+        <Collapse in={hasValidateInput} unmountOnExit>
+          <Alert severity="error">{validateInput}</Alert>
+        </Collapse>
+        <Button disabled={loading} type="submit" variant="contained" fullWidth>
           Sign Up
         </Button>
-        {!(validateInput === "") ? (
-          <Typography color="primary.light">{validateInput}</Typography>
-        ) : (
-          <></>
-        )}
-        <Grid container justifyContent="flex-end">
-          <Grid item></Grid>
-        </Grid>
-      </Box>
+      </Stack>
     </Box>
   );
 }

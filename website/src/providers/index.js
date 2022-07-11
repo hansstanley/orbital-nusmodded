@@ -2,7 +2,7 @@ import { AppContextProvider } from "./AppContextProvider";
 import { AuthSessionProvider, useAuthSession } from "./auth-session.provider";
 import { BackendProvider, useBackend } from "./backend.provider";
 import { CourseProvider, useCourse } from "./course.provider";
-import DrawerContextProvider from "./drawer.provider";
+import { DrawerContextProvider, useDrawer } from "./drawer.provider";
 import DurationContextProvider from "./duration.provider";
 import LandingProvider from "./landing.provider";
 import { ModGroupProvider, useModGroup } from "./mod-group.provider";
@@ -32,6 +32,7 @@ export {
   useAuthSession,
   useBackend,
   useCourse,
+  useDrawer,
   useModGroup,
   useMod,
   useRoadmap,

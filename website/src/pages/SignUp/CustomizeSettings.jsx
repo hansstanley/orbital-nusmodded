@@ -1,39 +1,23 @@
-import * as React from "react";
-import {
-  Avatar,
-  Button,
-  TextField,
-  Grid,
-  Box,
-  Typography,
-  Card,
-  Stack,
-} from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { supabase } from "../../services";
+import { Button, Typography, Stack, Divider, Box } from "@mui/material";
 import Settings from "../Settings";
 import { useAuthSession } from "../../providers";
 
-export default function CustomizeSettings({ handleNext }) {
+export default function CustomizeSettings({ handleNext = () => {} }) {
   const { isAuth } = useAuthSession();
-  return (
-    isAuth() ? <>
-    <Stack sx={{ display: "flex", flex: 1, margin: 2 }}>
-      <Stack marginTop={8} alignItems='center'>
-        <Settings />
-        <Button
-          variant="contained"
-          sx={{ mt: 20, width: 300 }}
-          onClick = {handleNext}
-        >
-          Next
-        </Button>
-      </Stack>
+
+  return isAuth() ? (
+    <Stack spacing={2} alignItems="flex-start" flex={1}>
+      <Settings />
+      <Divider sx={{ width: "100%" }} />
+      <Button variant="contained" onClick={handleNext}>
+        Next
+      </Button>
     </Stack>
-    </> : <>
-      <Stack sx={{ display: "flex", flex: 1, margin: 2 }} alignItems='center'>
-        <Typography variant="h4" marginTop={8}>Please confirm your email address and return to this page!</Typography>
-      </Stack>
-    </>
+  ) : (
+    <Box sx={{ flex: 1 }}>
+      <Typography variant="h6">
+        Please check your email for the verification link!
+      </Typography>
+    </Box>
   );
 }

@@ -9,14 +9,12 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
-  LinearProgress,
-  Stack,
-  Switch,
   TextField,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { ModGroup } from "../../models";
 import { stringToInt } from "../../utils/parsers";
+import LoadingBar from "../LoadingBar";
 
 export default function ModGroupForm({
   open = false,
@@ -150,11 +148,7 @@ export default function ModGroupForm({
           </Button>
           <Button onClick={handleClose}>Cancel</Button>
         </DialogActions>
-        {loading ? (
-          <LinearProgress />
-        ) : (
-          <LinearProgress variant="determinate" value={100} />
-        )}
+        <LoadingBar loading={loading} />
       </Box>
     </Dialog>
   );
