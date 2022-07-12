@@ -21,18 +21,20 @@ const SnackbarContext = createContext({
   pushSnack: ({ message, severity, action }) => {},
 });
 
-function SnackbarProvider({ children }) {
+function SnackbarProvider({ children, stacked = false }) {
   const [snackPack, setSnackPack] = useState([]);
   const [open, setOpen] = useState(false);
   const [snack, setSnack] = useState(undefined);
 
   useEffect(() => {
-    if (snackPack.length > 0 && !snack) {
+    if (snackPack.length && !snack) {
       setSnack({ ...snackPack[0] });
       setSnackPack((prev) => prev.slice(1));
       setOpen(true);
+    } else if (!stacked && snackPack.length && snack && open) {
+      setOpen(false);
     }
-  }, [snack, snackPack]);
+  }, [open, snack, snackPack]);
 
   const pushSnack = useCallback(({ message, severity, action }) => {
     setSnackPack((prev) => [
@@ -57,7 +59,7 @@ function SnackbarProvider({ children }) {
   };
 
   const defaultAction =
-    snackPack.length > 0 ? (
+    stacked && snackPack.length > 0 ? (
       <ButtonGroup size="small" variant="text" color="inherit">
         <Button size="small" onClick={handleClose}>
           +{snackPack.length} more
@@ -88,7 +90,7 @@ function SnackbarProvider({ children }) {
             severity={snack.severity}
             action={snack?.action || defaultAction}
           >
-            {snack.message}{" "}
+            {snack.message}
           </Alert>
         </Snackbar>
       ) : (

@@ -35,49 +35,49 @@ export default function SignUp({ handleNext }) {
     if (username.length < 3) {
       passed = false;
       setValidateInput((prev) => [
-        "Username is too short! (minimum 3 characters)",
         ...prev,
+        "Username is too short! (minimum 3 characters)",
       ]);
     }
     if (!emailCheck.test(email)) {
       passed = false;
-      setValidateInput((prev) => ["Email entered is invalid!", ...prev]);
+      setValidateInput((prev) => [...prev, "Email entered is invalid!"]);
     }
     if (password.length < 8) {
       passed = false;
       setValidateInput((prev) => [
-        "Password is too short! (minimum 8 characters)",
         ...prev,
+        "Password is too short! (minimum 8 characters)",
       ]);
     }
     if (password.toLowerCase() === password) {
       passed = false;
       setValidateInput((prev) => [
-        "Password should contain at least one uppercase letter.",
         ...prev,
+        "Password should contain at least one uppercase letter.",
       ]);
     }
     if (password.toUpperCase() === password) {
       passed = false;
       setValidateInput((prev) => [
-        "Password should contain at least one lowercase letter.",
         ...prev,
+        "Password should contain at least one lowercase letter.",
       ]);
     }
     if (!/\d/.test(password)) {
       passed = false;
       setValidateInput((prev) => [
-        "Password should contain at least one number.",
         ...prev,
+        "Password should contain at least one number.",
       ]);
     }
     if (!passwordCheck.test(password)) {
       passed = false;
-      setValidateInput((prev) => ["Password entered is invalid!", ...prev]);
+      setValidateInput((prev) => [...prev, "Password entered is invalid!"]);
     }
     if (password !== confirmPassword) {
       passed = false;
-      setValidateInput((prev) => ["Passwords do not match!", ...prev]);
+      setValidateInput((prev) => [...prev, "Passwords do not match!"]);
     }
 
     if (passed) {
