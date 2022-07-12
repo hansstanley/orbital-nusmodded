@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Button, Card, StepContent } from "@mui/material";
+import { Box, Button, Card, CardContent, StepContent } from "@mui/material";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
@@ -36,17 +36,18 @@ export default function ProgressStepper() {
           <Step key={index}>
             <StepLabel>{label}</StepLabel>
             <StepContent sx={{ flex: 1 }}>
-              <Card
-                sx={{
-                  display: "flex",
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  p: 2,
-                  overflow: "auto",
-                }}
-              >
-                {content}
+              <Card>
+                <CardContent
+                  sx={{
+                    display: "flex",
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    overflow: "auto",
+                  }}
+                >
+                  {content}
+                </CardContent>
               </Card>
               {/* <Button
                 onClick={handleNext}

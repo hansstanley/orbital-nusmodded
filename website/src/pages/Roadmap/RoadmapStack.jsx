@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { Stack, Typography, Divider, Box, Skeleton, Chip } from "@mui/material";
+import {
+  Stack,
+  Typography,
+  Box,
+  Skeleton,
+  Chip,
+  useTheme,
+} from "@mui/material";
+import { grey } from "@mui/material/colors";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
 import { ModGroupStack } from "../../components/ModGroup";
 import ModGroupBox from "./ModGroupBox";
@@ -8,70 +16,9 @@ import BookIcon from "@mui/icons-material/Book";
 import BackpackIcon from "@mui/icons-material/Backpack";
 import RightDrawer from "./RightDrawer";
 import { useRoadmap, useCourse } from "../../providers";
-import { ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
+import { COLORS, ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
 import SemesterOrderer from "./SemesterOrderer";
 import RoadmapGenerator from "./RoadmapGenerator";
-
-function Semester({ sem }) {
-  const { id, year, semester, modules } = sem;
-
-  return (
-    <Stack spacing={2} direction="row" alignItems="center">
-      <Divider orientation="vertical" />
-      <Stack spacing={2} alignItems="flex-start">
-        <Chip
-          label={`Year ${year || "?"} ${
-            Object.keys(SEMESTER_TITLE)
-              .map((key) => parseInt(key))
-              .includes(semester)
-              ? SEMESTER_TITLE[semester]
-              : "Semester ?"
-          }`}
-        />
-        <Droppable droppableId={id} direction="horizontal">
-          {(provided) => (
-            <Stack
-              spacing={1}
-              direction="row"
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-            >
-              {modules?.map((moduleCode, index) => (
-                moduleCode[0] !== "^" ?
-                <ModuleBox
-                  moduleCode={moduleCode}
-                  key={moduleCode}
-                  index={index}
-                  isDraggable={true}
-                /> :
-                <ModGroupBox
-                  name={moduleCode}
-                  key={moduleCode}
-                  index={index}
-                  isDraggable={true}
-                />
-              ))}
-              {modules?.length ? null : (
-                <Typography
-                  sx={{
-                    borderColor: "gray",
-                    borderRadius: 1,
-                    borderStyle: "dashed",
-                    p: 4,
-                  }}
-                >
-                  Drag modules here
-                </Typography>
-              )}
-              {provided.placeholder}
-            </Stack>
-          )}
-        </Droppable>
-      </Stack>
-      <Divider orientation="vertical" />
-    </Stack>
-  );
-}
 
 export default function RoadmapStack() {
   const {
@@ -86,10 +33,7 @@ export default function RoadmapStack() {
     checkSemestersPreclusion,
   } = useRoadmap();
 
-  const {
-    getCourseModGroups,
-    getCourseId,
-  } = useCourse();
+  const { getCourseModGroups, getCourseId } = useCourse();
 
   const [modGroups, setModGroups] = useState([]);
 
@@ -104,7 +48,7 @@ export default function RoadmapStack() {
   );
 
   const onDragEnd = ({ source, destination, draggableId }) => {
-    if (!source || !destination) return;  
+    if (!source || !destination) return;
     dragMods(
       source.index,
       source.droppableId,
@@ -112,8 +56,11 @@ export default function RoadmapStack() {
       destination.droppableId
     );
 
-
-    if (checkSemestersMC(getSemesters()) || checkSemestersPrereq(getSemesters(), draggableId) || checkSemestersPreclusion(getSemesters(), draggableId)) {
+    if (
+      checkSemestersMC(getSemesters()) ||
+      checkSemestersPrereq(getSemesters(), draggableId) ||
+      checkSemestersPreclusion(getSemesters(), draggableId)
+    ) {
       dragMods(
         destination.index,
         destination.droppableId,
@@ -121,8 +68,6 @@ export default function RoadmapStack() {
         source.droppableId
       );
     }
-
-    
   };
 
   const handleAddMyMods = (moduleCodes = []) => {
@@ -155,18 +100,14 @@ export default function RoadmapStack() {
 
   return (
     <>
-      <Stack spacing={2} width="100%" overflow="auto">
+      <Stack spacing={2} width="100%" alignItems="flex-start">
         <SemesterOrderer />
         <DragDropContext onDragEnd={onDragEnd}>
-          {loading
-            ? [...Array(4).keys()].map((key) => (
-                <Stack spacing={2} key={key}>
-                  <Skeleton variant="rectangular" width="100%">
-                    <Box sx={{ width: "100%", height: 120 }} />
-                  </Skeleton>
-                </Stack>
-              ))
-            : getSemesters().map((sem) => <Semester key={sem.id} sem={sem} />)}
+          {loading ? (
+            <SemesterSkeleton />
+          ) : (
+            getSemesters().map((sem) => <Semester key={sem.id} sem={sem} />)
+          )}
           <RightDrawer
             items={[
               {
@@ -176,7 +117,7 @@ export default function RoadmapStack() {
               {
                 icon: <BackpackIcon />,
                 label: "My module groups",
-              }
+              },
             ]}
           >
             <ModStack
@@ -190,7 +131,7 @@ export default function RoadmapStack() {
               modGroups={modGroups}
               isDroppable={true}
               droppableId={"modgroup"}
-              isCourse = {true}
+              isCourse={true}
             />
             <div />
           </RightDrawer>
@@ -198,5 +139,105 @@ export default function RoadmapStack() {
       </Stack>
       {/* <RoadmapGenerator /> */}
     </>
+  );
+}
+
+function Semester({ sem }) {
+  const { id, year, semester, modules, bgColor } = sem;
+
+  const isDarkTheme = useTheme().palette.mode === "dark";
+  const bgHex = COLORS[bgColor || "deepOrange"][isDarkTheme ? 900 : 100];
+
+  return (
+    <Stack
+      spacing={1}
+      alignItems="flex-start"
+      bgcolor={bgHex}
+      p={1}
+      borderRadius={2}
+      boxShadow={2}
+      maxWidth="100%"
+    >
+      <Stack direction="row" spacing={1}>
+        <Chip
+          label={`Year ${year || "?"} ${
+            Object.keys(SEMESTER_TITLE)
+              .map((key) => parseInt(key))
+              .includes(semester)
+              ? SEMESTER_TITLE[semester]
+              : "Semester ?"
+          }`}
+        />
+        <Chip label={`${modules?.length ?? 0} module(s)`} />
+      </Stack>
+      <Stack
+        spacing={2}
+        alignItems="flex-start"
+        maxWidth="100%"
+        overflow="auto"
+      >
+        <Droppable droppableId={id} direction="horizontal">
+          {(provided) => (
+            <Stack
+              spacing={1}
+              direction="row"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {modules?.map((moduleCode, index) =>
+                moduleCode[0] !== "^" ? (
+                  <ModuleBox
+                    moduleCode={moduleCode}
+                    key={moduleCode}
+                    index={index}
+                    isDraggable={true}
+                  />
+                ) : (
+                  <ModGroupBox
+                    name={moduleCode}
+                    key={moduleCode}
+                    index={index}
+                    isDraggable={true}
+                  />
+                )
+              )}
+              {modules?.length ? null : <ModulePlaceholer />}
+              {provided.placeholder}
+            </Stack>
+          )}
+        </Droppable>
+      </Stack>
+    </Stack>
+  );
+}
+
+function ModulePlaceholer() {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        borderColor: grey[200],
+        borderRadius: 1,
+        borderStyle: "dashed",
+        py: 4,
+        width: 320,
+      }}
+    >
+      <Typography>Drag modules here</Typography>
+    </Box>
+  );
+}
+
+function SemesterSkeleton() {
+  return (
+    <Stack spacing={2} width="100%">
+      {[...Array(4).keys()].map((key) => (
+        <Skeleton key={key} variant="rectangular" width="100%">
+          <Box sx={{ width: "100%", height: 160 }} />
+        </Skeleton>
+      ))}
+    </Stack>
   );
 }

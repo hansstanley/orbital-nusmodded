@@ -20,6 +20,7 @@ const RoadmapContext = createContext({
   setYearById: (id, year) => {},
   setSemesterById: (id, semester) => {},
   setModulesById: (id, modules = []) => {},
+  setBgColorById: (id, colorKey) => {},
   dragSemesters: (srcIndex, destIndex) => {},
   dragMods: (srcIndex, srcDroppableId, destIndex, destDroppableId) => {},
 });
@@ -28,14 +29,8 @@ function RoadmapProvider({ children }) {
   const { isAuth } = useAuthSession();
   const { makeRequest } = useBackend();
   const { pushSnack } = useSnackbar();
-  const {
-    getCourseModGroups,
-    getCourseId,
-  } = useCourse();
-  const {
-    getModInfo,
-    modMap,
-  } = useMod();
+  const { getCourseModGroups, getCourseId } = useCourse();
+  const { getModInfo, modMap } = useMod();
   const [loading, setLoading] = useState(false);
   const [roadmap, setRoadmap] = useState([]);
   const [MCLimit, setMCLimit] = useState(0);
@@ -211,6 +206,13 @@ function RoadmapProvider({ children }) {
     [setPropertyById]
   );
 
+  const setBgColorById = useCallback(
+    (id, colorKey) => {
+      setPropertyById(id, "bgColor", colorKey);
+    },
+    [setPropertyById]
+  );
+
   const dragSemesters = useCallback(
     (srcIndex, destIndex) => {
       const semesters = getSemesters();
@@ -235,9 +237,9 @@ function RoadmapProvider({ children }) {
     (arr, moduleCode) => {
       const prevId = "^" + arr[1] + "^" + arr[2] + "^" + arr[3];
       const newId = "^" + arr[1] + "^" + arr[2] + "^" + moduleCode;
-      const newModules = roadmap.find(sem => sem.modules.includes(prevId));
+      const newModules = roadmap.find((sem) => sem.modules.includes(prevId));
       newModules.modules[newModules.modules.indexOf(prevId)] = newId;
-      
+
       const newRoadmap = roadmap.map((sem) => {
         if (sem.modules.includes(prevId)) {
           return newModules;
@@ -245,27 +247,36 @@ function RoadmapProvider({ children }) {
           return sem;
         }
       });
-    setRoadmap(newRoadmap);
-  },
-  [roadmap]
-);
+      setRoadmap(newRoadmap);
+    },
+    [roadmap]
+  );
 
   const getAllMods = useCallback(
     () =>
-      roadmap.reduce(
-        (prev, currSem) => prev.concat(currSem?.modules || []),
-        []
-      ).map(mod => mod[0] === "^" ? mod.split("^")[3] : mod),
+      roadmap
+        .reduce((prev, currSem) => prev.concat(currSem?.modules || []), [])
+        .map((mod) => (mod[0] === "^" ? mod.split("^")[3] : mod)),
     [roadmap]
-  );  
+  );
 
   const checkSemestersMC = useCallback(
     (roadmap) => {
-      if(isLoaded) {
-        roadmap = roadmap.map(sem => sem.modules.map(mod => mod[0] === "^" ? mod.split("^")[3] : mod));
-        roadmap = roadmap.map(sem => sem.map(mod => mod !== "" ? modules.find(x => x.moduleCode === mod).moduleCredit : 0));
-        roadmap = roadmap.map(sem => sem.reduce((a,b)=>a+parseInt(b), 0));
-        roadmap = roadmap.map(sem => sem > MCLimit);
+      if (isLoaded) {
+        roadmap = roadmap.map((sem) =>
+          sem.modules.map((mod) => (mod[0] === "^" ? mod.split("^")[3] : mod))
+        );
+        roadmap = roadmap.map((sem) =>
+          sem.map((mod) =>
+            mod !== ""
+              ? modules.find((x) => x.moduleCode === mod).moduleCredit
+              : 0
+          )
+        );
+        roadmap = roadmap.map((sem) =>
+          sem.reduce((a, b) => a + parseInt(b), 0)
+        );
+        roadmap = roadmap.map((sem) => sem > MCLimit);
       }
       if (roadmap.includes(true)) {
         pushSnack({
@@ -277,43 +288,70 @@ function RoadmapProvider({ children }) {
       return false;
     },
     [MCLimit, isLoaded, modules, pushSnack]
-  )
+  );
 
   const checkSemestersPrereq = useCallback(
     (roadmap, module) => {
       const moduleCode = module[0] === "^" ? module.split("^")[3] : module;
-      if (roadmap[roadmap.findIndex(sem => sem.modules.includes(module))].index === ROADMAP.MY_MODS_ID || moduleCode === "") return false;
+      if (
+        roadmap[roadmap.findIndex((sem) => sem.modules.includes(module))]
+          .index === ROADMAP.MY_MODS_ID ||
+        moduleCode === ""
+      )
+        return false;
       const ignored = ["MA1301", "ES1000"];
       const prereq = modMap.get(moduleCode).prereqTree;
       let check = [];
       let pushSnackMessage = [];
-      const newArr = roadmap.slice(0, roadmap.findIndex(sem => sem.modules.includes(module))).reduce((a,b)=>a.concat(b.modules), [])
-        .map(mod => mod[0] === "^" ? mod.split("^")[3] : mod === "CS1101S" ? "CS1010" : mod);
-      if(!prereq) return;
+      const newArr = roadmap
+        .slice(
+          0,
+          roadmap.findIndex((sem) => sem.modules.includes(module))
+        )
+        .reduce((a, b) => a.concat(b.modules), [])
+        .map((mod) =>
+          mod[0] === "^"
+            ? mod.split("^")[3]
+            : mod === "CS1101S"
+            ? "CS1010"
+            : mod
+        );
+      if (!prereq) return;
 
       if (!prereq.and) {
         if (!prereq.or) {
-          check.push(ignored.some(x => x.indexOf(prereq) >= 0) || newArr.some(x => x.indexOf(prereq) >= 0));
+          check.push(
+            ignored.some((x) => x.indexOf(prereq) >= 0) ||
+              newArr.some((x) => x.indexOf(prereq) >= 0)
+          );
           console.log(check);
           if (!check.includes(true)) {
             pushSnackMessage.push(prereq);
           }
         } else {
-          check = prereq.or.map(or => {
+          check = prereq.or.map((or) => {
             if (!or.and) {
-              const tf = ignored.some(x => x.indexOf(or) >= 0) || newArr.some(x => x.indexOf(or) >= 0)
+              const tf =
+                ignored.some((x) => x.indexOf(or) >= 0) ||
+                newArr.some((x) => x.indexOf(or) >= 0);
               if (!tf) {
                 pushSnackMessage.push(or);
               }
               return tf;
             } else {
-              const tf = or.and.map(mod => ignored.some(x => x.indexOf(mod) >= 0) || newArr.some(x => x.indexOf(mod) >= 0)).includes(true);
+              const tf = or.and
+                .map(
+                  (mod) =>
+                    ignored.some((x) => x.indexOf(mod) >= 0) ||
+                    newArr.some((x) => x.indexOf(mod) >= 0)
+                )
+                .includes(true);
               if (!tf) {
                 pushSnackMessage.push("(" + or.and.join(" and ") + ")");
               }
               return tf;
             }
-          })
+          });
           if (!check.includes(true)) {
             pushSnackMessage = ["(" + pushSnackMessage.join(" or ") + ")"];
           } else {
@@ -321,15 +359,23 @@ function RoadmapProvider({ children }) {
           }
         }
       } else {
-        check = prereq.and.map(and => {
+        check = prereq.and.map((and) => {
           if (!and.or) {
-            const tf = ignored.some(x => x.indexOf(and) >= 0) || newArr.some(x => x.indexOf(and) >= 0);
+            const tf =
+              ignored.some((x) => x.indexOf(and) >= 0) ||
+              newArr.some((x) => x.indexOf(and) >= 0);
             if (!tf) {
               pushSnackMessage.push(and);
             }
             return tf;
           } else {
-            const tf = and.or.map(mod => ignored.some(x => x.indexOf(mod) >= 0) || newArr.some(x => x.indexOf(mod) >= 0)).includes(true);
+            const tf = and.or
+              .map(
+                (mod) =>
+                  ignored.some((x) => x.indexOf(mod) >= 0) ||
+                  newArr.some((x) => x.indexOf(mod) >= 0)
+              )
+              .includes(true);
             if (!tf) {
               pushSnackMessage.push("(" + and.or.join(" or ") + ")");
             }
@@ -341,7 +387,11 @@ function RoadmapProvider({ children }) {
 
       if (pushSnackMessage.join(" and ")) {
         pushSnack({
-          message: "These prerequisites for " + moduleCode + " are not fulfilled: " + pushSnackMessage.join(" and "),
+          message:
+            "These prerequisites for " +
+            moduleCode +
+            " are not fulfilled: " +
+            pushSnackMessage.join(" and "),
           severity: "error",
         });
         return true;
@@ -349,21 +399,35 @@ function RoadmapProvider({ children }) {
       return false;
     },
     [modMap, pushSnack]
-  )
+  );
 
   const checkSemestersPreclusion = useCallback(
     (roadmap, module) => {
       const moduleCode = module[0] === "^" ? module.split("^")[3] : module;
-      if ( moduleCode === "" || !modMap.get(moduleCode).preclusion) return false;
-      if (roadmap[roadmap.findIndex(sem => sem.modules.includes(module))].index === ROADMAP.MY_MODS_ID) return false;
-      const preclusion = modMap.get(moduleCode).preclusion.split(" ").map(mod => mod.replace(/[^a-zA-Z0-9 ]/g, '')).filter(input => /[a-zA-Z]+[0-9]/.test(input));
-      const newArr = roadmap.reduce((a,b)=>a.concat(b.modules), []).map(mod => mod[0] === "^" ? mod.split("^")[3] : mod);
-    
-      if(!preclusion) return;
+      if (moduleCode === "" || !modMap.get(moduleCode).preclusion) return false;
+      if (
+        roadmap[roadmap.findIndex((sem) => sem.modules.includes(module))]
+          .index === ROADMAP.MY_MODS_ID
+      )
+        return false;
+      const preclusion = modMap
+        .get(moduleCode)
+        .preclusion.split(" ")
+        .map((mod) => mod.replace(/[^a-zA-Z0-9 ]/g, ""))
+        .filter((input) => /[a-zA-Z]+[0-9]/.test(input));
+      const newArr = roadmap
+        .reduce((a, b) => a.concat(b.modules), [])
+        .map((mod) => (mod[0] === "^" ? mod.split("^")[3] : mod));
 
-      if (newArr.some(x => preclusion.includes(x) && x !== moduleCode)) {
+      if (!preclusion) return;
+
+      if (newArr.some((x) => preclusion.includes(x) && x !== moduleCode)) {
         pushSnack({
-          message: "The preclusion for " + moduleCode + " is already in the roadmap: " + newArr.find(x => preclusion.includes(x) && x !== moduleCode),
+          message:
+            "The preclusion for " +
+            moduleCode +
+            " is already in the roadmap: " +
+            newArr.find((x) => preclusion.includes(x) && x !== moduleCode),
           severity: "error",
         });
         return true;
@@ -371,14 +435,10 @@ function RoadmapProvider({ children }) {
       return false;
     },
     [modMap, pushSnack]
-  )
-
-
+  );
 
   const dragMods = useCallback(
     (srcIndex, srcDroppableId, destIndex, destDroppableId) => {
-
-
       function getModGroups() {
         async function loadModGroups(courseId) {
           const data = await getCourseModGroups(courseId);
@@ -388,38 +448,55 @@ function RoadmapProvider({ children }) {
         return modGroups;
       }
 
-      const srcDroppable = srcDroppableId !== "modgroup" ? getSemesterById(srcDroppableId) : getModGroups();
+      const srcDroppable =
+        srcDroppableId !== "modgroup"
+          ? getSemesterById(srcDroppableId)
+          : getModGroups();
       const destDroppable = getSemesterById(destDroppableId);
       function modGroupId(name) {
         let temp = name;
-        roadmap.map(sem => sem.modules.forEach(mod => {if(mod.includes(temp)) {if(mod > name) name = mod;}} ));
-        return name === temp ? "^" + name + "^1^" : "^" + temp + "^" + (parseInt(name[name.length-1]) + 1) + "^";
+        roadmap.map((sem) =>
+          sem.modules.forEach((mod) => {
+            if (mod.includes(temp)) {
+              if (mod > name) name = mod;
+            }
+          })
+        );
+        return name === temp
+          ? "^" + name + "^1^"
+          : "^" + temp + "^" + (parseInt(name[name.length - 1]) + 1) + "^";
       }
 
-      const [dragged] = srcDroppableId !== "modgroup" ? srcDroppable.modules.splice(srcIndex, 1) : srcDroppable.splice(srcIndex, 1);
-      srcDroppableId !== "modgroup" ? destDroppable.modules.splice(destIndex, 0, dragged) : destDroppable.modules.splice(destIndex, 0, modGroupId(dragged.name));
+      const [dragged] =
+        srcDroppableId !== "modgroup"
+          ? srcDroppable.modules.splice(srcIndex, 1)
+          : srcDroppable.splice(srcIndex, 1);
+      srcDroppableId !== "modgroup"
+        ? destDroppable.modules.splice(destIndex, 0, dragged)
+        : destDroppable.modules.splice(destIndex, 0, modGroupId(dragged.name));
 
-      const newRoadmap = srcDroppableId !== "modgroup" ? 
-        roadmap.map((sem) => {
-          switch (sem.id) {
-            case srcDroppable.id:
-              return srcDroppable;
-            case destDroppable.id:
-              return destDroppable;
-            default:
-              return sem;
-          }
-        }) : 
-        roadmap.map((sem) => {
-          switch (sem.id) {
-            case destDroppable.id:
-              return destDroppable;
-            default:
-              return sem;
-          }
-        });
-        
-        setRoadmap(newRoadmap);
+      const newRoadmap =
+        srcDroppableId !== "modgroup"
+          ? roadmap.map((sem) => {
+              switch (sem.id) {
+                case srcDroppable.id:
+                  return srcDroppable;
+                case destDroppable.id:
+                  return destDroppable;
+                default:
+                  return sem;
+              }
+            })
+          : roadmap.map((sem) => {
+              switch (sem.id) {
+                case destDroppable.id:
+                  return destDroppable;
+                default:
+                  return sem;
+              }
+            });
+
+      setRoadmap(newRoadmap);
     },
     [roadmap, getSemesterById, getCourseId, getCourseModGroups, modGroups]
   );
@@ -435,6 +512,7 @@ function RoadmapProvider({ children }) {
     setYearById,
     setSemesterById,
     setModulesById,
+    setBgColorById,
     dragSemesters,
     dragMods,
     updateModuleGroup,

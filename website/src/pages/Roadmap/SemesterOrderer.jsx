@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   ButtonGroup,
@@ -9,13 +10,16 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Grid,
+  IconButton,
   Stack,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useMemo, useRef, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
+import { COLORS, ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useRoadmap } from "../../providers";
 
@@ -89,9 +93,12 @@ export default function SemesterOrderer() {
 }
 
 function SemesterBar({ sem = {}, index, isNew = false }) {
-  const { id, year, semester, modules } = sem;
+  const { id, year, semester, modules, bgColor } = sem;
 
-  const { setYearById, setSemesterById } = useRoadmap();
+  const isDarkTheme = useTheme().palette.mode === "dark";
+  const bgHex = COLORS[bgColor || "deepOrange"][isDarkTheme ? 900 : 200];
+
+  const { setBgColorById, setYearById, setSemesterById } = useRoadmap();
   const [open, setOpen] = useState(false);
 
   const title = useMemo(() => {
@@ -120,6 +127,21 @@ function SemesterBar({ sem = {}, index, isNew = false }) {
 
   const handleYearChange = (year) => () => setYearById(id, year);
   const handleSemesterChange = (sem) => () => setSemesterById(id, sem);
+  const handleBgColorChange = (colorKey) => () => setBgColorById(id, colorKey);
+
+  const loadBgColorButtons = () => {
+    return (
+      <Grid>
+        {Object.keys(COLORS).map((colorKey) => (
+          <IconButton key={colorKey} onClick={handleBgColorChange(colorKey)}>
+            <Avatar sx={{ bgcolor: COLORS[colorKey][isDarkTheme ? 900 : 200] }}>
+              {" "}
+            </Avatar>
+          </IconButton>
+        ))}
+      </Grid>
+    );
+  };
 
   return (
     <>
@@ -127,6 +149,8 @@ function SemesterBar({ sem = {}, index, isNew = false }) {
         <DialogTitle>Edit semester</DialogTitle>
         <DialogContent>
           <Stack spacing={1}>
+            <DialogContentText>Background colour:</DialogContentText>
+            {loadBgColorButtons()}
             <DialogContentText>Year of study:</DialogContentText>
             <ButtonGroup>
               {[...Array(ROADMAP.YEAR_MAX_COUNT).keys()]
@@ -171,7 +195,9 @@ function SemesterBar({ sem = {}, index, isNew = false }) {
             {...provided.dragHandleProps}
           >
             <Stack direction="row" alignItems="center" spacing={2}>
-              <DragIndicatorIcon />
+              <Avatar sx={{ bgcolor: bgHex }}>
+                <DragIndicatorIcon />
+              </Avatar>
               <Typography variant="overline" sx={{ flex: 1 }}>
                 {title}
               </Typography>
@@ -183,7 +209,10 @@ function SemesterBar({ sem = {}, index, isNew = false }) {
                 sx={{ border: 1, borderRadius: 6, borderColor: "gray" }}
               >
                 {modules.map((code) => (
-                  <Chip key={code} label={code[0] === "^" ? code.split("^")[3] : code} />
+                  <Chip
+                    key={code}
+                    label={code[0] === "^" ? code.split("^")[3] : code}
+                  />
                 ))}
                 {modules.length ? null : <Chip label="No modules" />}
               </Stack>
