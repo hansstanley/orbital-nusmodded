@@ -6,6 +6,7 @@ import {
   Skeleton,
   Chip,
   useTheme,
+  Divider,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
@@ -136,6 +137,7 @@ export default function RoadmapStack() {
             <div />
           </RightDrawer>
         </DragDropContext>
+        <Divider sx={{ width: "100%" }} />
       </Stack>
       {/* <RoadmapGenerator /> */}
     </>
@@ -153,12 +155,11 @@ function Semester({ sem }) {
       spacing={1}
       alignItems="flex-start"
       bgcolor={bgHex}
-      p={1}
       borderRadius={2}
       boxShadow={2}
       maxWidth="100%"
     >
-      <Stack direction="row" spacing={1}>
+      <Stack direction="row" spacing={1} pt={1} px={1}>
         <Chip
           label={`Year ${year || "?"} ${
             Object.keys(SEMESTER_TITLE)
@@ -170,12 +171,7 @@ function Semester({ sem }) {
         />
         <Chip label={`${modules?.length ?? 0} module(s)`} />
       </Stack>
-      <Stack
-        spacing={2}
-        alignItems="flex-start"
-        maxWidth="100%"
-        overflow="auto"
-      >
+      <Stack alignItems="flex-start" maxWidth="100%" overflow="auto">
         <Droppable droppableId={id} direction="horizontal">
           {(provided) => (
             <Stack
@@ -183,6 +179,7 @@ function Semester({ sem }) {
               direction="row"
               {...provided.droppableProps}
               ref={provided.innerRef}
+              p={1}
             >
               {modules?.map((moduleCode, index) =>
                 moduleCode[0] !== "^" ? (

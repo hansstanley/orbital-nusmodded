@@ -1,11 +1,8 @@
-import { Button, Typography, Stack, Divider, Box } from "@mui/material";
+import { Button, Stack, Divider } from "@mui/material";
 import Settings from "../Settings";
-import { useAuthSession } from "../../providers";
 
 export default function CustomizeSettings({ handleNext = () => {} }) {
-  const { isAuth } = useAuthSession();
-
-  return isAuth() ? (
+  return (
     <Stack spacing={2} alignItems="flex-start" flex={1}>
       <Settings />
       <Divider sx={{ width: "100%" }} />
@@ -13,11 +10,5 @@ export default function CustomizeSettings({ handleNext = () => {} }) {
         Next
       </Button>
     </Stack>
-  ) : (
-    <Box sx={{ flex: 1 }}>
-      <Typography variant="h6">
-        Please check your email for the verification link!
-      </Typography>
-    </Box>
   );
 }

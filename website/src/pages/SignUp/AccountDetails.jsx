@@ -11,9 +11,10 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useAuthSession } from "../../providers";
+import { TransitionGroup } from "react-transition-group";
 
 export default function SignUp({ handleNext }) {
-  const [validateInput, setValidateInput] = useState("");
+  const [validateInput, setValidateInput] = useState([]);
   const [loading, setLoading] = useState(false);
   const { handleSignup } = useAuthSession();
   const emailCheck =
@@ -24,47 +25,80 @@ export default function SignUp({ handleNext }) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    setValidateInput("");
-    if (data.get("username").length < 3) {
-      setValidateInput("Username is too short! (minimum 3 characters)");
-    } else if (emailCheck.test(data.get("email"))) {
-      if (data.get("password") === data.get("confirmPassword")) {
-        if (passwordCheck.test(data.get("password"))) {
-          setLoading(true);
-          const user = await handleSignup({
-            username: data.get("username"),
-            email: data.get("email"),
-            password: data.get("password"),
-          });
-          setLoading(false);
-          console.log("successfully signed up!", user);
-          handleNext();
-        } else if (data.get("password").length < 8) {
-          setValidateInput("Password is too short! (minimum 8 characters)");
-        } else if (
-          data.get("password").toLowerCase() === data.get("password")
-        ) {
-          setValidateInput(
-            "Password does not contain at least one uppercase letter"
-          );
-        } else if (
-          data.get("password").toUpperCase() === data.get("password")
-        ) {
-          setValidateInput(
-            "Password does not contain at least one lowercase letter"
-          );
-        } else {
-          setValidateInput("Password does not contain at least one number");
-        }
-      } else {
-        setValidateInput("Password does not match!");
+    const username = data.get("username");
+    const email = data.get("email");
+    const password = data.get("password");
+    const confirmPassword = data.get("confirmPassword");
+
+    let passed = true;
+    setValidateInput([]);
+    if (username.length < 3) {
+      passed = false;
+      setValidateInput((prev) => [
+        "Username is too short! (minimum 3 characters)",
+        ...prev,
+      ]);
+    }
+    if (!emailCheck.test(email)) {
+      passed = false;
+      setValidateInput((prev) => ["Email entered is invalid!", ...prev]);
+    }
+    if (password.length < 8) {
+      passed = false;
+      setValidateInput((prev) => [
+        "Password is too short! (minimum 8 characters)",
+        ...prev,
+      ]);
+    }
+    if (password.toLowerCase() === password) {
+      passed = false;
+      setValidateInput((prev) => [
+        "Password should contain at least one uppercase letter.",
+        ...prev,
+      ]);
+    }
+    if (password.toUpperCase() === password) {
+      passed = false;
+      setValidateInput((prev) => [
+        "Password should contain at least one lowercase letter.",
+        ...prev,
+      ]);
+    }
+    if (!/\d/.test(password)) {
+      passed = false;
+      setValidateInput((prev) => [
+        "Password should contain at least one number.",
+        ...prev,
+      ]);
+    }
+    if (!passwordCheck.test(password)) {
+      passed = false;
+      setValidateInput((prev) => ["Password entered is invalid!", ...prev]);
+    }
+    if (password !== confirmPassword) {
+      passed = false;
+      setValidateInput((prev) => ["Passwords do not match!", ...prev]);
+    }
+
+    if (passed) {
+      setLoading(true);
+      try {
+        await handleSignup({
+          username,
+          email,
+          password,
+        });
+        handleNext();
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
-    } else {
-      setValidateInput("Email entered is invalid!");
     }
   };
 
-  const hasValidateInput = typeof validateInput === "string" && !!validateInput;
+  const hasValidateInput =
+    Array.isArray(validateInput) && !!validateInput.length;
 
   return (
     <Box sx={{ width: { xs: "100%", sm: 360 } }}>
@@ -112,9 +146,20 @@ export default function SignUp({ handleNext }) {
           type="password"
           id="confirmPassword"
         />
-        <Collapse in={hasValidateInput} unmountOnExit>
-          <Alert severity="error">{validateInput}</Alert>
-        </Collapse>
+        <TransitionGroup>
+          {validateInput.map((msg, index) => (
+            <Collapse
+              key={index}
+              in={hasValidateInput}
+              sx={{ width: "100%", mt: 1 }}
+              unmountOnExit
+            >
+              <Alert severity="error">
+                <Typography variant="body2">{msg}</Typography>
+              </Alert>
+            </Collapse>
+          ))}
+        </TransitionGroup>
         <Button disabled={loading} type="submit" variant="contained" fullWidth>
           Sign Up
         </Button>
