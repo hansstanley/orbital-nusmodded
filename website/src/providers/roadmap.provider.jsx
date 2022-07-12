@@ -432,8 +432,6 @@ function RoadmapProvider({ children }) {
         }
       });
 
-      console.log(roadmap);
-      console.log(newRoadmap);
       if (checkSemestersPrereq(newRoadmap, newId)) {
         return false;
       }
