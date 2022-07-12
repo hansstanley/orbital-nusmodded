@@ -96,9 +96,11 @@ export default function ModGroupBox({
       }
       return "Y" + semWithMod.year + "S" + semWithMod.semester;
     }
+    if (!updateModuleGroup(arr, moduleCode)) {
+      return "";
+    }
     const mod = await getModInfo(moduleCode);
     setMod(mod);
-    updateModuleGroup(arr, moduleCode);
     let newArr = arr;
     newArr[3] = moduleCode;
     setArr(newArr);

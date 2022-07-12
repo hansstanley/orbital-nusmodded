@@ -150,7 +150,7 @@ export default function ModuleStack({
           message: `${moduleCode} selected!`,
           severity: "success",
         });
-      } else {
+      } else if (mod !== "") {
         pushSnack({
           message: `${moduleCode} already exists in the roadmap at ${mod}! `,
           severity: "error",

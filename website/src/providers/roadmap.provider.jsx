@@ -233,25 +233,6 @@ function RoadmapProvider({ children }) {
     }
   }, [getCourseModGroups, getCourseId]);
 
-  const updateModuleGroup = useCallback(
-    (arr, moduleCode) => {
-      const prevId = "^" + arr[1] + "^" + arr[2] + "^" + arr[3];
-      const newId = "^" + arr[1] + "^" + arr[2] + "^" + moduleCode;
-      const newModules = roadmap.find((sem) => sem.modules.includes(prevId));
-      newModules.modules[newModules.modules.indexOf(prevId)] = newId;
-
-      const newRoadmap = roadmap.map((sem) => {
-        if (sem.modules.includes(prevId)) {
-          return newModules;
-        } else {
-          return sem;
-        }
-      });
-      setRoadmap(newRoadmap);
-    },
-    [roadmap]
-  );
-
   const getAllMods = useCallback(
     () =>
       roadmap
@@ -324,7 +305,6 @@ function RoadmapProvider({ children }) {
             ignored.some((x) => x.indexOf(prereq) >= 0) ||
               newArr.some((x) => x.indexOf(prereq) >= 0)
           );
-          console.log(check);
           if (!check.includes(true)) {
             pushSnackMessage.push(prereq);
           }
@@ -435,6 +415,34 @@ function RoadmapProvider({ children }) {
       return false;
     },
     [modMap, pushSnack]
+  );
+
+  const updateModuleGroup = useCallback(
+    (arr, moduleCode) => {
+      const prevId = "^" + arr[1] + "^" + arr[2] + "^" + arr[3];
+      const newId = "^" + arr[1] + "^" + arr[2] + "^" + moduleCode;
+      const newModules = JSON.parse(JSON.stringify(roadmap.find((sem) => sem.modules.includes(prevId))));
+      newModules.modules[newModules.modules.indexOf(prevId)] = newId;
+
+      const newRoadmap = roadmap.map((sem) => {
+        if (sem.modules.includes(prevId)) {
+          return newModules;
+        } else {
+          return sem;
+        }
+      });
+
+      console.log(roadmap);
+      console.log(newRoadmap);
+      if (checkSemestersPrereq(newRoadmap, newId)) {
+        return false;
+      }
+
+      setRoadmap(newRoadmap);
+      return true;
+      
+    },
+    [roadmap, checkSemestersPrereq]
   );
 
   const dragMods = useCallback(
