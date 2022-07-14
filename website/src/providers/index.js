@@ -9,6 +9,7 @@ import { ModGroupProvider, useModGroup } from "./mod-group.provider";
 import { ModProvider, useMod } from "./mod.provider";
 import ModuleInfoProvider from "./moduleInfo.provider";
 import { RoadmapProvider, useRoadmap } from "./roadmap.provider";
+import { SettingsProvider, useSettings } from "./settings.provider";
 import { SnackbarProvider, useSnackbar } from "./snackbar.provider";
 import ThemeContextProvider from "./themeContext.provider";
 
@@ -24,6 +25,7 @@ export {
   ModProvider,
   ModuleInfoProvider,
   RoadmapProvider,
+  SettingsProvider,
   SnackbarProvider,
   ThemeContextProvider,
 };
@@ -36,5 +38,6 @@ export {
   useModGroup,
   useMod,
   useRoadmap,
+  useSettings,
   useSnackbar,
 };

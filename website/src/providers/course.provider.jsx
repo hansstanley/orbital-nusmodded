@@ -22,7 +22,7 @@ const CourseContext = createContext({
   createCourse: async (data) => new Course(),
   updateCourse: async (courseId, data) => new Course(),
   deleteCourse: async (courseId) => new Course(),
-  getCourseId: null,
+  getCourseId: () => "",
 });
 
 function CourseProvider({ children }) {
@@ -252,8 +252,8 @@ function CourseProvider({ children }) {
     }
 
     if (isAuth()) init();
-}, [isAuth, makeRequest, pushSnack]);
-const getCourseId = useCallback(() => courseId, [courseId]);
+  }, [isAuth, makeRequest, pushSnack]);
+  const getCourseId = useCallback(() => courseId, [courseId]);
 
   const values = {
     loading,

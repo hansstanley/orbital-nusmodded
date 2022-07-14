@@ -15,9 +15,20 @@ import ModGroupBox from "./ModGroupBox";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import BookIcon from "@mui/icons-material/Book";
 import BackpackIcon from "@mui/icons-material/Backpack";
+import SchoolIcon from "@mui/icons-material/School";
 import RightDrawer from "./RightDrawer";
-import { useRoadmap, useCourse } from "../../providers";
-import { COLORS, ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
+import {
+  useRoadmap,
+  useCourse,
+  useSettings,
+  useSnackbar,
+} from "../../providers";
+import {
+  COLORS,
+  ROADMAP,
+  SEMESTER_TITLE,
+  SETTINGS,
+} from "../../utils/constants";
 import SemesterOrderer from "./SemesterOrderer";
 import RoadmapGenerator from "./RoadmapGenerator";
 
@@ -33,9 +44,16 @@ export default function RoadmapStack() {
     checkSemestersPrereq,
     checkSemestersPreclusion,
   } = useRoadmap();
+  const {
+    loading: loadingCourse,
+    getCourseMods,
+    getCourseModGroups,
+    getCourseId,
+  } = useCourse();
+  const { loading: loadingSettings, getSetting } = useSettings();
+  const { pushSnack } = useSnackbar();
 
-  const { getCourseModGroups, getCourseId } = useCourse();
-
+  const [courseMods, setCourseMods] = useState([]);
   const [modGroups, setModGroups] = useState([]);
 
   const allMods = getAllMods();
@@ -99,6 +117,35 @@ export default function RoadmapStack() {
     }
   }, [getCourseModGroups, getCourseId]);
 
+  useEffect(() => {
+    if (loading || loadingCourse || loadingSettings) return;
+
+    loadCourseMods();
+
+    async function loadCourseMods() {
+      try {
+        const courseId = getSetting(SETTINGS.COURSE.ID);
+        if (!courseId) return;
+
+        const mods = await getCourseMods(courseId);
+        setCourseMods(mods);
+      } catch (error) {
+        console.error(error);
+        pushSnack({
+          message: "Unable to load modules for your course",
+          severity: "warning",
+        });
+      }
+    }
+  }, [
+    loading,
+    loadingCourse,
+    loadingSettings,
+    getCourseMods,
+    getSetting,
+    pushSnack,
+  ]);
+
   return (
     <>
       <Stack spacing={2} width="100%" alignItems="flex-start">
@@ -119,6 +166,10 @@ export default function RoadmapStack() {
                 icon: <BackpackIcon />,
                 label: "My module groups",
               },
+              {
+                icon: <SchoolIcon />,
+                label: "Course modules",
+              },
             ]}
           >
             <ModStack
@@ -131,9 +182,31 @@ export default function RoadmapStack() {
             <ModGroupStack
               modGroups={modGroups}
               isDroppable={true}
-              droppableId={"modgroup"}
+              droppableId={ROADMAP.COURSE_MOD_GROUPS_ID}
               isCourse={true}
             />
+            <Droppable droppableId={ROADMAP.COURSE_MODS_ID}>
+              {(provided) => (
+                <Stack
+                  spacing={2}
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  {courseMods.map((mod, index) =>
+                    getAllMods().includes(mod.moduleCode) ? null : (
+                      <ModuleBox
+                        key={mod.moduleCode + ROADMAP.COURSE_MODS_ID}
+                        moduleCode={mod.moduleCode}
+                        isDraggable
+                        draggableId={mod.moduleCode + ROADMAP.COURSE_MODS_ID}
+                        index={index}
+                      />
+                    )
+                  )}
+                  {provided.placeholder}
+                </Stack>
+              )}
+            </Droppable>
             <div />
           </RightDrawer>
         </DragDropContext>
@@ -209,13 +282,15 @@ function Semester({ sem }) {
 }
 
 function ModulePlaceholer() {
+  const isDarkTheme = useTheme().palette.mode === "dark";
+
   return (
     <Box
       sx={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        borderColor: grey[200],
+        borderColor: grey[isDarkTheme ? 200 : 600],
         borderRadius: 1,
         borderStyle: "dashed",
         py: 4,

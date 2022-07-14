@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { useMemo, useRef, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
+import DoneIcon from "@mui/icons-material/Done";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { COLORS, ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
@@ -135,7 +136,7 @@ function SemesterBar({ sem = {}, index, isNew = false }) {
         {Object.keys(COLORS).map((colorKey) => (
           <IconButton key={colorKey} onClick={handleBgColorChange(colorKey)}>
             <Avatar sx={{ bgcolor: COLORS[colorKey][isDarkTheme ? 900 : 200] }}>
-              {" "}
+              {colorKey === bgColor ? <DoneIcon /> : " "}
             </Avatar>
           </IconButton>
         ))}

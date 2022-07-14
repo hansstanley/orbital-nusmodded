@@ -12,6 +12,7 @@ import {
   useAuthSession,
   useBackend,
   useCourse,
+  useSettings,
   useSnackbar,
 } from "../../providers";
 import { SETTINGS } from "../../utils/constants";
@@ -28,6 +29,7 @@ export default function Settings() {
   const { makeRequest } = useBackend();
   const { loading: loadingCourses, getCourseArray } = useCourse();
   const { pushSnack } = useSnackbar();
+  const { loading, getSetting, setCourseId, setMCLimit } = useSettings();
   const [loadingRow, setLoadingRow] = useState([]);
   const [successRow, setSuccessRow] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("");
@@ -36,61 +38,29 @@ export default function Settings() {
   const arrMCs = [...Array(39).keys()].map((x) => (x += 12));
 
   useEffect(() => {
-    async function init() {
-      setLoadingRow([...Object.values(rowIds)]);
-      try {
-        const { status, data } = await makeRequest({
-          method: "get",
-          route: "/user-settings",
-          isPublic: false,
-        });
-
-        if (status === 200 && data) {
-          setSelectedCourse(data[rowIds.course] || "");
-          setMaxMCs(data[rowIds.maxMCs || 23]);
-          setExemptedModules(data[rowIds.exemptedModules] || []);
-          // console.log(data);
-        } else {
-          throw new Error("Unable to retrieve user settings");
-        }
-      } catch (error) {
-        console.error(error);
-        pushSnack({
-          message: error.message || "Unable to retrieve user settings",
-          severity: "error",
-        });
-      } finally {
-        setLoadingRow([]);
-      }
+    if (loading) {
+      setLoadingRow([SETTINGS.COURSE.ID, SETTINGS.MC_LIMIT.ID]);
+    } else {
+      setSelectedCourse(getSetting(SETTINGS.COURSE.ID) || "");
+      setMaxMCs(getSetting(SETTINGS.MC_LIMIT.ID) || 23);
+      setLoadingRow([]);
     }
-
-    if (isAuth()) init();
-  }, [isAuth, makeRequest, pushSnack]);
+  }, [loading, getSetting]);
 
   const sortCourses = useCallback(() => {
     let courses = getCourseArray();
-
     return courses;
   }, [getCourseArray]);
 
   const handleChangeCourse = async (event) => {
-    setSelectedCourse(event.target.value);
+    const newCourseId = event.target.value;
+
+    setSelectedCourse(newCourseId);
     setSuccessRow(null);
-    setLoadingRow((prev) => prev.concat([rowIds.course]));
+    setLoadingRow((prev) => prev.concat([SETTINGS.COURSE.ID]));
 
     try {
-      const { status } = await makeRequest({
-        method: "post",
-        route: "/user-settings/edit",
-        data: { key: rowIds.course, value: event.target.value },
-        isPublic: false,
-      });
-
-      if (status === 200) {
-        setSuccessRow(rowIds.course);
-      } else {
-        throw new Error(`Unable to save course`);
-      }
+      await setCourseId(newCourseId);
     } catch (error) {
       console.error(error);
       pushSnack({
@@ -103,23 +73,14 @@ export default function Settings() {
   };
 
   const handleChangeMCs = async (event) => {
-    setMaxMCs(event.target.value);
+    const newMaxMCs = event.target.value;
+
+    setMaxMCs(newMaxMCs);
     setSuccessRow(null);
     setLoadingRow((prev) => prev.concat([rowIds.maxMCs]));
 
     try {
-      const { status } = await makeRequest({
-        method: "post",
-        route: "/user-settings/edit",
-        data: { key: rowIds.maxMCs, value: event.target.value },
-        isPublic: false,
-      });
-
-      if (status === 200) {
-        setSuccessRow(rowIds.maxMCs);
-      } else {
-        throw new Error("Unable to save MC limit");
-      }
+      await setMCLimit(newMaxMCs);
     } catch (error) {
       console.error(error);
       pushSnack({
