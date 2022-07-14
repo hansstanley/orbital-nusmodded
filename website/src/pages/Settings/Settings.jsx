@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { AuthGuard } from "../../components";
+import { ModuleStack } from "../../components/Mod";
 import {
   useAuthSession,
   useBackend,
@@ -19,6 +20,7 @@ import SettingsRow from "./SettingsRow";
 const rowIds = {
   course: SETTINGS.COURSE.ID,
   maxMCs: SETTINGS.MC_LIMIT.ID,
+  exemptedModules: SETTINGS.EXEMPTED_MODULES.ID,
 };
 
 export default function Settings() {
@@ -30,6 +32,7 @@ export default function Settings() {
   const [successRow, setSuccessRow] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [maxMCs, setMaxMCs] = useState(23);
+  const [exemptedModules, setExemptedModules] = useState([]);
   const arrMCs = [...Array(39).keys()].map((x) => (x += 12));
 
   useEffect(() => {
@@ -45,6 +48,8 @@ export default function Settings() {
         if (status === 200 && data) {
           setSelectedCourse(data[rowIds.course] || "");
           setMaxMCs(data[rowIds.maxMCs || 23]);
+          setExemptedModules(data[rowIds.exemptedModules] || []);
+          // console.log(data);
         } else {
           throw new Error("Unable to retrieve user settings");
         }
@@ -126,6 +131,69 @@ export default function Settings() {
     }
   };
 
+  const handleAddExemptedModules = async (moduleCodes = []) => {
+    const newCodes = moduleCodes.filter((code) => !exemptedModules.includes(code));
+
+    const holdingCodes = newCodes.concat(exemptedModules?.modules || []);
+
+    setSuccessRow(null);
+    setLoadingRow((prev) => prev.concat([rowIds.exemptedModules]));
+
+    try {
+      const { status } = await makeRequest({
+        method: "post",
+        route: "/user-settings/edit",
+        data: { key: rowIds.exemptedModules, value: holdingCodes },
+        isPublic: false,
+      });
+
+      if (status === 200) {
+        setExemptedModules(holdingCodes);
+      } else {
+        throw new Error("Unable to save exempted modules");
+      }
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: error.message || "Unable to save exempted modules",
+        severity: "error",
+      });
+    } finally {
+      setLoadingRow((prev) => prev.filter((id) => id !== rowIds.exemptedModules));
+    }
+    return newCodes;
+  };
+
+  const handleDeleteExemptedModules = async (moduleCode) => {
+    const holdingCodes = exemptedModules?.modules?.filter((code) => code !== moduleCode) || [];
+
+    setSuccessRow(null);
+    setLoadingRow((prev) => prev.concat([rowIds.exemptedModules]));
+
+    try {
+      const { status } = await makeRequest({
+        method: "post",
+        route: "/user-settings/edit",
+        data: { key: rowIds.exemptedModules, value: holdingCodes },
+        isPublic: false,
+      });
+
+      if (status === 200) {
+        setExemptedModules(holdingCodes);
+      } else {
+        throw new Error("Unable to save exempted modules");
+      }
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: error.message || "Unable to save exempted modules",
+        severity: "error",
+      });
+    } finally {
+      setLoadingRow((prev) => prev.filter((id) => id !== rowIds.exemptedModules));
+    }
+  };
+
   const settingsRows = [
     {
       id: rowIds.course,
@@ -167,6 +235,18 @@ export default function Settings() {
             ))}
           </Select>
         </FormControl>
+      ),
+    },
+    {
+      id: rowIds.exemptedModules,
+      title: "Exempted Modules",
+      content: (
+        <ModuleStack 
+          mods={exemptedModules}
+          isDroppable={false}
+          handleAddMods={handleAddExemptedModules}
+          handleDeleteMod={handleDeleteExemptedModules}
+        />
       ),
     },
   ];

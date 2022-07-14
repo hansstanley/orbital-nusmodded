@@ -34,7 +34,7 @@ function RoadmapProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [roadmap, setRoadmap] = useState([]);
   const [MCLimit, setMCLimit] = useState(0);
-  const [MCExceed, setMCExceed] = useState(false);
+  const [exemptedModules, setExemptedModules] = useState([]);
   const [modGroups, setModGroups] = useState([]);
   const { modules, isLoaded } = useContext(ModuleInfoContext);
 
@@ -82,6 +82,13 @@ function RoadmapProvider({ children }) {
         } else {
           throw new Error(`Failed to retrieve MC limit with status ${status}`);
         }
+
+        if (status === 200) {
+          // setExemptedModules(data?.EXEMPTED_MODULES);
+        } else {
+          throw new Error(`Failed to retrieve exempted modules with status ${status}`);
+        }
+
       } catch (error) {
         console.error(error);
         pushSnack({
@@ -280,7 +287,7 @@ function RoadmapProvider({ children }) {
         moduleCode === ""
       )
         return false;
-      const ignored = ["MA1301", "ES1000"];
+      // const ignored = ["MA1301", "ES1000"];
       const prereq = modMap.get(moduleCode).prereqTree;
       let check = [];
       let pushSnackMessage = [];
@@ -302,7 +309,7 @@ function RoadmapProvider({ children }) {
       if (!prereq.and) {
         if (!prereq.or) {
           check.push(
-            ignored.some((x) => x.indexOf(prereq) >= 0) ||
+              exemptedModules.some((x) => x.indexOf(prereq) >= 0) ||
               newArr.some((x) => x.indexOf(prereq) >= 0)
           );
           if (!check.includes(true)) {
@@ -312,7 +319,7 @@ function RoadmapProvider({ children }) {
           check = prereq.or.map((or) => {
             if (!or.and) {
               const tf =
-                ignored.some((x) => x.indexOf(or) >= 0) ||
+                exemptedModules.some((x) => x.indexOf(or) >= 0) ||
                 newArr.some((x) => x.indexOf(or) >= 0);
               if (!tf) {
                 pushSnackMessage.push(or);
@@ -322,7 +329,7 @@ function RoadmapProvider({ children }) {
               const tf = or.and
                 .map(
                   (mod) =>
-                    ignored.some((x) => x.indexOf(mod) >= 0) ||
+                    exemptedModules.some((x) => x.indexOf(mod) >= 0) ||
                     newArr.some((x) => x.indexOf(mod) >= 0)
                 )
                 .includes(true);
@@ -342,7 +349,7 @@ function RoadmapProvider({ children }) {
         check = prereq.and.map((and) => {
           if (!and.or) {
             const tf =
-              ignored.some((x) => x.indexOf(and) >= 0) ||
+              exemptedModules.some((x) => x.indexOf(and) >= 0) ||
               newArr.some((x) => x.indexOf(and) >= 0);
             if (!tf) {
               pushSnackMessage.push(and);
@@ -352,7 +359,7 @@ function RoadmapProvider({ children }) {
             const tf = and.or
               .map(
                 (mod) =>
-                  ignored.some((x) => x.indexOf(mod) >= 0) ||
+                  exemptedModules.some((x) => x.indexOf(mod) >= 0) ||
                   newArr.some((x) => x.indexOf(mod) >= 0)
               )
               .includes(true);
@@ -363,7 +370,6 @@ function RoadmapProvider({ children }) {
           }
         });
       }
-      // console.log(pushSnackMessage.join(" and "));
 
       if (pushSnackMessage.join(" and ")) {
         pushSnack({
@@ -378,7 +384,7 @@ function RoadmapProvider({ children }) {
       }
       return false;
     },
-    [modMap, pushSnack]
+    [modMap, pushSnack, exemptedModules]
   );
 
   const checkSemestersPreclusion = useCallback(

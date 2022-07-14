@@ -93,4 +93,7 @@ export const SETTINGS = {
   MC_LIMIT: {
     ID: "MC_LIMIT",
   },
+  EXEMPTED_MODULES: {
+    ID: "EXEMPTED_MODULES",
+  },
 };

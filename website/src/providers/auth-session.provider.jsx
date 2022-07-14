@@ -126,13 +126,14 @@ function AuthSessionProvider({ children }) {
   };
 
   const handleSignup = async ({ username, email, password }) => {
-    const { error } = await supabase.auth.signUp(
+    const { user, error } = await supabase.auth.signUp(
       {
         email,
         password,
       },
       { data: { username } }
     );
+    console.log(user);
     if (error) throw error;
   };
 
