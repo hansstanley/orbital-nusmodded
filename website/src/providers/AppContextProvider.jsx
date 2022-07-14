@@ -12,6 +12,7 @@ import { CourseProvider } from "./course.provider";
 import { ModProvider } from "./mod.provider";
 import { ModGroupProvider } from "./mod-group.provider";
 import { RoadmapProvider } from "./roadmap.provider";
+import { SettingsProvider } from "./settings.provider";
 
 function combineComponents(...components) {
   return components.reduce(
@@ -31,6 +32,7 @@ const providers = [
   SnackbarProvider,
   AuthSessionProvider,
   BackendProvider,
+  SettingsProvider,
   ThemeContextProvider,
   CourseProvider,
   ModProvider,

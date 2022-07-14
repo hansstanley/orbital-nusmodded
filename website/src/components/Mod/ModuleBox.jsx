@@ -30,6 +30,7 @@ export default function ModuleBox({
   moduleCode,
   actions = null,
   isDraggable = false,
+  draggableId,
   index,
 }) {
   const { getModInfo } = useMod();
@@ -130,7 +131,11 @@ export default function ModuleBox({
   return (
     <>
       {isDraggable ? (
-        <Draggable draggableId={moduleCode} index={index} key={moduleCode}>
+        <Draggable
+          draggableId={draggableId || moduleCode}
+          index={index}
+          key={draggableId || moduleCode}
+        >
           {(provided, snapshot) => (
             <Card
               sx={{ width: 320 }}

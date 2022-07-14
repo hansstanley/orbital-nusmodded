@@ -64,7 +64,9 @@ export const SEMESTER_TITLE = {
 
 export const ROADMAP = {
   MY_MODS_ID: v5("MY_MODS", NIL),
+  MY_MOD_GROUPS_ID: v5("MY_MOD_GROUPS", NIL),
   COURSE_MODS_ID: v5("COURSE_MODS", NIL),
+  COURSE_MOD_GROUPS_ID: v5("COURSE_MOD_GROUPS", NIL),
   YEAR_MAX_COUNT: 10,
   TEMPLATE: () => {
     const colorKeys = Object.keys(COLORS);
