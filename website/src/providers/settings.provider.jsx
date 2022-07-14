@@ -81,7 +81,22 @@ function SettingsProvider({ children }) {
     setUpdated(true);
   };
 
-  const values = { loading, getSetting, setCourseId, setMCLimit };
+  const setExemptedModules = async (moduleCodes) => {
+    const { status } = await makeRequest({
+      method: "post",
+      route: "/user-settings/edit",
+      data: { key: SETTINGS.EXEMPTED_MODULES, value: moduleCodes },
+      isPublic: false,
+    });
+
+    if (status === 200) {
+      setExemptedModules(moduleCodes);
+    } else {
+      throw new Error("Unable to save exempted modules");
+    }
+  }
+
+  const values = { loading, getSetting, setCourseId, setMCLimit, setExemptedModules };
 
   return (
     <SettingsContext.Provider value={values}>

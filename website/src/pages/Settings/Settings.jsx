@@ -29,12 +29,12 @@ export default function Settings() {
   const { makeRequest } = useBackend();
   const { loading: loadingCourses, getCourseArray } = useCourse();
   const { pushSnack } = useSnackbar();
-  const { loading, getSetting, setCourseId, setMCLimit } = useSettings();
+  const { loading, getSetting, setCourseId, setMCLimit, setExemptedModules } = useSettings();
   const [loadingRow, setLoadingRow] = useState([]);
   const [successRow, setSuccessRow] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [maxMCs, setMaxMCs] = useState(23);
-  const [exemptedModules, setExemptedModules] = useState([]);
+  const [exemptedMods, setExemptedMods] = useState([]);
   const arrMCs = [...Array(39).keys()].map((x) => (x += 12));
 
   useEffect(() => {
@@ -43,6 +43,7 @@ export default function Settings() {
     } else {
       setSelectedCourse(getSetting(SETTINGS.COURSE.ID) || "");
       setMaxMCs(getSetting(SETTINGS.MC_LIMIT.ID) || 23);
+      setExemptedMods(getSetting(SETTINGS.EXEMPTED_MODULES) || []);
       setLoadingRow([]);
     }
   }, [loading, getSetting]);
@@ -93,26 +94,15 @@ export default function Settings() {
   };
 
   const handleAddExemptedModules = async (moduleCodes = []) => {
-    const newCodes = moduleCodes.filter((code) => !exemptedModules.includes(code));
+    const newCodes = moduleCodes.filter((code) => !exemptedMods.includes(code));
 
-    const holdingCodes = newCodes.concat(exemptedModules?.modules || []);
+    const holdingCodes = newCodes.concat(exemptedMods?.modules || []);
 
     setSuccessRow(null);
     setLoadingRow((prev) => prev.concat([rowIds.exemptedModules]));
 
     try {
-      const { status } = await makeRequest({
-        method: "post",
-        route: "/user-settings/edit",
-        data: { key: rowIds.exemptedModules, value: holdingCodes },
-        isPublic: false,
-      });
-
-      if (status === 200) {
-        setExemptedModules(holdingCodes);
-      } else {
-        throw new Error("Unable to save exempted modules");
-      }
+      await setExemptedModules(holdingCodes);
     } catch (error) {
       console.error(error);
       pushSnack({
@@ -126,24 +116,13 @@ export default function Settings() {
   };
 
   const handleDeleteExemptedModules = async (moduleCode) => {
-    const holdingCodes = exemptedModules?.modules?.filter((code) => code !== moduleCode) || [];
+    const holdingCodes = exemptedMods?.modules?.filter((code) => code !== moduleCode) || [];
 
     setSuccessRow(null);
     setLoadingRow((prev) => prev.concat([rowIds.exemptedModules]));
 
     try {
-      const { status } = await makeRequest({
-        method: "post",
-        route: "/user-settings/edit",
-        data: { key: rowIds.exemptedModules, value: holdingCodes },
-        isPublic: false,
-      });
-
-      if (status === 200) {
-        setExemptedModules(holdingCodes);
-      } else {
-        throw new Error("Unable to save exempted modules");
-      }
+      await setExemptedModules(holdingCodes);
     } catch (error) {
       console.error(error);
       pushSnack({
@@ -203,7 +182,7 @@ export default function Settings() {
       title: "Exempted Modules",
       content: (
         <ModuleStack 
-          mods={exemptedModules}
+          mods={exemptedMods}
           isDroppable={false}
           handleAddMods={handleAddExemptedModules}
           handleDeleteMod={handleDeleteExemptedModules}
