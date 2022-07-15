@@ -67,6 +67,7 @@ export const ROADMAP = {
   MY_MOD_GROUPS_ID: v5("MY_MOD_GROUPS", NIL),
   COURSE_MODS_ID: v5("COURSE_MODS", NIL),
   COURSE_MOD_GROUPS_ID: v5("COURSE_MOD_GROUPS", NIL),
+  EXEMPTED_MODS_ID: v5("EXEMPTED_MODS", NIL),
   YEAR_MAX_COUNT: 10,
   TEMPLATE: () => {
     const colorKeys = Object.keys(COLORS);
@@ -89,6 +90,9 @@ export const ROADMAP = {
 };
 
 export const SETTINGS = {
+  ROADMAP: {
+    ID: "ROADMAP",
+  },
   COURSE: {
     ID: "COURSE_ID",
   },

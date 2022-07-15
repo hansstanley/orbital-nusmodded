@@ -15,6 +15,7 @@ import ModGroupBox from "./ModGroupBox";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import BookIcon from "@mui/icons-material/Book";
 import BackpackIcon from "@mui/icons-material/Backpack";
+import NotInterestedIcon from "@mui/icons-material/NotInterested";
 import SchoolIcon from "@mui/icons-material/School";
 import RightDrawer from "./RightDrawer";
 import {
@@ -40,9 +41,6 @@ export default function RoadmapStack() {
     getSemesterById,
     setModulesById,
     getAllMods,
-    checkSemestersMC,
-    checkSemestersPrereq,
-    checkSemestersPreclusion,
   } = useRoadmap();
   const {
     loading: loadingCourse,
@@ -66,6 +64,14 @@ export default function RoadmapStack() {
     [getSemesterById]
   );
 
+  const exemptedMods = useMemo(
+    () =>
+      getSemesterById(ROADMAP.EXEMPTED_MODS_ID)?.modules?.map((moduleCode) => ({
+        moduleCode,
+      })) || [],
+    [getSemesterById]
+  );
+
   const onDragEnd = ({ source, destination, draggableId }) => {
     if (!source || !destination) return;
     dragMods(
@@ -75,18 +81,18 @@ export default function RoadmapStack() {
       destination.droppableId
     );
 
-    if (
-      checkSemestersMC(getSemesters()) ||
-      checkSemestersPrereq(getSemesters(), draggableId) ||
-      checkSemestersPreclusion(getSemesters(), draggableId)
-    ) {
-      dragMods(
-        destination.index,
-        destination.droppableId,
-        source.index,
-        source.droppableId
-      );
-    }
+    // if (
+    //   checkSemestersMC(getSemesters()) ||
+    //   checkSemestersPrereq(getSemesters(), draggableId) ||
+    //   checkSemestersPreclusion(getSemesters(), draggableId)
+    // ) {
+    //   dragMods(
+    //     destination.index,
+    //     destination.droppableId,
+    //     source.index,
+    //     source.droppableId
+    //   );
+    // }
   };
 
   const handleAddMyMods = (moduleCodes = []) => {
@@ -105,6 +111,24 @@ export default function RoadmapStack() {
       holdingSem?.modules?.filter((code) => code !== moduleCode) || [];
 
     setModulesById(ROADMAP.MY_MODS_ID, holdingCodes);
+  };
+
+  const handleAddExemptedMods = (moduleCodes = []) => {
+    const holdingSem = getSemesterById(ROADMAP.EXEMPTED_MODS_ID);
+    const newCodes = moduleCodes.filter((code) => !allMods.includes(code));
+
+    const holdingCodes = newCodes.concat(holdingSem?.modules || []);
+    setModulesById(ROADMAP.EXEMPTED_MODS_ID, holdingCodes);
+
+    return newCodes;
+  };
+
+  const handleDeleteExemptedMod = (moduleCode) => {
+    const holdingSem = getSemesterById(ROADMAP.EXEMPTED_MODS_ID);
+    const holdingCodes =
+      holdingSem?.modules?.filter((code) => code !== moduleCode) || [];
+
+    setModulesById(ROADMAP.EXEMPTED_MODS_ID, holdingCodes);
   };
 
   useEffect(() => {
@@ -170,6 +194,10 @@ export default function RoadmapStack() {
                 icon: <SchoolIcon />,
                 label: "Course modules",
               },
+              {
+                icon: <NotInterestedIcon />,
+                label: "Exempted modules",
+              },
             ]}
           >
             <ModStack
@@ -207,6 +235,11 @@ export default function RoadmapStack() {
                 </Stack>
               )}
             </Droppable>
+            <ModStack
+              mods={exemptedMods}
+              handleAddMods={handleAddExemptedMods}
+              handleDeleteMod={handleDeleteExemptedMod}
+            />
             <div />
           </RightDrawer>
         </DragDropContext>

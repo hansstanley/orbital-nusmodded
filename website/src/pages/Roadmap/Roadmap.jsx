@@ -6,7 +6,7 @@ export default function Roadmap() {
   return (
     <AuthGuard>
       <RoadmapStack />
-      {/* <StatusFab /> */}
+      <StatusFab />
     </AuthGuard>
   );
 }

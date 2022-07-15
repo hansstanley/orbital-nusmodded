@@ -1,13 +1,12 @@
 import { useCallback, useEffect } from "react";
 import { createContext, useContext, useState } from "react";
 import { v4, validate as uuidValidate, version as uuidVersion } from "uuid";
-import { ROADMAP, SETTINGS } from "../utils/constants";
+import { ROADMAP, SEMESTER_TITLE, SETTINGS } from "../utils/constants";
 import { useAuthSession } from "./auth-session.provider";
 import { useBackend } from "./backend.provider";
 import { useSnackbar } from "./snackbar.provider";
 import { useCourse } from "./course.provider";
 import { useMod } from "./mod.provider";
-import { ModuleInfoContext } from "../contexts";
 import { useSettings } from "./settings.provider";
 
 const RoadmapContext = createContext({
@@ -25,6 +24,7 @@ const RoadmapContext = createContext({
   dragSemesters: (srcIndex, destIndex) => {},
   dragMods: (srcIndex, srcDroppableId, destIndex, destDroppableId) => {},
   getAllMods: () => [],
+  getIssues: async () => [],
 });
 
 function RoadmapProvider({ children }) {
@@ -40,10 +40,9 @@ function RoadmapProvider({ children }) {
   const [exemptedModules, setExemptedModules] = useState([]);
   const [courseMods, setCourseMods] = useState([]);
   const [courseModGroups, setCourseModGroups] = useState([]);
-  const { modules, isLoaded } = useContext(ModuleInfoContext);
 
   useEffect(() => {
-    function maintainRoadmap(roadmap = []) {
+    function maintainRoadmap(roadmap) {
       const newRoadmap = Array.isArray(roadmap) ? [...roadmap] : [];
 
       const isEmpty = newRoadmap.length === 0;
@@ -51,6 +50,9 @@ function RoadmapProvider({ children }) {
         newRoadmap.findIndex((sem) => sem?.id === ROADMAP.MY_MODS_ID) === -1;
       const missingMyModGroups =
         newRoadmap.findIndex((sem) => sem?.id === ROADMAP.MY_MOD_GROUPS_ID) ===
+        -1;
+      const missingExemptedMods =
+        newRoadmap.findIndex((sem) => sem?.id === ROADMAP.EXEMPTED_MODS_ID) ===
         -1;
 
       if (isEmpty) {
@@ -62,50 +64,29 @@ function RoadmapProvider({ children }) {
       if (missingMyModGroups) {
         newRoadmap.push({ id: ROADMAP.MY_MOD_GROUPS_ID, modules: [] });
       }
+      if (missingExemptedMods) {
+        newRoadmap.push({ id: ROADMAP.EXEMPTED_MODS_ID, modules: [] });
+      }
 
       setRoadmap(newRoadmap);
     }
 
-    async function init() {
-      setLoading(true);
-      try {
-        const { status, data } = await makeRequest({
-          method: "get",
-          route: "/user-settings",
-          isPublic: false,
-        });
-
-        if (status === 200) {
-          maintainRoadmap(data?.ROADMAP);
-        } else {
-          throw new Error(`Failed to retrieve roadmap with status ${status}`);
-        }
-
-        if (status === 200) {
-          setMCLimit(data?.MC_LIMIT);
-        } else {
-          throw new Error(`Failed to retrieve MC limit with status ${status}`);
-        }
-
-        if (status === 200) {
-          // setExemptedModules(data?.EXEMPTED_MODULES);
-        } else {
-          throw new Error(`Failed to retrieve exempted modules with status ${status}`);
-        }
-
-      } catch (error) {
-        console.error(error);
-        pushSnack({
-          message: "Unable to retrieve roadmap/MC limit",
-          severity: "error",
-        });
-      } finally {
+    function init() {
+      if (loadingSettings) {
+        setLoading(true);
+      } else {
+        const loadedRoadmap = getSetting(SETTINGS.ROADMAP.ID);
+        const loadedMCLimit = getSetting(SETTINGS.MC_LIMIT.ID);
+        const loadedExempted = getSetting(SETTINGS.EXEMPTED_MODULES.ID);
+        maintainRoadmap(loadedRoadmap);
+        setMCLimit(loadedMCLimit);
+        setExemptedModules(loadedExempted);
         setLoading(false);
       }
     }
 
     if (isAuth()) init();
-  }, [isAuth, makeRequest, pushSnack]);
+  }, [isAuth, loadingSettings, getSetting]);
 
   useEffect(() => {
     async function saveRoadmap() {
@@ -114,7 +95,7 @@ function RoadmapProvider({ children }) {
           method: "post",
           route: "/user-settings/edit",
           data: {
-            key: "ROADMAP",
+            key: SETTINGS.ROADMAP.ID,
             value: roadmap,
           },
           isPublic: false,
@@ -264,178 +245,200 @@ function RoadmapProvider({ children }) {
   );
 
   const checkSemestersMC = useCallback(
-    (roadmap) => {
-      if (isLoaded) {
-        roadmap = roadmap.map((sem) =>
-          sem.modules.map((mod) => (mod[0] === "^" ? mod.split("^")[3] : mod))
+    async (roadmap = []) => {
+      const hasExceeds = await Promise.all(
+        roadmap
+          .map(toModuleCodes)
+          .map(toModuleCredits)
+          .map(toTotalCredit)
+          .map(toExceedLimit)
+      );
+
+      const issues = [];
+      hasExceeds.forEach((exceeds, index) => {
+        if (exceeds)
+          issues.push({
+            severity: "warning",
+            message: `${getSemesterName(
+              roadmap[index]
+            )} exceeds the MC limit of ${MCLimit}.`,
+          });
+      });
+      return issues;
+
+      function toModuleCodes(sem) {
+        return (
+          sem?.modules?.map((mod) =>
+            mod && mod[0] === "^" ? mod.split("^")[3] : mod
+          ) || []
         );
-        roadmap = roadmap.map((sem) =>
-          sem.map((mod) =>
-            mod !== ""
-              ? modules.find((x) => x.moduleCode === mod).moduleCredit
-              : 0
-          )
-        );
-        roadmap = roadmap.map((sem) =>
-          sem.reduce((a, b) => a + parseInt(b), 0)
-        );
-        roadmap = roadmap.map((sem) => sem > MCLimit);
       }
-      if (roadmap.includes(true)) {
-        pushSnack({
-          message: "Semester exceeds MC Limit!",
-          severity: "error",
-        });
-        return true;
+      function toModuleCredits(moduleCodes) {
+        return (
+          moduleCodes?.map(async (mod) =>
+            mod ? (await getModInfo(mod)).moduleCredit : 0
+          ) || []
+        );
       }
-      return false;
+      async function toTotalCredit(moduleCredits) {
+        const credits = await Promise.all(moduleCredits);
+        return credits.reduce((sum, credit) => sum + parseInt(credit), 0);
+      }
+      async function toExceedLimit(totalCredit) {
+        return (await totalCredit) > MCLimit;
+      }
+
+      function getSemesterName(sem) {
+        if (!sem) {
+          return "Unknown semester";
+        } else {
+          return `Year ${sem?.year} ${
+            SEMESTER_TITLE[sem?.semester || -1] || "Semester ?"
+          }`;
+        }
+      }
     },
-    [MCLimit, isLoaded, modules, pushSnack]
+    [MCLimit, getModInfo]
   );
 
   const checkSemestersPrereq = useCallback(
-    (roadmap, module) => {
-      const moduleCode = module[0] === "^" ? module.split("^")[3] : module;
-      if (
-        roadmap[roadmap.findIndex((sem) => sem.modules.includes(module))]
-          .index === ROADMAP.MY_MODS_ID ||
-        moduleCode === ""
-      )
-        return false;
-      // const ignored = ["MA1301", "ES1000"];
-      const prereq = modMap.get(moduleCode).prereqTree;
-      let check = [];
-      let pushSnackMessage = [];
-      const newArr = roadmap
-        .slice(
-          0,
-          roadmap.findIndex((sem) => sem.modules.includes(module))
-        )
-        .reduce((a, b) => a.concat(b.modules), [])
-        .map((mod) =>
-          mod[0] === "^"
-            ? mod.split("^")[3]
-            : mod === "CS1101S"
-            ? "CS1010"
-            : mod
-        );
-      if (!prereq) return;
+    async (roadmap = []) => {
+      let issues = [];
 
-      if (!prereq.and) {
-        if (!prereq.or) {
-          check.push(
-              exemptedModules.some((x) => x.indexOf(prereq) >= 0) ||
-              newArr.some((x) => x.indexOf(prereq) >= 0)
-          );
-          if (!check.includes(true)) {
-            pushSnackMessage.push(prereq);
-          }
-        } else {
-          check = prereq.or.map((or) => {
-            if (!or.and) {
-              const tf =
-                exemptedModules.some((x) => x.indexOf(or) >= 0) ||
-                newArr.some((x) => x.indexOf(or) >= 0);
-              if (!tf) {
-                pushSnackMessage.push(or);
-              }
-              return tf;
-            } else {
-              const tf = or.and
-                .map(
-                  (mod) =>
-                    exemptedModules.some((x) => x.indexOf(mod) >= 0) ||
-                    newArr.some((x) => x.indexOf(mod) >= 0)
-                )
-                .includes(true);
-              if (!tf) {
-                pushSnackMessage.push("(" + or.and.join(" and ") + ")");
-              }
-              return tf;
-            }
-          });
-          if (!check.includes(true)) {
-            pushSnackMessage = ["(" + pushSnackMessage.join(" or ") + ")"];
-          } else {
-            pushSnackMessage = [];
+      const exemptedMods =
+        getSemesterById(ROADMAP.EXEMPTED_MODS_ID)?.modules || [];
+      let modsBefore = [];
+      for (let sem of roadmap) {
+        const mods = sem?.modules || [];
+        const moduleCodes = mods.map((mod) =>
+          mod[0] === "^" ? mod.split("^")[3] : mod
+        );
+        const modInfos = await Promise.all(
+          moduleCodes.map((code) => getModInfo(code))
+        );
+        const prereqs = modInfos.map((info) => info.prereqTree);
+
+        let index = -1;
+        for (let prereq of prereqs) {
+          index += 1;
+          if (!prereq) continue;
+
+          const tempIssues = processPrereq(prereq, modsBefore, exemptedMods);
+          if (tempIssues) {
+            issues.push(
+              `The module ${moduleCodes[index]} has the prerequisite(s): ${tempIssues}`
+            );
           }
         }
-      } else {
-        check = prereq.and.map((and) => {
-          if (!and.or) {
-            const tf =
-              exemptedModules.some((x) => x.indexOf(and) >= 0) ||
-              newArr.some((x) => x.indexOf(and) >= 0);
-            if (!tf) {
-              pushSnackMessage.push(and);
-            }
-            return tf;
-          } else {
-            const tf = and.or
-              .map(
-                (mod) =>
-                  exemptedModules.some((x) => x.indexOf(mod) >= 0) ||
-                  newArr.some((x) => x.indexOf(mod) >= 0)
-              )
-              .includes(true);
-            if (!tf) {
-              pushSnackMessage.push("(" + and.or.join(" or ") + ")");
-            }
-            return tf;
+
+        modsBefore = modsBefore.concat(moduleCodes);
+        for (let info of modInfos) {
+          if (Array.isArray(info?.preclusion)) {
+            modsBefore = modsBefore.concat(info.preclusion);
           }
-        });
+        }
       }
 
-      if (pushSnackMessage.join(" and ")) {
-        pushSnack({
-          message:
-            "These prerequisites for " +
-            moduleCode +
-            " are not fulfilled: " +
-            pushSnackMessage.join(" and "),
-          severity: "error",
-        });
-        return true;
+      return issues;
+
+      function processPrereq(
+        prereq,
+        modsBefore = [],
+        exemptedMods = [],
+        isFirstLevel = true
+      ) {
+        if (typeof prereq === "string") {
+          return modsBefore.includes(prereq) || exemptedMods.includes(prereq)
+            ? false
+            : prereq;
+        }
+
+        let missing = [];
+        const prereqAnd = prereq.and;
+        const prereqOr = prereq.or;
+
+        if (Array.isArray(prereqAnd)) {
+          const missingAnd = prereqAnd
+            .map((mod) => processPrereq(mod, modsBefore, exemptedMods, false))
+            .filter((mod) => !!mod);
+          return missingAnd.length
+            ? `${isFirstLevel ? "" : "all of ("}${missingAnd.join(", ")}${
+                isFirstLevel ? "" : ")"
+              }`
+            : false;
+        } else if (Array.isArray(prereqOr)) {
+          const missingOr = prereqOr.map((mod) =>
+            processPrereq(mod, modsBefore, exemptedMods, false)
+          );
+
+          let tempMissing = [];
+          for (let mod of missingOr) {
+            if (mod) {
+              tempMissing.push(mod);
+            } else {
+              tempMissing = [];
+              break;
+            }
+          }
+
+          if (tempMissing.length) {
+            return `one of (${tempMissing.join(", ")})`;
+          } else {
+            return false;
+          }
+        }
+
+        return missing.length ? missing : false;
       }
-      return false;
     },
-    [modMap, pushSnack, exemptedModules]
+    [getModInfo, getSemesterById]
   );
 
   const checkSemestersPreclusion = useCallback(
-    (roadmap, module) => {
-      const moduleCode = module[0] === "^" ? module.split("^")[3] : module;
-      if (moduleCode === "" || !modMap.get(moduleCode).preclusion) return false;
-      if (
-        roadmap[roadmap.findIndex((sem) => sem.modules.includes(module))]
-          .index === ROADMAP.MY_MODS_ID
-      )
-        return false;
-      const preclusion = modMap
-        .get(moduleCode)
-        .preclusion.split(" ")
-        .map((mod) => mod.replace(/[^a-zA-Z0-9 ]/g, ""))
-        .filter((input) => /[a-zA-Z]+[0-9]/.test(input));
-      const newArr = roadmap
-        .reduce((a, b) => a.concat(b.modules), [])
-        .map((mod) => (mod[0] === "^" ? mod.split("^")[3] : mod));
+    async (roadmap, module) => {
+      let issues = [];
 
-      if (!preclusion) return;
+      for (let sem of roadmap) {
+        const mods = sem?.modules || [];
+        const moduleCodes = mods.map((mod) =>
+          mod[0] === "^" ? mod.split("^")[3] : mod
+        );
+        let modInfos = await Promise.all(
+          moduleCodes.map((code) => getModInfo(code))
+        );
 
-      if (newArr.some((x) => preclusion.includes(x) && x !== moduleCode)) {
-        pushSnack({
-          message:
-            "The preclusion for " +
-            moduleCode +
-            " is already in the roadmap: " +
-            newArr.find((x) => preclusion.includes(x) && x !== moduleCode),
-          severity: "error",
-        });
-        return true;
+        while (modInfos.length) {
+          const { precludedMods, otherMods } = modInfos.slice(1).reduce(
+            (prev, curr) => {
+              if (prev.preclusion.includes(curr.moduleCode)) {
+                prev.precludedMods.push(curr);
+              } else {
+                prev.otherMods.push(curr);
+              }
+              return prev;
+            },
+            {
+              precludedMods: [modInfos[0]],
+              otherMods: [],
+              preclusion: modInfos[0]?.preclusion || [],
+            }
+          );
+
+          if (precludedMods.length > 1) {
+            issues.push({
+              severity: "error",
+              message: `${precludedMods
+                .map((mod) => mod.moduleCode)
+                .join(", ")} are preclusions.`,
+            });
+          }
+          modInfos = otherMods;
+        }
       }
-      return false;
+
+      return issues;
     },
-    [modMap, pushSnack]
+    [getModInfo]
   );
 
   const updateModuleGroup = useCallback(
@@ -464,6 +467,23 @@ function RoadmapProvider({ children }) {
     },
     [roadmap, checkSemestersPrereq]
   );
+
+  const getIssues = useCallback(async () => {
+    const roadmap = getSemesters();
+
+    let issues = [];
+    issues = issues
+      .concat(await checkSemestersMC(roadmap))
+      .concat(await checkSemestersPrereq(roadmap))
+      .concat(await checkSemestersPreclusion(roadmap));
+
+    return issues;
+  }, [
+    getSemesters,
+    checkSemestersMC,
+    checkSemestersPrereq,
+    checkSemestersPreclusion,
+  ]);
 
   const dragMods = useCallback(
     (srcIndex, srcDroppableId, destIndex, destDroppableId) => {
@@ -550,6 +570,7 @@ function RoadmapProvider({ children }) {
     checkSemestersMC,
     checkSemestersPrereq,
     checkSemestersPreclusion,
+    getIssues,
   };
 
   return (

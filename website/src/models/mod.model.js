@@ -10,6 +10,7 @@ export default class Mod {
   moduleCredit;
   department;
   faculty;
+  preclusion;
   workload;
   aliases;
   attributes; // TBD
@@ -18,6 +19,6 @@ export default class Mod {
   semesterData; // TBD
 
   // Requisite tree
-  prereqTree; // TBD
+  prereqTree;
   fulfillRequirements;
 }

@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { SETTINGS } from "../utils/constants";
 import { useAuthSession } from "./auth-session.provider";
 import { useBackend } from "./backend.provider";
@@ -15,13 +22,12 @@ function SettingsProvider({ children }) {
   const { isAuth } = useAuthSession();
   const { makeRequest } = useBackend();
   const { pushSnack } = useSnackbar();
-  const [loading, setLoading] = useState(false);
   const [updated, setUpdated] = useState(true);
-  const [settings, setSettings] = useState({});
+  const [settings, setSettings] = useState({ loading: true, data: {} });
 
   useEffect(() => {
     async function loadSettings() {
-      setLoading(true);
+      setSettings(({ loading, data }) => ({ loading: true, data }));
       try {
         const { status, data } = await makeRequest({
           method: "get",
@@ -30,26 +36,27 @@ function SettingsProvider({ children }) {
         });
 
         if (status === 200 && data) {
-          setSettings(data);
+          setSettings({ loading: false, data });
           setUpdated(false);
         } else {
           throw new Error("Unable to retrieve user settings");
         }
       } catch (error) {
+        setSettings(({ loading, data }) => ({ loading: false, data }));
         console.error(error);
         pushSnack({
           message: "Unable to retrieve user settings",
           severity: "error",
         });
-      } finally {
-        setLoading(false);
       }
     }
 
     if (isAuth() && updated) loadSettings();
   }, [updated, isAuth, makeRequest, pushSnack]);
 
-  const getSetting = (key) => settings[key];
+  const loading = useMemo(() => settings.loading, [settings]);
+
+  const getSetting = useCallback((key) => settings.data[key], [settings]);
 
   const setCourseId = async (courseId) => {
     const { status } = await makeRequest({
@@ -94,9 +101,15 @@ function SettingsProvider({ children }) {
     } else {
       throw new Error("Unable to save exempted modules");
     }
-  }
+  };
 
-  const values = { loading, getSetting, setCourseId, setMCLimit, setExemptedModules };
+  const values = {
+    loading,
+    getSetting,
+    setCourseId,
+    setMCLimit,
+    setExemptedModules,
+  };
 
   return (
     <SettingsContext.Provider value={values}>
