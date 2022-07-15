@@ -7,12 +7,14 @@ import {
   Chip,
   useTheme,
   Divider,
+  Collapse,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
 import { ModGroupStack } from "../../components/ModGroup";
 import ModGroupBox from "./ModGroupBox";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import BookIcon from "@mui/icons-material/Book";
 import BackpackIcon from "@mui/icons-material/Backpack";
 import NotInterestedIcon from "@mui/icons-material/NotInterested";
@@ -292,8 +294,8 @@ function Semester({ sem }) {
                   />
                 )
               )}
-              {modules?.length ? null : <ModulePlaceholer />}
               {provided.placeholder}
+              <ModulePlaceholer show={!modules?.length} />
             </Stack>
           )}
         </Droppable>
@@ -302,24 +304,29 @@ function Semester({ sem }) {
   );
 }
 
-function ModulePlaceholer() {
+function ModulePlaceholer({ show = false }) {
   const isDarkTheme = useTheme().palette.mode === "dark";
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        borderColor: grey[isDarkTheme ? 200 : 600],
-        borderRadius: 1,
-        borderStyle: "dashed",
-        py: 4,
-        width: 320,
-      }}
-    >
-      <Typography>Drag modules here</Typography>
-    </Box>
+    <Collapse in={show} orientation="horizontal" unmountOnExit>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          borderColor: grey[isDarkTheme ? 200 : 600],
+          borderRadius: 1,
+          borderStyle: "dashed",
+          py: 4,
+          width: 320,
+        }}
+      >
+        <Stack direction="row" spacing={1}>
+          <ArrowLeftIcon />
+          <Typography>Drag modules here</Typography>
+        </Stack>
+      </Box>
+    </Collapse>
   );
 }
 
