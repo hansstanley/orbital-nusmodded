@@ -228,14 +228,8 @@ export default function ModGroupBox({
       <Collapse in={open}>
         <Divider />
         <CardActions sx={{ justifyContent: "space-between" }}>
-          {mod ? (
-            <>
-              <Button onClick={handleOpenDialog}>View</Button>
-              <Button onClick={handleOpenSelectDialog}>Choose module</Button>
-            </>
-          ) : (
-            <Button onClick={handleOpenSelectDialog}>Choose module</Button>
-          )}
+          {mod ? <Button onClick={handleOpenDialog}>View</Button> : null}
+          <Button onClick={handleOpenSelectDialog}>Choose module</Button>
           {actions}
         </CardActions>
       </Collapse>

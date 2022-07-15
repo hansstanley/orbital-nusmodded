@@ -85,7 +85,11 @@ function RoadmapProvider({ children }) {
       }
     }
 
-    if (isAuth()) init();
+    if (isAuth()) {
+      init();
+    } else {
+      setRoadmap([]);
+    }
   }, [isAuth, loadingSettings, getSetting]);
 
   useEffect(() => {
@@ -113,7 +117,9 @@ function RoadmapProvider({ children }) {
       }
     }
 
-    if (isAuth() && Array.isArray(roadmap) && roadmap.length) saveRoadmap();
+    if (isAuth() && Array.isArray(roadmap) && roadmap.length) {
+      saveRoadmap();
+    }
   }, [isAuth, roadmap, makeRequest, pushSnack]);
 
   useEffect(() => {

@@ -8,6 +8,7 @@ import {
   useTheme,
   Divider,
   Collapse,
+  Button,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
@@ -84,41 +85,31 @@ export default function RoadmapStack() {
     );
   };
 
-  const handleAddMyMods = (moduleCodes = []) => {
-    const holdingSem = getSemesterById(ROADMAP.MY_MODS_ID);
-    const newCodes = moduleCodes.filter((code) => !allMods.includes(code));
+  const handleAddMods =
+    (semesterId) =>
+    (moduleCodes = []) => {
+      const targetSem = getSemesterById(semesterId);
+      const newCodes = moduleCodes.filter((code) => !allMods.includes(code));
 
-    const holdingCodes = newCodes.concat(holdingSem?.modules || []);
-    setModulesById(ROADMAP.MY_MODS_ID, holdingCodes);
+      const targetCodes = newCodes.concat(targetSem?.modules || []);
+      setModulesById(semesterId, targetCodes);
 
-    return newCodes;
+      return newCodes;
+    };
+
+  const handleDeleteMod = (semesterId) => (moduleCode) => {
+    const targetSem = getSemesterById(semesterId);
+    const targetCodes =
+      targetSem?.modules?.filter((code) => code !== moduleCode) || [];
+
+    setModulesById(semesterId, targetCodes);
   };
 
-  const handleDeleteMyMod = (moduleCode) => {
-    const holdingSem = getSemesterById(ROADMAP.MY_MODS_ID);
-    const holdingCodes =
-      holdingSem?.modules?.filter((code) => code !== moduleCode) || [];
+  const handleAddMyMods = handleAddMods(ROADMAP.MY_MODS_ID);
+  const handleDeleteMyMod = handleDeleteMod(ROADMAP.MY_MODS_ID);
 
-    setModulesById(ROADMAP.MY_MODS_ID, holdingCodes);
-  };
-
-  const handleAddExemptedMods = (moduleCodes = []) => {
-    const holdingSem = getSemesterById(ROADMAP.EXEMPTED_MODS_ID);
-    const newCodes = moduleCodes.filter((code) => !allMods.includes(code));
-
-    const holdingCodes = newCodes.concat(holdingSem?.modules || []);
-    setModulesById(ROADMAP.EXEMPTED_MODS_ID, holdingCodes);
-
-    return newCodes;
-  };
-
-  const handleDeleteExemptedMod = (moduleCode) => {
-    const holdingSem = getSemesterById(ROADMAP.EXEMPTED_MODS_ID);
-    const holdingCodes =
-      holdingSem?.modules?.filter((code) => code !== moduleCode) || [];
-
-    setModulesById(ROADMAP.EXEMPTED_MODS_ID, holdingCodes);
-  };
+  const handleAddExemptedMods = handleAddMods(ROADMAP.EXEMPTED_MODS_ID);
+  const handleDeleteExemptedMod = handleDeleteMod(ROADMAP.EXEMPTED_MODS_ID);
 
   useEffect(() => {
     async function loadModGroups(courseId) {
@@ -167,7 +158,13 @@ export default function RoadmapStack() {
           {loading ? (
             <SemesterSkeleton />
           ) : (
-            getSemesters().map((sem) => <Semester key={sem.id} sem={sem} />)
+            getSemesters().map((sem) => (
+              <Semester
+                key={sem.id}
+                sem={sem}
+                onDeleteMod={handleDeleteMod(sem.id)}
+              />
+            ))
           )}
           <RightDrawer
             items={[
@@ -239,11 +236,28 @@ export default function RoadmapStack() {
   );
 }
 
-function Semester({ sem }) {
+function Semester({ sem, onDeleteMod = (moduleCode) => {} }) {
   const { id, year, semester, modules, bgColor } = sem;
+  const { pushSnack } = useSnackbar();
 
   const isDarkTheme = useTheme().palette.mode === "dark";
   const bgHex = COLORS[bgColor || "deepOrange"][isDarkTheme ? 900 : 100];
+
+  const handleDeleteMod = (moduleCode) => () => {
+    try {
+      onDeleteMod(moduleCode);
+      pushSnack({
+        message: `${moduleCode} deleted!`,
+        severity: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: `Unable to delete ${moduleCode}.`,
+        severity: "error",
+      });
+    }
+  };
 
   return (
     <Stack
@@ -278,19 +292,27 @@ function Semester({ sem }) {
               p={1}
             >
               {modules?.map((moduleCode, index) =>
-                moduleCode[0] !== "^" ? (
-                  <ModuleBox
-                    moduleCode={moduleCode}
-                    key={moduleCode}
-                    index={index}
-                    isDraggable={true}
-                  />
-                ) : (
+                moduleCode[0] === "^" ? (
                   <ModGroupBox
                     name={moduleCode}
                     key={moduleCode}
                     index={index}
                     isDraggable={true}
+                  />
+                ) : (
+                  <ModuleBox
+                    moduleCode={moduleCode}
+                    key={moduleCode}
+                    index={index}
+                    isDraggable={true}
+                    actions={
+                      <Button
+                        color="error"
+                        onClick={handleDeleteMod(moduleCode)}
+                      >
+                        Delete
+                      </Button>
+                    }
                   />
                 )
               )}
