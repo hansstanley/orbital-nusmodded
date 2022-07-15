@@ -11,15 +11,15 @@ import {
   Typography,
   Zoom,
 } from "@mui/material";
-import DoneIcon from "@mui/icons-material/Done";
-import ErrorIcon from "@mui/icons-material/Error";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import DoneRoundedIcon from "@mui/icons-material/DoneRounded";
+import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import { useRoadmap } from "../../providers";
 
 const statuses = {
-  success: { icon: <DoneIcon /> },
-  warning: { icon: <WarningAmberIcon /> },
-  error: { icon: <ErrorIcon /> },
+  success: { icon: <DoneRoundedIcon /> },
+  warning: { icon: <WarningAmberRoundedIcon /> },
+  error: { icon: <ErrorOutlineRoundedIcon /> },
 };
 
 export default function StatusFab() {

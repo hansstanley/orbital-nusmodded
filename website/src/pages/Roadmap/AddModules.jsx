@@ -20,9 +20,15 @@ import { TransitionGroup } from "react-transition-group";
 import AddIcon from "@mui/icons-material/Add";
 import { useAuthSession, useMod, useSnackbar } from "../../providers";
 import ModuleBox from "./ModuleBox";
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from "@mui/icons-material/Close";
 
-export default function ModuleStack({roadMap, handleAdd, loadingProfile, allMods, handleDelete}) {
+export default function ModuleStack({
+  roadMap,
+  handleAdd,
+  loadingProfile,
+  allMods,
+  handleDelete,
+}) {
   const { isAuth } = useAuthSession();
   const { getModArray } = useMod();
   const { pushSnack } = useSnackbar();
@@ -93,7 +99,7 @@ export default function ModuleStack({roadMap, handleAdd, loadingProfile, allMods
 
   const handleSubmit = () => {
     handleAdd(selected);
-    console.log(roadMap.find(sem => parseInt(sem.id) === -1));
+    console.log(roadMap.find((sem) => parseInt(sem.id) === -1));
     handleClose();
   };
 
@@ -125,8 +131,6 @@ export default function ModuleStack({roadMap, handleAdd, loadingProfile, allMods
   //   }
   // };
 
-
-
   return (
     <Stack spacing={1} width={320}>
       <Stack
@@ -157,7 +161,9 @@ export default function ModuleStack({roadMap, handleAdd, loadingProfile, allMods
               multiple
               onChange={handleAutocomplete}
               value={selected}
-              options={modArray.filter(mod => !allMods.includes(mod.moduleCode))}
+              options={modArray.filter(
+                (mod) => !allMods.includes(mod.moduleCode)
+              )}
               getOptionLabel={(option) => option.moduleCode}
               isOptionEqualToValue={(option, value) =>
                 option.moduleCode === value.moduleCode
@@ -197,16 +203,25 @@ export default function ModuleStack({roadMap, handleAdd, loadingProfile, allMods
           )}
         </Card>
       </Collapse>
-        <Stack spacing={1} >
-          {!loadingProfile ? roadMap.find(sem => parseInt(sem.id) === parseInt(-1)).modules.map((moduleCode, index) => (
-            <ModuleBox
-              moduleCode={moduleCode} key={moduleCode} index = {"-1"} handleDelete = {handleDelete}
-            />
-          )) : <></>}
-        </Stack>
-            {!loadingProfile ? roadMap.find(sem => parseInt(sem.id) === -1).modules.length ? null : (
-            <Typography variant="body2">No modules.</Typography>
-          ) : <></>}
+      <Stack spacing={1}>
+        {!loadingProfile
+          ? roadMap
+              .find((sem) => parseInt(sem.id) === parseInt(-1))
+              .modules.map((moduleCode, index) => (
+                <ModuleBox
+                  moduleCode={moduleCode}
+                  key={moduleCode}
+                  index={"-1"}
+                  handleDelete={handleDelete}
+                />
+              ))
+          : null}
+      </Stack>
+      {!loadingProfile ? (
+        roadMap.find((sem) => parseInt(sem.id) === -1).modules.length ? null : (
+          <Typography variant="body2">No modules.</Typography>
+        )
+      ) : null}
     </Stack>
   );
 }

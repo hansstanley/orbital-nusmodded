@@ -134,9 +134,7 @@ export default function ModGroupBox({
             <Button onClick={handleCloseDialog}>Close</Button>
           </DialogActions>
         </Dialog>
-      ) : (
-        <></>
-      )}
+      ) : null}
       {modGroup ? (
         <Dialog
           open={dialogModGroupOpen}
@@ -182,9 +180,7 @@ export default function ModGroupBox({
             <Button onClick={handleCloseSelectDialog}>Close</Button>
           </DialogActions>
         </Dialog>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </>
   );
 
@@ -234,11 +230,11 @@ export default function ModGroupBox({
         <CardActions sx={{ justifyContent: "space-between" }}>
           {mod ? (
             <>
-              <Button onClick={handleOpenDialog}>{"View"}</Button>
-              <Button onClick={handleOpenSelectDialog}>{"Select"}</Button>
+              <Button onClick={handleOpenDialog}>View</Button>
+              <Button onClick={handleOpenSelectDialog}>Choose module</Button>
             </>
           ) : (
-            <Button onClick={handleOpenSelectDialog}>{"Select"}</Button>
+            <Button onClick={handleOpenSelectDialog}>Choose module</Button>
           )}
           {actions}
         </CardActions>

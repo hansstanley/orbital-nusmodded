@@ -122,7 +122,9 @@ export default function ModuleBox({
         <Divider />
         <CardActions sx={{ justifyContent: "space-between" }}>
           <Button onClick={handleOpenDialog}>View</Button>
-          {actions}
+          <Stack direction="row" spacing={1}>
+            {actions}
+          </Stack>
         </CardActions>
       </Collapse>
     </>

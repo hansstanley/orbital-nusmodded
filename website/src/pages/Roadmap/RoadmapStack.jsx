@@ -80,19 +80,6 @@ export default function RoadmapStack() {
       destination.index,
       destination.droppableId
     );
-
-    // if (
-    //   checkSemestersMC(getSemesters()) ||
-    //   checkSemestersPrereq(getSemesters(), draggableId) ||
-    //   checkSemestersPreclusion(getSemesters(), draggableId)
-    // ) {
-    //   dragMods(
-    //     destination.index,
-    //     destination.droppableId,
-    //     source.index,
-    //     source.droppableId
-    //   );
-    // }
   };
 
   const handleAddMyMods = (moduleCodes = []) => {
@@ -283,6 +270,7 @@ function Semester({ sem }) {
             <Stack
               spacing={1}
               direction="row"
+              alignItems="flex-start"
               {...provided.droppableProps}
               ref={provided.innerRef}
               p={1}

@@ -31,8 +31,8 @@ function RoadmapProvider({ children }) {
   const { isAuth } = useAuthSession();
   const { makeRequest } = useBackend();
   const { pushSnack } = useSnackbar();
-  const { getCourseMods, getCourseModGroups, getCourseId } = useCourse();
-  const { getModInfo, modMap } = useMod();
+  const { getCourseMods, getCourseModGroups } = useCourse();
+  const { getModInfo } = useMod();
   const { loading: loadingSettings, getSetting } = useSettings();
   const [loading, setLoading] = useState(false);
   const [roadmap, setRoadmap] = useState([]);
@@ -458,14 +458,10 @@ function RoadmapProvider({ children }) {
         }
       });
 
-      if (checkSemestersPrereq(newRoadmap, newId)) {
-        return false;
-      }
-
       setRoadmap(newRoadmap);
       return true;
     },
-    [roadmap, checkSemestersPrereq]
+    [roadmap]
   );
 
   const getIssues = useCallback(async () => {

@@ -86,17 +86,17 @@ export default function ModGroupStack({
       setLoading(false);
     }
   };
-  
-  const modGroupList = (
-    modGroups.length ? (
-      modGroups.map((modGroup, index) => (
-        <ModGroupBox
-          key={modGroup.id}
-          modGroup={modGroup}
-          isDraggable={isDroppable}
-          index={index}
-          actions={
-            !isCourse || isAdmin() ? <>
+
+  const modGroupList = modGroups.length ? (
+    modGroups.map((modGroup, index) => (
+      <ModGroupBox
+        key={modGroup.id}
+        modGroup={modGroup}
+        isDraggable={isDroppable}
+        index={index}
+        actions={
+          !isCourse || isAdmin() ? (
+            <>
               <Button
                 color="error"
                 disabled={loading}
@@ -108,24 +108,24 @@ export default function ModGroupStack({
                 modGroup={modGroup}
                 handleBindModGroup={handleBindModGroup}
               />
-            </> : <></>
-          }
-        />
-      ))
-    ) : (
-      <Typography variant="body2">No module groups.</Typography>
-    )
+            </>
+          ) : null
+        }
+      />
+    ))
+  ) : (
+    <Typography variant="body2">No module groups.</Typography>
   );
-
 
   return (
     <Stack spacing={1} width={320}>
       <Stack spacing={2} direction="row" justifyContent="space-between">
         <Typography variant="h6">{title}</Typography>
-        {!isCourse || isAdmin() ?
+        {!isCourse || isAdmin() ? (
           <IconButton color="primary" onClick={handleOpen}>
             <AddIcon />
-          </IconButton> : <></>}
+          </IconButton>
+        ) : null}
       </Stack>
       <Divider />
       <Box>
