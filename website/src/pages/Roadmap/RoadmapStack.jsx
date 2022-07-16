@@ -30,6 +30,7 @@ import {
   useCourse,
   useSettings,
   useSnackbar,
+  useModGroup,
 } from "../../providers";
 import {
   COLORS,
@@ -256,6 +257,7 @@ function Semester({
   disableDrag = false,
 }) {
   const { id, year, semester, modules, bgColor } = sem;
+  const { isModGroupString } = useModGroup();
   const { pushSnack } = useSnackbar();
 
   const isDarkTheme = useTheme().palette.mode === "dark";
@@ -310,7 +312,7 @@ function Semester({
               p={1}
             >
               {modules?.map((moduleCode, index) =>
-                moduleCode[0] === "^" ? (
+                isModGroupString(moduleCode) ? (
                   <ModGroupBox
                     name={moduleCode}
                     key={moduleCode}

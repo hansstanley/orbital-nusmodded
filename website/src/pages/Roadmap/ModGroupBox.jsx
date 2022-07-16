@@ -22,44 +22,47 @@ import ResponsiveStack from "../../components/ResponsiveStack";
 import { ModuleStack } from "../../components/Mod";
 
 export default function ModGroupBox({
-  name,
+  name = "",
   actions = null,
   isDraggable = false,
   index,
 }) {
   const { getModInfo } = useMod();
+  const { getModGroupMods, getModGroupArray, parseModGroupString } =
+    useModGroup();
+  const { updateModuleGroup, getAllMods, roadmap } = useRoadmap();
   const { pushSnack } = useSnackbar();
   const [mod, setMod] = useState(null);
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogModGroupOpen, setDialogModGroupOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [arr, setArr] = useState([]);
+  const [parsed, setParsed] = useState(null);
   const [modGroup, setModGroup] = useState(null);
   const [modGroupMods, setModGroupMods] = useState(null);
-  const { getModGroupMods, getModGroupArray } = useModGroup();
-  const { updateModuleGroup, getAllMods, roadmap } = useRoadmap();
 
   useEffect(() => {
     async function init() {
       setLoading(true);
       try {
-        const arr = name.split("^");
-        setArr(arr);
-        const modGroupName = arr[1];
+        const modGroupData = parseModGroupString(name);
+        if (!modGroupData) throw new Error(`Invalid module group ${name}`);
+        setParsed(modGroupData);
+
+        const modGroupName = modGroupData?.name;
         const modGroupArray = getModGroupArray();
         const modGroup = modGroupArray.find((mg) => mg.name === modGroupName);
         const data = await getModGroupMods(modGroup.id);
         setModGroupMods(data);
         setModGroup(modGroup);
-        if (arr[3] !== "") {
-          const mod = await getModInfo(arr[3]);
+        if (modGroupData?.moduleCode) {
+          const mod = await getModInfo(modGroupData.moduleCode);
           setMod(mod);
         }
       } catch (error) {
         console.error(error);
         pushSnack({
-          message: `Error loading ${name}`,
+          message: `Error loading module group ${name}`,
           severity: "error",
         });
       } finally {
@@ -68,7 +71,14 @@ export default function ModGroupBox({
     }
 
     init();
-  }, [name, getModGroupMods, getModInfo, getModGroupArray, pushSnack]);
+  }, [
+    name,
+    getModGroupMods,
+    getModInfo,
+    getModGroupArray,
+    pushSnack,
+    parseModGroupString,
+  ]);
 
   const toggleOpen = () => setOpen(!open);
 
@@ -88,7 +98,7 @@ export default function ModGroupBox({
     if (getAllMods().includes(moduleCode)) {
       const semWithMod = roadmap.find((sem) =>
         sem.modules
-          .map((mod) => (mod[0] === "^" ? mod.split("^")[3] : mod))
+          .map((mod) => parseModGroupString(mod)?.moduleCode || mod)
           .includes(moduleCode)
       );
       if (!semWithMod.year) {
@@ -96,14 +106,14 @@ export default function ModGroupBox({
       }
       return "Y" + semWithMod.year + "S" + semWithMod.semester;
     }
-    if (!updateModuleGroup(arr, moduleCode)) {
-      return "";
-    }
+
+    const newId = updateModuleGroup(parsed, moduleCode);
+    if (!newId) return "";
+
     const mod = await getModInfo(moduleCode);
     setMod(mod);
-    let newArr = arr;
-    newArr[3] = moduleCode;
-    setArr(newArr);
+    setParsed(parseModGroupString(newId));
+
     return moduleCode;
   };
 

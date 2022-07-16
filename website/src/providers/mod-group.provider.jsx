@@ -20,6 +20,13 @@ const ModGroupContext = createContext({
   createModGroup: async (data) => new ModGroup(),
   updateModGroup: async (groupId, data) => new ModGroup(),
   deleteModGroup: async (groupId) => new ModGroup(),
+  isModGroupString: (modString) => false,
+  parseModGroupString: (modString = "") => ({
+    name: "",
+    count: 0,
+    moduleCode: "",
+  }),
+  getModGroupString: (name, count, moduleCode) => "",
 });
 
 function ModGroupProvider({ children }) {
@@ -184,6 +191,30 @@ function ModGroupProvider({ children }) {
     }
   };
 
+  const isModGroupString = (modString) => {
+    if (typeof modString === "string") {
+      return /^\^.*\^\d*\^.*$/.test(modString);
+    } else {
+      return false;
+    }
+  };
+
+  const parseModGroupString = (modString = "") => {
+    if (isModGroupString(modString)) {
+      // eslint-disable-next-line
+      const [ignored, name, count, moduleCode] = modString.split("^");
+      return { name, count: parseInt(count) || undefined, moduleCode };
+    } else {
+      return null;
+    }
+  };
+
+  const getModGroupString = (name, count, moduleCode) => {
+    return `^${name ?? ""}^${typeof count === "number" ? count : ""}^${
+      moduleCode ?? ""
+    }`;
+  };
+
   const values = {
     loading,
     getModGroupArray,
@@ -195,6 +226,9 @@ function ModGroupProvider({ children }) {
     createModGroup,
     updateModGroup,
     deleteModGroup,
+    isModGroupString,
+    parseModGroupString,
+    getModGroupString,
   };
 
   return (

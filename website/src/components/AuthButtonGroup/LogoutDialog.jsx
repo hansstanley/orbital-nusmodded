@@ -17,6 +17,7 @@ export default function LogoutDialog({ open = false, handleClose = () => {} }) {
     await handleSignout();
     handleClose();
     navigate("/");
+    window.location.reload();
   };
 
   return (

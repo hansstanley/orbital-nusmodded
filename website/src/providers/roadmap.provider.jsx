@@ -8,6 +8,7 @@ import { useSnackbar } from "./snackbar.provider";
 import { useCourse } from "./course.provider";
 import { useMod } from "./mod.provider";
 import { useSettings } from "./settings.provider";
+import { useModGroup } from ".";
 
 const RoadmapContext = createContext({
   loading: false,
@@ -33,6 +34,7 @@ function RoadmapProvider({ children }) {
   const { pushSnack } = useSnackbar();
   const { getCourseMods, getCourseModGroups } = useCourse();
   const { getModInfo } = useMod();
+  const { getModGroupString, parseModGroupString } = useModGroup();
   const { loading: loadingSettings, getSetting } = useSettings();
   const [loading, setLoading] = useState(false);
   const [roadmap, setRoadmap] = useState([]);
@@ -147,8 +149,8 @@ function RoadmapProvider({ children }) {
     () =>
       roadmap
         .reduce((prev, currSem) => prev.concat(currSem?.modules || []), [])
-        .map((mod) => (mod[0] === "^" ? mod.split("^")[3] : mod)),
-    [roadmap]
+        .map((mod) => parseModGroupString(mod)?.moduleCode || mod),
+    [roadmap, parseModGroupString]
   );
 
   const addSemester = useCallback(
@@ -274,8 +276,8 @@ function RoadmapProvider({ children }) {
 
       function toModuleCodes(sem) {
         return (
-          sem?.modules?.map((mod) =>
-            mod && mod[0] === "^" ? mod.split("^")[3] : mod
+          sem?.modules?.map(
+            (mod) => parseModGroupString(mod)?.moduleCode || mod
           ) || []
         );
       }
@@ -304,7 +306,7 @@ function RoadmapProvider({ children }) {
         }
       }
     },
-    [MCLimit, getModInfo]
+    [MCLimit, getModInfo, parseModGroupString]
   );
 
   const checkSemestersPrereq = useCallback(
@@ -316,8 +318,8 @@ function RoadmapProvider({ children }) {
       let modsBefore = [];
       for (let sem of roadmap) {
         const mods = sem?.modules || [];
-        const moduleCodes = mods.map((mod) =>
-          mod[0] === "^" ? mod.split("^")[3] : mod
+        const moduleCodes = mods.map(
+          (mod) => parseModGroupString(mod)?.moduleCode || mod
         );
         const modInfos = await Promise.all(
           moduleCodes.map((code) => getModInfo(code))
@@ -397,7 +399,7 @@ function RoadmapProvider({ children }) {
         return missing.length ? missing : false;
       }
     },
-    [getModInfo, getSemesterById]
+    [getModInfo, getSemesterById, parseModGroupString]
   );
 
   const checkSemestersPreclusion = useCallback(
@@ -406,8 +408,8 @@ function RoadmapProvider({ children }) {
 
       for (let sem of roadmap) {
         const mods = sem?.modules || [];
-        const moduleCodes = mods.map((mod) =>
-          mod[0] === "^" ? mod.split("^")[3] : mod
+        const moduleCodes = mods.map(
+          (mod) => parseModGroupString(mod)?.moduleCode || mod
         );
         let modInfos = await Promise.all(
           moduleCodes.map((code) => getModInfo(code))
@@ -444,30 +446,29 @@ function RoadmapProvider({ children }) {
 
       return issues;
     },
-    [getModInfo]
+    [getModInfo, parseModGroupString]
   );
 
   const updateModuleGroup = useCallback(
-    (arr, moduleCode) => {
-      const prevId = "^" + arr[1] + "^" + arr[2] + "^" + arr[3];
-      const newId = "^" + arr[1] + "^" + arr[2] + "^" + moduleCode;
-      const newModules = JSON.parse(
-        JSON.stringify(roadmap.find((sem) => sem.modules.includes(prevId)))
-      );
-      newModules.modules[newModules.modules.indexOf(prevId)] = newId;
+    ({ name, count, moduleCode }, newModuleCode) => {
+      if (!Array.isArray(roadmap)) return null;
 
-      const newRoadmap = roadmap.map((sem) => {
-        if (sem.modules.includes(prevId)) {
-          return newModules;
-        } else {
-          return sem;
-        }
-      });
+      const prevId = getModGroupString(name, count, moduleCode);
+      const newId = getModGroupString(name, count, newModuleCode);
+      const targetSemester = roadmap.find(
+        (sem) => sem?.modules?.includes(prevId) ?? false
+      );
+      if (!targetSemester) return null;
+
+      targetSemester.modules[targetSemester.modules.indexOf(prevId)] = newId;
+      const newRoadmap = roadmap.map((sem) =>
+        sem?.modules?.includes(prevId) ? targetSemester : sem
+      );
 
       setRoadmap(newRoadmap);
-      return true;
+      return newId;
     },
-    [roadmap]
+    [roadmap, getModGroupString]
   );
 
   const getIssues = useCallback(async () => {
@@ -499,8 +500,8 @@ function RoadmapProvider({ children }) {
           })
         );
         return name === temp
-          ? "^" + name + "^1^"
-          : "^" + temp + "^" + (parseInt(name[name.length - 1]) + 1) + "^";
+          ? getModGroupString(name, 1)
+          : getModGroupString(temp, parseInt(name[name.length - 1]) + 1);
       }
 
       let srcDroppable;
@@ -550,7 +551,7 @@ function RoadmapProvider({ children }) {
 
       setRoadmap(newRoadmap);
     },
-    [roadmap, getSemesterById, courseMods, courseModGroups]
+    [roadmap, getSemesterById, courseMods, courseModGroups, getModGroupString]
   );
 
   const values = {

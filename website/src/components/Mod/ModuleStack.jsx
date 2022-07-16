@@ -21,7 +21,12 @@ import {
 import { TransitionGroup } from "react-transition-group";
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
-import { useAuthSession, useMod, useSnackbar } from "../../providers";
+import {
+  useAuthSession,
+  useMod,
+  useModGroup,
+  useSnackbar,
+} from "../../providers";
 import ModuleBox from "./ModuleBox";
 import { Droppable } from "react-beautiful-dnd";
 import ModGroupBox from "../../pages/Roadmap/ModGroupBox";
@@ -39,6 +44,7 @@ export default function ModuleStack({
 }) {
   const { isAuth, isAdmin } = useAuthSession();
   const { getModArray } = useMod();
+  const { isModGroupString, parseModGroupString } = useModGroup();
   const { pushSnack } = useSnackbar();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -128,7 +134,7 @@ export default function ModuleStack({
       await handleDeleteMod(moduleCode);
       pushSnack({
         message: `${
-          moduleCode[0] === "^" ? moduleCode.split("^")[3] : moduleCode
+          parseModGroupString(moduleCode)?.moduleCode || moduleCode
         } deleted!`,
         severity: "success",
       });
@@ -170,23 +176,41 @@ export default function ModuleStack({
     }
   };
 
-  const modCode = (moduleCode) => {
-    if (moduleCode[0] !== "^") {
-      return moduleCode;
-    } else {
-      return moduleCode.split("^")[3];
-    }
-  };
-
   const moduleList = (
     <TransitionGroup component={Stack} spacing={1}>
       {sortMods().map((mod, index) => (
         <Collapse key={mod.moduleCode}>
-          {mod.moduleCode[0] !== "^" ? (
-            <ModuleBox
-              key={modCode(mod.moduleCode)}
+          {isModGroupString(mod.moduleCode) ? (
+            <ModGroupBox
+              name={mod.moduleCode}
+              key={mod.moduleCode}
               index={index}
-              moduleCode={modCode(mod.moduleCode)}
+              isDraggable={true}
+              actions={
+                !isCourse || isAdmin() ? (
+                  <>
+                    <Button
+                      color="error"
+                      disabled={!isAuth() || loading}
+                      onClick={handleDelete(mod.moduleCode)}
+                    >
+                      Delete
+                    </Button>
+                  </>
+                ) : null
+              }
+            />
+          ) : (
+            <ModuleBox
+              key={
+                parseModGroupString(mod.moduleCode)?.moduleCode ||
+                mod.moduleCode
+              }
+              index={index}
+              moduleCode={
+                parseModGroupString(mod.moduleCode)?.moduleCode ||
+                mod.moduleCode
+              }
               isDraggable={isDroppable}
               actions={
                 <>
@@ -209,26 +233,6 @@ export default function ModuleStack({
                     </Button>
                   ) : null}
                 </>
-              }
-            />
-          ) : (
-            <ModGroupBox
-              name={mod.moduleCode}
-              key={mod.moduleCode}
-              index={index}
-              isDraggable={true}
-              actions={
-                !isCourse || isAdmin() ? (
-                  <>
-                    <Button
-                      color="error"
-                      disabled={!isAuth() || loading}
-                      onClick={handleDelete(mod.moduleCode)}
-                    >
-                      Delete
-                    </Button>
-                  </>
-                ) : null
               }
             />
           )}

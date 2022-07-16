@@ -22,7 +22,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { COLORS, ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { useRoadmap } from "../../providers";
+import { useModGroup, useRoadmap } from "../../providers";
 
 export default function SemesterOrderer() {
   const { loading, getSemesters, dragSemesters } = useRoadmap();
@@ -95,11 +95,12 @@ export default function SemesterOrderer() {
 
 function SemesterBar({ sem = {}, index, isNew = false }) {
   const { id, year, semester, modules, bgColor } = sem;
+  const { setBgColorById, setYearById, setSemesterById } = useRoadmap();
+  const { isModGroupString, parseModGroupString } = useModGroup();
 
   const isDarkTheme = useTheme().palette.mode === "dark";
   const bgHex = COLORS[bgColor || "deepOrange"][isDarkTheme ? 900 : 200];
 
-  const { setBgColorById, setYearById, setSemesterById } = useRoadmap();
   const [open, setOpen] = useState(false);
 
   const title = useMemo(() => {
@@ -209,12 +210,19 @@ function SemesterBar({ sem = {}, index, isNew = false }) {
                 padding={1}
                 sx={{ border: 1, borderRadius: 6, borderColor: "gray" }}
               >
-                {modules.map((code) => (
-                  <Chip
-                    key={code}
-                    label={code[0] === "^" ? code.split("^")[3] : code}
-                  />
-                ))}
+                {modules.map((code) =>
+                  isModGroupString(code) ? (
+                    <Chip
+                      key={code}
+                      label={
+                        parseModGroupString(code)?.moduleCode ||
+                        `"${parseModGroupString(code)?.name}"`
+                      }
+                    />
+                  ) : (
+                    <Chip key={code} label={code} />
+                  )
+                )}
                 {modules.length ? null : <Chip label="No modules" />}
               </Stack>
               <Button onClick={handleOpen}>Edit</Button>
