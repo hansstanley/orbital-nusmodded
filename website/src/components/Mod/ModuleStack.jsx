@@ -134,7 +134,7 @@ export default function ModuleStack({
       await handleDeleteMod(moduleCode);
       pushSnack({
         message: `${
-          parseModGroupString(moduleCode)?.moduleCode || moduleCode
+          parseModGroupString(moduleCode)?.moduleCode || parseModGroupString(moduleCode)?.name || moduleCode
         } deleted!`,
         severity: "success",
       });

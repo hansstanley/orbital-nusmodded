@@ -82,7 +82,7 @@ export default function RoadmapStack() {
   );
 
   const onDragEnd = ({ source, destination, draggableId }) => {
-    if (!source || !destination) return;
+    if (!source || !destination || destination.droppableId === ROADMAP.COURSE_MODS_ID || destination.droppableId === ROADMAP.COURSE_MOD_GROUPS_ID) return;
     dragMods(
       source.index,
       source.droppableId,

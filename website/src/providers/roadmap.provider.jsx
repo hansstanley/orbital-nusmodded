@@ -502,7 +502,7 @@ function RoadmapProvider({ children }) {
         );
         return name === temp
           ? getModGroupString(name, 1)
-          : getModGroupString(temp, parseInt(name[name.length - 1]) + 1);
+          : getModGroupString(temp, parseInt(name[name.length - 2]) + 1);
       }
 
       let srcDroppable;
@@ -513,7 +513,7 @@ function RoadmapProvider({ children }) {
           srcDroppable = { modules: courseMods.map((mod) => mod.moduleCode) };
           break;
         case ROADMAP.COURSE_MOD_GROUPS_ID:
-          srcDroppable = { modules: courseModGroups };
+          srcDroppable = { modules: JSON.parse(JSON.stringify((courseModGroups))) };
           break;
         default:
           srcDroppable = getSemesterById(srcDroppableId);
