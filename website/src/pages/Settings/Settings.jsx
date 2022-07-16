@@ -177,18 +177,6 @@ export default function Settings() {
         </FormControl>
       ),
     },
-    {
-      id: rowIds.exemptedModules,
-      title: "Exempted Modules",
-      content: (
-        <ModuleStack 
-          mods={exemptedMods}
-          isDroppable={false}
-          handleAddMods={handleAddExemptedModules}
-          handleDeleteMod={handleDeleteExemptedModules}
-        />
-      ),
-    },
   ];
 
   return (
