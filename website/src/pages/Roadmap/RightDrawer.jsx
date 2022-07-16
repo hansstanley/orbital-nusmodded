@@ -8,6 +8,9 @@ import {
   SpeedDial,
   SpeedDialIcon,
   SpeedDialAction,
+  Box,
+  Fab,
+  Zoom,
 } from "@mui/material";
 import { useState } from "react";
 import BlockIcon from "@mui/icons-material/Block";
@@ -45,7 +48,7 @@ export default function RightDrawer({
       <SpeedDial
         ariaLabel="Roadmap SpeedDial"
         icon={<SpeedDialIcon />}
-        sx={{ position: "absolute", bottom: 32, right: 32 }}
+        sx={{ position: "fixed", bottom: 32, right: 32 }}
         open={expand}
         onClick={toggleSpeedDial}
         hidden={open}
@@ -66,24 +69,26 @@ export default function RightDrawer({
           />
         )}
       </SpeedDial>
+      <Zoom in={open}>
+        <Fab
+          color="primary"
+          onClick={handleDrawerClose}
+          sx={{ position: "fixed", bottom: 32, right: 32 }}
+        >
+          <ChevronRightIcon />
+        </Fab>
+      </Zoom>
       <Slide direction="left" in={open} mountOnEnter unmountOnExit>
         <Card
           raised={true}
           sx={{
-            position: "absolute",
+            position: "fixed",
             right: 32,
             maxHeight: "80%",
             overflow: "auto",
           }}
         >
-          <CardHeader
-            subheader={drawerTitle}
-            action={
-              <IconButton onClick={handleDrawerClose}>
-                <ChevronRightIcon />
-              </IconButton>
-            }
-          />
+          <CardHeader subheader={drawerTitle} />
           <Divider />
           <CardContent>{children[drawerIndex] || "Nothing here."}</CardContent>
         </Card>

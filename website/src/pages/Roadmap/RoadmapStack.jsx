@@ -9,6 +9,8 @@ import {
   Divider,
   Collapse,
   Button,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
@@ -18,6 +20,8 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import BookIcon from "@mui/icons-material/Book";
 import BackpackIcon from "@mui/icons-material/Backpack";
+import LockIcon from "@mui/icons-material/Lock";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import NotInterestedIcon from "@mui/icons-material/NotInterested";
 import SchoolIcon from "@mui/icons-material/School";
 import RightDrawer from "./RightDrawer";
@@ -54,6 +58,7 @@ export default function RoadmapStack() {
   const { loading: loadingSettings, getSetting } = useSettings();
   const { pushSnack } = useSnackbar();
 
+  const [locked, setLocked] = useState(false);
   const [courseMods, setCourseMods] = useState([]);
   const [modGroups, setModGroups] = useState([]);
 
@@ -111,6 +116,8 @@ export default function RoadmapStack() {
   const handleAddExemptedMods = handleAddMods(ROADMAP.EXEMPTED_MODS_ID);
   const handleDeleteExemptedMod = handleDeleteMod(ROADMAP.EXEMPTED_MODS_ID);
 
+  const toggleLocked = () => setLocked((prev) => !prev);
+
   useEffect(() => {
     async function loadModGroups(courseId) {
       const data = await getCourseModGroups(courseId);
@@ -153,7 +160,14 @@ export default function RoadmapStack() {
   return (
     <>
       <Stack spacing={2} width="100%" alignItems="flex-start">
-        <SemesterOrderer />
+        <Stack direction="row" spacing={1}>
+          <SemesterOrderer />
+          <Tooltip title={locked ? "Click to unlock" : "Click to lock"}>
+            <IconButton onClick={toggleLocked}>
+              {locked ? <LockIcon /> : <LockOpenIcon />}
+            </IconButton>
+          </Tooltip>
+        </Stack>
         <DragDropContext onDragEnd={onDragEnd}>
           {loading ? (
             <SemesterSkeleton />
@@ -163,6 +177,7 @@ export default function RoadmapStack() {
                 key={sem.id}
                 sem={sem}
                 onDeleteMod={handleDeleteMod(sem.id)}
+                disableDrag={locked}
               />
             ))
           )}
@@ -188,14 +203,14 @@ export default function RoadmapStack() {
           >
             <ModStack
               mods={myMods}
-              isDroppable={true}
+              isDroppable={!locked}
               droppableId={ROADMAP.MY_MODS_ID}
               handleAddMods={handleAddMyMods}
               handleDeleteMod={handleDeleteMyMod}
             />
             <ModGroupStack
               modGroups={modGroups}
-              isDroppable={true}
+              isDroppable={!locked}
               droppableId={ROADMAP.COURSE_MOD_GROUPS_ID}
               isCourse={true}
             />
@@ -211,7 +226,7 @@ export default function RoadmapStack() {
                       <ModuleBox
                         key={mod.moduleCode + ROADMAP.COURSE_MODS_ID}
                         moduleCode={mod.moduleCode}
-                        isDraggable
+                        isDraggable={!locked}
                         draggableId={mod.moduleCode + ROADMAP.COURSE_MODS_ID}
                         index={index}
                       />
@@ -226,7 +241,6 @@ export default function RoadmapStack() {
               handleAddMods={handleAddExemptedMods}
               handleDeleteMod={handleDeleteExemptedMod}
             />
-            <div />
           </RightDrawer>
         </DragDropContext>
         <Divider sx={{ width: "100%" }} />
@@ -236,7 +250,11 @@ export default function RoadmapStack() {
   );
 }
 
-function Semester({ sem, onDeleteMod = (moduleCode) => {} }) {
+function Semester({
+  sem,
+  onDeleteMod = (moduleCode) => {},
+  disableDrag = false,
+}) {
   const { id, year, semester, modules, bgColor } = sem;
   const { pushSnack } = useSnackbar();
 
@@ -297,14 +315,14 @@ function Semester({ sem, onDeleteMod = (moduleCode) => {} }) {
                     name={moduleCode}
                     key={moduleCode}
                     index={index}
-                    isDraggable={true}
+                    isDraggable={!disableDrag}
                   />
                 ) : (
                   <ModuleBox
                     moduleCode={moduleCode}
                     key={moduleCode}
                     index={index}
-                    isDraggable={true}
+                    isDraggable={!disableDrag}
                     actions={
                       <Button
                         color="error"
