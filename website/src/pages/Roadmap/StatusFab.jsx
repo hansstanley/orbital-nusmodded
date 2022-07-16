@@ -67,15 +67,17 @@ export default function StatusFab() {
 
   return (
     <>
-      <Zoom in={!open}>
-        <Fab
-          color={status}
-          onClick={handleOpen}
-          sx={{ position: "absolute", bottom: 32, right: 104 }}
-        >
-          {statuses[status].icon}
-        </Fab>
-      </Zoom>
+      {Object.keys(statuses).map((severity, index) => (
+        <Zoom key={index} in={!open && status === severity}>
+          <Fab
+            color={severity}
+            onClick={handleOpen}
+            sx={{ position: "absolute", bottom: 32, right: 104 }}
+          >
+            {statuses[severity].icon}
+          </Fab>
+        </Zoom>
+      ))}
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
           <Stack spacing={1}>

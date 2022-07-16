@@ -34,7 +34,8 @@ function RoadmapProvider({ children }) {
   const { pushSnack } = useSnackbar();
   const { getCourseMods, getCourseModGroups } = useCourse();
   const { getModInfo } = useMod();
-  const { getModGroupString, parseModGroupString } = useModGroup();
+  const { isModGroupString, getModGroupString, parseModGroupString } =
+    useModGroup();
   const { loading: loadingSettings, getSetting } = useSettings();
   const [loading, setLoading] = useState(false);
   const [roadmap, setRoadmap] = useState([]);
@@ -125,7 +126,7 @@ function RoadmapProvider({ children }) {
   }, [isAuth, roadmap, makeRequest, pushSnack]);
 
   useEffect(() => {
-    async function loadModGroups() {
+    async function loadData() {
       const courseId = getSetting(SETTINGS.COURSE.ID);
 
       if (courseId) {
@@ -142,7 +143,7 @@ function RoadmapProvider({ children }) {
       }
     }
 
-    if (!loadingSettings) loadModGroups();
+    if (!loadingSettings) loadData();
   }, [loadingSettings, getSetting, getCourseMods, getCourseModGroups]);
 
   const getAllMods = useCallback(
@@ -276,8 +277,8 @@ function RoadmapProvider({ children }) {
 
       function toModuleCodes(sem) {
         return (
-          sem?.modules?.map(
-            (mod) => parseModGroupString(mod)?.moduleCode || mod
+          sem?.modules?.map((mod) =>
+            isModGroupString(mod) ? parseModGroupString(mod)?.moduleCode : mod
           ) || []
         );
       }
@@ -306,7 +307,7 @@ function RoadmapProvider({ children }) {
         }
       }
     },
-    [MCLimit, getModInfo, parseModGroupString]
+    [MCLimit, getModInfo, isModGroupString, parseModGroupString]
   );
 
   const checkSemestersPrereq = useCallback(
@@ -318,8 +319,8 @@ function RoadmapProvider({ children }) {
       let modsBefore = [];
       for (let sem of roadmap) {
         const mods = sem?.modules || [];
-        const moduleCodes = mods.map(
-          (mod) => parseModGroupString(mod)?.moduleCode || mod
+        const moduleCodes = mods.map((mod) =>
+          isModGroupString(mod) ? parseModGroupString(mod)?.moduleCode : mod
         );
         const modInfos = await Promise.all(
           moduleCodes.map((code) => getModInfo(code))
@@ -399,7 +400,7 @@ function RoadmapProvider({ children }) {
         return missing.length ? missing : false;
       }
     },
-    [getModInfo, getSemesterById, parseModGroupString]
+    [getModInfo, getSemesterById, isModGroupString, parseModGroupString]
   );
 
   const checkSemestersPreclusion = useCallback(
@@ -408,8 +409,8 @@ function RoadmapProvider({ children }) {
 
       for (let sem of roadmap) {
         const mods = sem?.modules || [];
-        const moduleCodes = mods.map(
-          (mod) => parseModGroupString(mod)?.moduleCode || mod
+        const moduleCodes = mods.map((mod) =>
+          isModGroupString(mod) ? parseModGroupString(mod)?.moduleCode : mod
         );
         let modInfos = await Promise.all(
           moduleCodes.map((code) => getModInfo(code))
@@ -446,7 +447,7 @@ function RoadmapProvider({ children }) {
 
       return issues;
     },
-    [getModInfo, parseModGroupString]
+    [getModInfo, isModGroupString, parseModGroupString]
   );
 
   const updateModuleGroup = useCallback(
