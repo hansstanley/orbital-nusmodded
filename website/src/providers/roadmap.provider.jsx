@@ -513,7 +513,9 @@ function RoadmapProvider({ children }) {
           srcDroppable = { modules: courseMods.map((mod) => mod.moduleCode) };
           break;
         case ROADMAP.COURSE_MOD_GROUPS_ID:
-          srcDroppable = { modules: JSON.parse(JSON.stringify((courseModGroups))) };
+          srcDroppable = {
+            modules: JSON.parse(JSON.stringify(courseModGroups)),
+          };
           break;
         default:
           srcDroppable = getSemesterById(srcDroppableId);
@@ -552,7 +554,14 @@ function RoadmapProvider({ children }) {
 
       setRoadmap(newRoadmap);
     },
-    [roadmap, getSemesterById, courseMods, courseModGroups, getModGroupString]
+    [
+      roadmap,
+      getSemesterById,
+      courseMods,
+      courseModGroups,
+      getModGroupString,
+      parseModGroupString,
+    ]
   );
 
   const values = {
