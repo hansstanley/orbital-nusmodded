@@ -81,12 +81,15 @@ function AuthSessionProvider({ children }) {
       return null;
     }
 
-    setAdmin(data.admin);
+    const result = new Profile();
+    if (data) {
+      result
+        .updateProperty("username", data.username)
+        .updateProperty("avatarUrl", data.avatar_url)
+        .updateProperty("roadmap", data.roadmap);
 
-    const result = new Profile()
-      .updateProperty("username", data.username)
-      .updateProperty("avatarUrl", data.avatar_url)
-      .updateProperty("roadmap", data.roadmap);
+      setAdmin(data.admin || false);
+    }
     return result;
   }, []);
 

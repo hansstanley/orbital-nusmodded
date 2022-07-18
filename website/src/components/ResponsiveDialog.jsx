@@ -1,4 +1,4 @@
-import { Dialog, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Dialog, useMediaQuery, useTheme } from "@mui/material";
 
 /**
  * Dialog that becomes fullscreen when the screen size is below sm.
@@ -9,6 +9,7 @@ import { Dialog, useMediaQuery, useTheme } from "@mui/material";
 export default function ResponsiveDialog({
   open = false,
   onClose = () => {},
+  component = null,
   children,
 }) {
   const theme = useTheme();
@@ -16,7 +17,7 @@ export default function ResponsiveDialog({
 
   return (
     <Dialog open={open} onClose={onClose} fullScreen={fullScreen}>
-      {children}
+      <Box component={component}>{children}</Box>
     </Dialog>
   );
 }

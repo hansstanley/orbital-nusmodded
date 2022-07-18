@@ -8,7 +8,6 @@ import Roadmap from "./Roadmap";
 import Settings from "./Settings";
 import ModuleInfo from "./ModuleInfo";
 import Landing from "./Landing";
-import Auth from "./Auth";
 import Account from "./Account";
 import Courses from "./Courses";
 import SignUp from "./SignUp";
@@ -58,11 +57,6 @@ const pages = [
     icon: <AccountCircleIcon />,
     title: "Account",
     content: <Account />,
-  },
-  {
-    key: "login",
-    path: "/login",
-    content: <Auth />,
   },
   {
     key: "signup",
