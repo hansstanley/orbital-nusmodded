@@ -66,7 +66,7 @@ export default function LoginDialog({ open = false, handleClose = () => {} }) {
   };
 
   return (
-    <ResponsiveDialog open={open} onClose={handleClose}>
+    <ResponsiveDialog component="form" open={open} onClose={handleClose}>
       <DialogTitle>Login</DialogTitle>
       <DialogContent>
         <DialogContentText

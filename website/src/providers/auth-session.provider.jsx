@@ -81,13 +81,18 @@ function AuthSessionProvider({ children }) {
       return null;
     }
 
-    setAdmin(data.admin);
+    if (data) {
+      const result = new Profile()
+        .updateProperty("id", data.id)
+        .updateProperty("username", data.username)
+        .updateProperty("avatarUrl", data.avatar_url)
+        .updateProperty("roadmap", data.roadmap);
 
-    const result = new Profile()
-      .updateProperty("username", data.username)
-      .updateProperty("avatarUrl", data.avatar_url)
-      .updateProperty("roadmap", data.roadmap);
-    return result;
+      setAdmin(data.admin || false);
+      return result;
+    } else {
+      return null;
+    }
   }, []);
 
   const isAdmin = useCallback(() => !!admin, [admin]);
