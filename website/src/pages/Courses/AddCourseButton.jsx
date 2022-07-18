@@ -42,8 +42,8 @@ export default function AddCourseButton() {
     }
   };
 
-  return (
-    isAdmin() ? <>
+  return isAdmin() ? (
+    <>
       <Button variant="outlined" onClick={handleOpen} disabled={!isAuth()}>
         Add course
       </Button>
@@ -56,6 +56,6 @@ export default function AddCourseButton() {
         handleSubmit={handleSubmit}
         handleClose={handleClose}
       />
-    </> : <></>
-  );
+    </>
+  ) : null;
 }

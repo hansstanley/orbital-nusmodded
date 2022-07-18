@@ -1,5 +1,12 @@
 import { Divider, Stack } from "@mui/material";
 
+/**
+ * Stack that toggles between vertical and horizontal layouts
+ * across the threshold sm-xs.
+ *
+ * @param {object} props
+ * @returns A responsive stack
+ */
 export default function ResponsiveStack({ children }) {
   return (
     <>

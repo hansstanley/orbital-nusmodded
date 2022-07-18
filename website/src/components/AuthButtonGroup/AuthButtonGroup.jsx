@@ -5,6 +5,11 @@ import { useAuthSession } from "../../providers";
 import LoginDialog from "./LoginDialog";
 import LogoutDialog from "./LogoutDialog";
 
+/**
+ * A self-contained component to handle logins and logouts.
+ *
+ * @returns A button group with login and logout dialogs.
+ */
 export default function AuthButtonGroup() {
   const navigate = useNavigate();
   const { isAuth } = useAuthSession();

@@ -9,15 +9,15 @@ export default function Landing() {
   };
 
   return (
-    <Stack marginTop={25} spacing={2} sx={sx.main}>
-      <Typography position={"relative"} top = {25} variant="h4" sx={sx.desktopTitle} color="primary">
-        WELCOME TO
+    <Stack spacing={2} sx={sx.main} my={8}>
+      <Typography variant="h4" sx={sx.desktopTitle} color="primary">
+        Welcome to
       </Typography>
       <Typography variant="h1" sx={sx.desktopTitle} color="primary">
         NUSMODDED
       </Typography>
-      <Typography position={"relative"} top = {25} variant="h4" sx={sx.mobileTitle} color="primary">
-        WELCOME TO
+      <Typography variant="h5" sx={sx.mobileTitle} color="primary">
+        Welcome to
       </Typography>
       <Typography variant="h3" sx={sx.mobileTitle} color="primary">
         NUSMODDED
@@ -37,11 +37,11 @@ const sx = {
     alignItems: "center",
   },
   desktopTitle: {
-    display: { sm: "block", xs: "none" },
+    display: { md: "block", xs: "none" },
     fontWeight: "bold",
   },
   mobileTitle: {
-    display: { sm: "none", xs: "block" },
+    display: { md: "none", xs: "block" },
     fontWeight: "bold",
   },
 };

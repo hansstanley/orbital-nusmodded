@@ -1,6 +1,5 @@
 import {
   Button,
-  LinearProgress,
   Paper,
   Table,
   TableBody,
@@ -11,6 +10,7 @@ import {
 } from "@mui/material";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { LoadingBar } from "../../components";
 import { useCourse } from "../../providers";
 import { columns } from "./constants";
 import EditCourseButton from "./EditCourseButton";
@@ -83,11 +83,7 @@ export default function CourseTable({ sortBy = "", searchBy = "" }) {
           </TableRow>
         </TableBody>
       </Table>
-      {loading ? (
-        <LinearProgress />
-      ) : (
-        <LinearProgress variant="determinate" value={100} />
-      )}
+      <LoadingBar loading={loading} />
     </TableContainer>
   );
 }

@@ -17,6 +17,7 @@ const AuthSessionContext = createContext({
   accessToken: null,
   profile: new Profile(),
   isAuth: () => false,
+  isAdmin: () => false,
   handleSignup: async ({ username, email, password }) => {},
   handleSignin: async ({ email, password }) => {},
   handleSignout: async () => {},
@@ -88,7 +89,7 @@ function AuthSessionProvider({ children }) {
     return result;
   }, []);
 
-  const isAdmin = useCallback(() => admin, [admin]);
+  const isAdmin = useCallback(() => !!admin, [admin]);
 
   const createProfile = useCallback(async (userId, username) => {
     const { data, error } = await supabase
@@ -125,7 +126,7 @@ function AuthSessionProvider({ children }) {
   };
 
   const handleSignup = async ({ username, email, password }) => {
-    const { error } = await supabase.auth.signUp(
+    const { user, error } = await supabase.auth.signUp(
       {
         email,
         password,
@@ -133,6 +134,10 @@ function AuthSessionProvider({ children }) {
       { data: { username } }
     );
     if (error) throw error;
+    if (user?.identities.length === 0) {
+      // Indicates dummy user returned
+      throw new Error(`Email ${email} has already been registered!`);
+    }
   };
 
   const handleSignin = async ({ email, password }) => {

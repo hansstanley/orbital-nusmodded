@@ -7,16 +7,13 @@ import { pages } from "../../pages";
  * @returns A router component.
  */
 export default function Router() {
-  return (
-    <Routes>
-      {pages.map((page) => {
-        if (page.path && page.content) {
-          return (
-            <Route key={page.key} path={page.path} element={page.content} />
-          );
-        }
-        return null;
-      })}
-    </Routes>
-  );
+  const handlePage = (page) => {
+    if (page.path && page.content) {
+      return <Route key={page.key} path={page.path} element={page.content} />;
+    } else {
+      return null;
+    }
+  };
+
+  return <Routes>{pages.map(handlePage)}</Routes>;
 }

@@ -1,17 +1,15 @@
 import { CookiesProvider } from "react-cookie";
 
 import { AuthSessionProvider } from "./auth-session.provider";
-import DrawerContextProvider from "./drawer.provider";
-import LandingProvider from "./landing.provider";
-import ModuleInfoProvider from "./moduleInfo.provider";
+import { DrawerContextProvider } from "./drawer.provider";
 import { SnackbarProvider } from "./snackbar.provider";
-import ThemeContextProvider from "./themeContext.provider";
-import CourseInfoProvider from "./courseInfo.provider";
+import { AppThemeProvider } from "./app-theme.provider";
 import { BackendProvider } from "./backend.provider";
 import { CourseProvider } from "./course.provider";
 import { ModProvider } from "./mod.provider";
 import { ModGroupProvider } from "./mod-group.provider";
 import { RoadmapProvider } from "./roadmap.provider";
+import { SettingsProvider } from "./settings.provider";
 
 function combineComponents(...components) {
   return components.reduce(
@@ -31,14 +29,12 @@ const providers = [
   SnackbarProvider,
   AuthSessionProvider,
   BackendProvider,
-  ThemeContextProvider,
+  SettingsProvider,
+  AppThemeProvider,
   CourseProvider,
   ModProvider,
   ModGroupProvider,
-  ModuleInfoProvider,
-  LandingProvider,
   DrawerContextProvider,
-  CourseInfoProvider,
   RoadmapProvider,
 ];
 

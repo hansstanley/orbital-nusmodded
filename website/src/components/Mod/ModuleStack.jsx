@@ -21,9 +21,16 @@ import {
 import { TransitionGroup } from "react-transition-group";
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
-import { useAuthSession, useMod, useSnackbar } from "../../providers";
+import {
+  useAuthSession,
+  useMod,
+  useModGroup,
+  useSnackbar,
+} from "../../providers";
 import ModuleBox from "./ModuleBox";
 import { Droppable } from "react-beautiful-dnd";
+import ModGroupBox from "../../pages/Roadmap/ModGroupBox";
+import { DIMENSIONS } from "../../utils/constants";
 
 export default function ModuleStack({
   title = "Modules",
@@ -32,10 +39,13 @@ export default function ModuleStack({
   droppableId,
   handleAddMods = async (moduleCodes = []) => [],
   handleDeleteMod = async (moduleCode) => {},
+  handleSelectMod = async (moduleCode) => {},
   isCourse = false,
+  isSelect = false,
 }) {
   const { isAuth, isAdmin } = useAuthSession();
   const { getModArray } = useMod();
+  const { isModGroupString, parseModGroupString } = useModGroup();
   const { pushSnack } = useSnackbar();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -85,6 +95,15 @@ export default function ModuleStack({
     try {
       const added = await handleAddMods(selected.map((mod) => mod.moduleCode));
       handleClose();
+      const notAdded = selected
+        .map((mod) => mod.moduleCode)
+        .filter((mod) => !added.includes(mod));
+      if (notAdded.length) {
+        pushSnack({
+          message: `${notAdded.join(", ")} already exists in the roadmap!`,
+          severity: "error",
+        });
+      }
       if (Array.isArray(added) && added.length) {
         pushSnack({
           message: `${added.join(", ")} added!`,
@@ -112,11 +131,14 @@ export default function ModuleStack({
 
   const handleDelete = (moduleCode) => async () => {
     setLoading(true);
-
     try {
       await handleDeleteMod(moduleCode);
       pushSnack({
-        message: `${moduleCode} deleted!`,
+        message: `${
+          parseModGroupString(moduleCode)?.moduleCode ||
+          parseModGroupString(moduleCode)?.name ||
+          moduleCode
+        } deleted!`,
         severity: "success",
       });
     } catch (error) {
@@ -130,33 +152,100 @@ export default function ModuleStack({
     }
   };
 
+  const handleSelect = (moduleCode) => async () => {
+    setLoading(true);
+
+    try {
+      const mod = await handleSelectMod(moduleCode);
+      if (mod === moduleCode) {
+        pushSnack({
+          message: `${moduleCode} selected!`,
+          severity: "success",
+        });
+      } else if (mod !== "") {
+        pushSnack({
+          message: `${moduleCode} already exists in the roadmap at ${mod}! `,
+          severity: "error",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: error.message || `Unable to select ${moduleCode}`,
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const moduleList = (
     <TransitionGroup component={Stack} spacing={1}>
       {sortMods().map((mod, index) => (
         <Collapse key={mod.moduleCode}>
-          <ModuleBox
-            key={mod.moduleCode}
-            index={index}
-            moduleCode={mod.moduleCode}
-            isDraggable={isDroppable}
-            actions={
-              !isCourse || isAdmin() ?
-              <Button
-                color="error"
-                disabled={!isAuth() || loading}
-                onClick={handleDelete(mod.moduleCode)}
-              >
-                Delete
-              </Button> : <></>
-            }
-          />
+          {isModGroupString(mod.moduleCode) ? (
+            <ModGroupBox
+              name={mod.moduleCode}
+              key={mod.moduleCode}
+              index={index}
+              isDraggable={true}
+              actions={
+                !isCourse || isAdmin() ? (
+                  <>
+                    <Button
+                      color="error"
+                      disabled={!isAuth() || loading}
+                      onClick={handleDelete(mod.moduleCode)}
+                    >
+                      Delete
+                    </Button>
+                  </>
+                ) : null
+              }
+            />
+          ) : (
+            <ModuleBox
+              key={
+                parseModGroupString(mod.moduleCode)?.moduleCode ||
+                mod.moduleCode
+              }
+              index={index}
+              moduleCode={
+                parseModGroupString(mod.moduleCode)?.moduleCode ||
+                mod.moduleCode
+              }
+              isDraggable={isDroppable}
+              actions={
+                <>
+                  {isSelect ? (
+                    <Button
+                      color="primary"
+                      disabled={!isAuth() || loading}
+                      onClick={handleSelect(mod.moduleCode)}
+                    >
+                      Select
+                    </Button>
+                  ) : null}
+                  {!isCourse || isAdmin() ? (
+                    <Button
+                      color="error"
+                      disabled={!isAuth() || loading}
+                      onClick={handleDelete(mod.moduleCode)}
+                    >
+                      Delete
+                    </Button>
+                  ) : null}
+                </>
+              }
+            />
+          )}
         </Collapse>
       ))}
     </TransitionGroup>
   );
 
   return (
-    <Stack spacing={1} width={320}>
+    <Stack spacing={1} width={DIMENSIONS.BOX_WIDTH}>
       <Stack
         spacing={2}
         direction="row"
@@ -164,7 +253,7 @@ export default function ModuleStack({
         alignItems="center"
       >
         <Typography variant="h6">{title}</Typography>
-        {!isCourse || isAdmin() ?
+        {!isCourse || isAdmin() ? (
           <Zoom in={!open}>
             <IconButton
               size="inherit"
@@ -174,7 +263,8 @@ export default function ModuleStack({
             >
               <AddIcon />
             </IconButton>
-          </Zoom> : <></>}
+          </Zoom>
+        ) : null}
       </Stack>
       <TextField
         fullWidth
@@ -206,7 +296,7 @@ export default function ModuleStack({
               multiple
               onChange={handleAutocomplete}
               value={selected}
-              options={modArray.filter(mod => !mods.map(x => x.moduleCode).includes(mod.moduleCode))}
+              options={modArray}
               getOptionLabel={(option) => option.moduleCode}
               isOptionEqualToValue={(option, value) =>
                 option.moduleCode === value.moduleCode

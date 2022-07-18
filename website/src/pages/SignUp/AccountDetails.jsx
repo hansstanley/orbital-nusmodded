@@ -3,18 +3,21 @@ import {
   Avatar,
   Button,
   TextField,
-  Grid,
   Box,
   Typography,
+  Collapse,
+  Alert,
+  Stack,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { supabase } from "../../services";
-import { useAuthSession } from "../../providers";
+import { useAuthSession, useSnackbar } from "../../providers";
+import { TransitionGroup } from "react-transition-group";
 
 export default function SignUp({ handleNext }) {
-  const [validateInput, setValidateInput] = useState("");
-  const [loading, setLoading] = useState(false);
   const { handleSignup } = useAuthSession();
+  const { pushSnack } = useSnackbar();
+  const [validateInput, setValidateInput] = useState([]);
+  const [loading, setLoading] = useState(false);
   const emailCheck =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   const passwordCheck = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/;
@@ -22,132 +25,150 @@ export default function SignUp({ handleNext }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    if(data.get("username").length < 3) {
-      setValidateInput("Username is too short! (minimum 3 characters)");
-    } else if (emailCheck.test(data.get("email"))) {
-      if (data.get("password") === data.get("confirmPassword")) {
-        if (passwordCheck.test(data.get("password"))) {
-          setLoading(true);
-          const user = await handleSignup({
-            username: data.get("username"),
-            email: data.get("email"),
-            password: data.get("password"),
-          });
-          // const { user, session, error } = await supabase.auth.signUp(
-          //   {
-          //     email: data.get("email"),
-          //     password: data.get("password"),
-          //   },
-          //   {
-          //     data: {
-          //       username: data.get("username"),
-          //     },
-          //   }
-          // );
-          setLoading(false);
-          console.log("successfully signed up!", user);
-          handleNext();
-        } else if (data.get("password").length < 8) {
-          setValidateInput("Password is too short! (minimum 8 characters)");
-        } else if (
-          data.get("password").toLowerCase() === data.get("password")
-        ) {
-          setValidateInput(
-            "Password does not contain at least one uppercase letter"
-          );
-        } else if (
-          data.get("password").toUpperCase() === data.get("password")
-        ) {
-          setValidateInput(
-            "Password does not contain at least one lowercase letter"
-          );
-        } else {
-          setValidateInput("Password does not contain at least one number");
-        }
-      } else {
-        setValidateInput("Password does not match!");
+
+    const username = data.get("username");
+    const email = data.get("email");
+    const password = data.get("password");
+    const confirmPassword = data.get("confirmPassword");
+
+    let passed = true;
+    setValidateInput([]);
+    if (username.length < 3) {
+      passed = false;
+      setValidateInput((prev) => [
+        ...prev,
+        "Username is too short! (minimum 3 characters)",
+      ]);
+    }
+    if (!emailCheck.test(email)) {
+      passed = false;
+      setValidateInput((prev) => [...prev, "Email entered is invalid!"]);
+    }
+    if (password.length < 8) {
+      passed = false;
+      setValidateInput((prev) => [
+        ...prev,
+        "Password is too short! (minimum 8 characters)",
+      ]);
+    }
+    if (password.toLowerCase() === password) {
+      passed = false;
+      setValidateInput((prev) => [
+        ...prev,
+        "Password should contain at least one uppercase letter.",
+      ]);
+    }
+    if (password.toUpperCase() === password) {
+      passed = false;
+      setValidateInput((prev) => [
+        ...prev,
+        "Password should contain at least one lowercase letter.",
+      ]);
+    }
+    if (!/\d/.test(password)) {
+      passed = false;
+      setValidateInput((prev) => [
+        ...prev,
+        "Password should contain at least one number.",
+      ]);
+    }
+    if (!passwordCheck.test(password)) {
+      passed = false;
+      setValidateInput((prev) => [...prev, "Password entered is invalid!"]);
+    }
+    if (password !== confirmPassword) {
+      passed = false;
+      setValidateInput((prev) => [...prev, "Passwords do not match!"]);
+    }
+
+    if (passed) {
+      setLoading(true);
+      try {
+        await handleSignup({
+          username,
+          email,
+          password,
+        });
+        handleNext();
+      } catch (error) {
+        console.warn(error);
+        pushSnack({
+          message: error.message || "Unable to sign up",
+          severity: "warning",
+        });
+      } finally {
+        setLoading(false);
       }
-    } else {
-      setValidateInput("Email entered is invalid!");
     }
   };
 
+  const hasValidateInput =
+    Array.isArray(validateInput) && !!validateInput.length;
+
   return (
-    <Box
-      sx={{
-        marginTop: 8,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <Avatar sx={{ m: 1 }}>
-        <LockOutlinedIcon />
-      </Avatar>
-      <Typography component="h1" variant="h5">
-        Sign up
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              name="username"
-              required
-              fullWidth
-              id="username"
-              label="Username"
-              autoFocus
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              id="email"
-              type="email"
-              label="Email Address"
-              name="email"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              name="confirmPassword"
-              label="Confirm Password"
-              type="password"
-              id="confirmPassword"
-            />
-          </Grid>
-        </Grid>
-        <Button
-          disabled={loading}
-          type="submit"
+    <Box sx={{ width: { xs: "100%", sm: 360 } }}>
+      <Stack
+        component="form"
+        onSubmit={handleSubmit}
+        spacing={2}
+        alignItems="center"
+      >
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Avatar>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography variant="h6">Sign up</Typography>
+        </Stack>
+        <TextField
+          name="username"
+          required
           fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-        >
+          id="username"
+          label="Username"
+          autoFocus
+        />
+        <TextField
+          required
+          fullWidth
+          id="email"
+          type="email"
+          label="Email Address"
+          name="email"
+        />
+        <TextField
+          required
+          fullWidth
+          name="password"
+          label="Password"
+          type="password"
+          id="password"
+        />
+        <TextField
+          required
+          fullWidth
+          name="confirmPassword"
+          label="Confirm Password"
+          type="password"
+          id="confirmPassword"
+        />
+        <TransitionGroup>
+          {validateInput.map((msg, index) => (
+            <Collapse
+              key={index}
+              in={hasValidateInput}
+              sx={{ width: "100%", mt: 1 }}
+              unmountOnExit
+            >
+              <Alert severity="error">
+                <Typography variant="body2">{msg}</Typography>
+              </Alert>
+            </Collapse>
+          ))}
+        </TransitionGroup>
+        <Button disabled={loading} type="submit" variant="contained" fullWidth>
           Sign Up
         </Button>
-        {!(validateInput === "") ? (
-          <Typography color="primary.light">{validateInput}</Typography>
-        ) : (
-          <></>
-        )}
-        <Grid container justifyContent="flex-end">
-          <Grid item></Grid>
-        </Grid>
-      </Box>
+      </Stack>
     </Box>
   );
 }

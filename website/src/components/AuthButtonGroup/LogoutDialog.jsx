@@ -9,7 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuthSession } from "../../providers";
 
-export default function LogoutDialog({ open, handleClose }) {
+export default function LogoutDialog({ open = false, handleClose = () => {} }) {
   const navigate = useNavigate();
   const { handleSignout } = useAuthSession();
 
@@ -17,6 +17,7 @@ export default function LogoutDialog({ open, handleClose }) {
     await handleSignout();
     handleClose();
     navigate("/");
+    window.location.reload();
   };
 
   return (

@@ -36,11 +36,25 @@ function ModProvider({ children }) {
 
     if (status === 200 && data) {
       const mod = plainToInstance(Mod, data);
-      modMap.set(moduleCode, mod);
+      mod.preclusion = processPreclusion(mod.preclusion);
+
+      setModMap((prev) => {
+        prev.set(moduleCode, mod);
+        return prev;
+      });
       return mod;
     } else {
       throw new Error(`Unable to retrieve info for module ${moduleCode}`);
     }
+  };
+
+  const processPreclusion = (preclusion = "") => {
+    if (!preclusion) return [];
+
+    const moduleCodes = [
+      ...preclusion.matchAll(/[A-Za-z]+[0-9]+[A-Za-z]*/g),
+    ].map((match) => match[0]);
+    return moduleCodes;
   };
 
   const values = {

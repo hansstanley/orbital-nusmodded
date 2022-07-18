@@ -11,7 +11,7 @@ import { NIL as NIL_UUID } from "uuid";
 import { Box } from "@mui/system";
 import { Course } from "../../models";
 import { ResponsiveStack } from "../../components";
-import { useCourse, useSnackbar } from "../../providers";
+import { useCourse } from "../../providers";
 import { ModuleStack } from "../../components/Mod";
 import EditCourseButton from "./EditCourseButton";
 import DeleteCourseButton from "./DeleteCourseButton";
@@ -20,6 +20,8 @@ import { ModGroupStack } from "../../components/ModGroup";
 /**
  * Component to show detailed information
  * about the course.
+ *
+ * @returns A react component.
  */
 export default function CourseDetail() {
   const { state } = useLocation();
@@ -33,7 +35,7 @@ export default function CourseDetail() {
     bindCourseModGroups,
     unbindCourseModGroups,
   } = useCourse();
-  const { pushSnack } = useSnackbar();
+
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState({
     courseStatus: false,
@@ -168,13 +170,13 @@ export default function CourseDetail() {
           mods={mods}
           handleAddMods={handleAddMods}
           handleDeleteMod={handleDeleteMod}
-          isCourse = {true}
+          isCourse={true}
         />
         <ModGroupStack
           modGroups={modGroups}
           handleBindModGroup={handleBindModGroup}
           handleUnbindModGroup={handleUnbindModGroup}
-          isCourse = {true}
+          isCourse={true}
         />
       </ResponsiveStack>
       <Divider />

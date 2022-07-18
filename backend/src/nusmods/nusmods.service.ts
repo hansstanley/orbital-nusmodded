@@ -5,7 +5,7 @@ import { catchError, lastValueFrom, map, of } from 'rxjs';
 import { ModDetailDto, ModInfoDto, ModSummaryDto } from './dto';
 
 const NUSMODS_API_URL = 'https://api.nusmods.com/v2';
-const ACAD_YEAR = '2021-2022';
+const ACAD_YEAR = '2022-2023';
 
 @Injectable()
 export class NusmodsService {

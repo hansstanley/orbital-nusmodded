@@ -1,11 +1,15 @@
 import { IconButton } from "@mui/material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { ThemeContext } from "../../contexts";
-import { useContext } from "react";
+import { useAppTheme } from "../../providers";
 
+/**
+ * Button to toggle between light and dark colour modes.
+ *
+ * @returns An icon button.
+ */
 export default function ColorModeButton() {
-  const { colorMode, toggleColorMode } = useContext(ThemeContext);
+  const { colorMode, toggleColorMode } = useAppTheme();
 
   return (
     <IconButton onClick={toggleColorMode} sx={{ ml: 1 }}>

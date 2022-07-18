@@ -13,6 +13,8 @@ import ModGroupBox from "./ModGroupBox";
 import ModGroupForm from "./ModGroupForm";
 import { stringToInt } from "../../utils/parsers";
 import EditModGroupButton from "./EditModGroupButton";
+import { Droppable } from "react-beautiful-dnd";
+import { DIMENSIONS } from "../../utils/constants";
 
 export default function ModGroupStack({
   title = "Module groups",
@@ -20,6 +22,8 @@ export default function ModGroupStack({
   handleBindModGroup = async (groupId) => {},
   handleUnbindModGroup = async (groupId) => {},
   isCourse = false,
+  isDroppable = false,
+  droppableId,
 }) {
   const { isAdmin } = useAuthSession();
   const { createModGroup } = useModGroup();
@@ -84,41 +88,64 @@ export default function ModGroupStack({
     }
   };
 
+  const modGroupList = modGroups.length ? (
+    modGroups.map((modGroup, index) => (
+      <ModGroupBox
+        key={modGroup.id}
+        modGroup={modGroup}
+        isDraggable={isDroppable}
+        index={index}
+        actions={
+          !isCourse || isAdmin() ? (
+            <>
+              <Button
+                color="error"
+                disabled={loading}
+                onClick={handleDelete(modGroup.id)}
+              >
+                Delete
+              </Button>
+              <EditModGroupButton
+                modGroup={modGroup}
+                handleBindModGroup={handleBindModGroup}
+              />
+            </>
+          ) : null
+        }
+      />
+    ))
+  ) : (
+    <Typography variant="body2">No module groups.</Typography>
+  );
+
   return (
-    <Stack spacing={1} width={320}>
-      <Stack spacing={2} direction="row" justifyContent="space-between">
+    <Stack spacing={1} width={DIMENSIONS.BOX_WIDTH}>
+      <Stack
+        spacing={2}
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Typography variant="h6">{title}</Typography>
-        {!isCourse || isAdmin() ?
+        {!isCourse || isAdmin() ? (
           <IconButton color="primary" onClick={handleOpen}>
             <AddIcon />
-          </IconButton> : <></>}
+          </IconButton>
+        ) : null}
       </Stack>
       <Divider />
       <Box>
-        {modGroups.length ? (
-          modGroups.map((modGroup) => (
-            <ModGroupBox
-              key={modGroup.id}
-              modGroup={modGroup}
-              actions={
-                !isCourse || isAdmin() ? <>
-                  <Button
-                    color="error"
-                    disabled={loading}
-                    onClick={handleDelete(modGroup.id)}
-                  >
-                    Delete
-                  </Button>
-                  <EditModGroupButton
-                    modGroup={modGroup}
-                    handleBindModGroup={handleBindModGroup}
-                  />
-                </> : <></>
-              }
-            />
-          ))
+        {isDroppable ? (
+          <Droppable droppableId={`${droppableId}`}>
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {modGroupList}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
         ) : (
-          <Typography variant="body2">No module groups.</Typography>
+          modGroupList
         )}
       </Box>
       <ModGroupForm

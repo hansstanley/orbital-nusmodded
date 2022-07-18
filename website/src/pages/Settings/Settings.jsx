@@ -5,31 +5,23 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
 import { AuthGuard } from "../../components";
+import { ModuleStack } from "../../components/Mod";
 import {
   useAuthSession,
   useBackend,
   useCourse,
+  useSettings,
   useSnackbar,
 } from "../../providers";
+import { SETTINGS } from "../../utils/constants";
 import SettingsRow from "./SettingsRow";
 
-// const minYearWidth = 1;
-// const [minYear, maxYear] = [1, 6];
-// const yearMarks = [
-//   { value: 1, label: "1" },
-//   { value: 2, label: "2" },
-//   { value: 3, label: "3" },
-//   { value: 4, label: "4" },
-//   { value: 5, label: "5" },
-//   { value: 6, label: "6" },
-// ];
 const rowIds = {
-  course: "COURSE_ID",
-  maxMCs: "MC_LIMIT",
+  course: SETTINGS.COURSE.ID,
+  maxMCs: SETTINGS.MC_LIMIT.ID,
+  exemptedModules: SETTINGS.EXEMPTED_MODULES.ID,
 };
 
 export default function Settings() {
@@ -37,69 +29,39 @@ export default function Settings() {
   const { makeRequest } = useBackend();
   const { loading: loadingCourses, getCourseArray } = useCourse();
   const { pushSnack } = useSnackbar();
+  const { loading, getSetting, setCourseId, setMCLimit, setExemptedModules } = useSettings();
   const [loadingRow, setLoadingRow] = useState([]);
   const [successRow, setSuccessRow] = useState(null);
-  // const [allMods, setAllMods] = useState([]);
-  // const [cookies, setCookies] = useCookies(["yearWidth"]);
-  // const [yearWidth, setYearWidth] = useState(cookies.yearWidth ?? [1, 4]);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [maxMCs, setMaxMCs] = useState(23);
+  const [exemptedMods, setExemptedMods] = useState([]);
   const arrMCs = [...Array(39).keys()].map((x) => (x += 12));
 
   useEffect(() => {
-    async function init() {
-      setLoadingRow([...Object.values(rowIds)]);
-      try {
-        const { status, data } = await makeRequest({
-          method: "get",
-          route: "/user-settings",
-          isPublic: false,
-        });
-
-        if (status === 200 && data) {
-          setSelectedCourse(data[rowIds.course] || "");
-          setMaxMCs(data[rowIds.maxMCs || 23]);
-        } else {
-          throw new Error("Unable to retrieve user settings");
-        }
-      } catch (error) {
-        console.error(error);
-        pushSnack({
-          message: error.message || "Unable to retrieve user settings",
-          severity: "error",
-        });
-      } finally {
-        setLoadingRow([]);
-      }
+    if (loading) {
+      setLoadingRow([SETTINGS.COURSE.ID, SETTINGS.MC_LIMIT.ID]);
+    } else {
+      setSelectedCourse(getSetting(SETTINGS.COURSE.ID) || "");
+      setMaxMCs(getSetting(SETTINGS.MC_LIMIT.ID) || 23);
+      setExemptedMods(getSetting(SETTINGS.EXEMPTED_MODULES) || []);
+      setLoadingRow([]);
     }
+  }, [loading, getSetting]);
 
-    if (isAuth()) init();
-  }, [isAuth, makeRequest, pushSnack]);
-
-  const sortCourses = React.useCallback(() => {
+  const sortCourses = useCallback(() => {
     let courses = getCourseArray();
-
     return courses;
   }, [getCourseArray]);
 
   const handleChangeCourse = async (event) => {
-    setSelectedCourse(event.target.value);
+    const newCourseId = event.target.value;
+
+    setSelectedCourse(newCourseId);
     setSuccessRow(null);
-    setLoadingRow((prev) => prev.concat([rowIds.course]));
+    setLoadingRow((prev) => prev.concat([SETTINGS.COURSE.ID]));
 
     try {
-      const { status } = await makeRequest({
-        method: "post",
-        route: "/user-settings/edit",
-        data: { key: rowIds.course, value: event.target.value },
-        isPublic: false,
-      });
-
-      if (status === 200) {
-        setSuccessRow(rowIds.course);
-      } else {
-        throw new Error(`Unable to save course`);
-      }
+      await setCourseId(newCourseId);
     } catch (error) {
       console.error(error);
       pushSnack({
@@ -112,23 +74,14 @@ export default function Settings() {
   };
 
   const handleChangeMCs = async (event) => {
-    setMaxMCs(event.target.value);
+    const newMaxMCs = event.target.value;
+
+    setMaxMCs(newMaxMCs);
     setSuccessRow(null);
     setLoadingRow((prev) => prev.concat([rowIds.maxMCs]));
 
     try {
-      const { status } = await makeRequest({
-        method: "post",
-        route: "/user-settings/edit",
-        data: { key: rowIds.maxMCs, value: event.target.value },
-        isPublic: false,
-      });
-
-      if (status === 200) {
-        setSuccessRow(rowIds.maxMCs);
-      } else {
-        throw new Error("Unable to save MC limit");
-      }
+      await setMCLimit(newMaxMCs);
     } catch (error) {
       console.error(error);
       pushSnack({
@@ -140,23 +93,46 @@ export default function Settings() {
     }
   };
 
-  // const handleYearWidthChange = (event, newYearWidth, activeThumb) => {
-  //   if (!Array.isArray(newYearWidth)) return;
+  const handleAddExemptedModules = async (moduleCodes = []) => {
+    const newCodes = moduleCodes.filter((code) => !exemptedMods.includes(code));
 
-  //   if (newYearWidth[1] - newYearWidth[0] < minYearWidth) {
-  //     if (activeThumb === minYear) {
-  //       const clamped = Math.min(newYearWidth[0], maxYear - minYearWidth);
-  //       setYearWidth([clamped, clamped + minYearWidth]);
-  //     } else {
-  //       const clamped = Math.max(newYearWidth[1], minYearWidth);
-  //       setYearWidth([clamped - minYearWidth, clamped]);
-  //     }
-  //   } else {
-  //     setYearWidth(newYearWidth);
-  //   }
+    const holdingCodes = newCodes.concat(exemptedMods?.modules || []);
 
-  //   setCookies("yearWidth", yearWidth, { path: "/" });
-  // };
+    setSuccessRow(null);
+    setLoadingRow((prev) => prev.concat([rowIds.exemptedModules]));
+
+    try {
+      await setExemptedModules(holdingCodes);
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: error.message || "Unable to save exempted modules",
+        severity: "error",
+      });
+    } finally {
+      setLoadingRow((prev) => prev.filter((id) => id !== rowIds.exemptedModules));
+    }
+    return newCodes;
+  };
+
+  const handleDeleteExemptedModules = async (moduleCode) => {
+    const holdingCodes = exemptedMods?.modules?.filter((code) => code !== moduleCode) || [];
+
+    setSuccessRow(null);
+    setLoadingRow((prev) => prev.concat([rowIds.exemptedModules]));
+
+    try {
+      await setExemptedModules(holdingCodes);
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: error.message || "Unable to save exempted modules",
+        severity: "error",
+      });
+    } finally {
+      setLoadingRow((prev) => prev.filter((id) => id !== rowIds.exemptedModules));
+    }
+  };
 
   const settingsRows = [
     {

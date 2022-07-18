@@ -6,6 +6,7 @@ import { Course, Mod, ModGroup } from "../models";
 import { useBackend } from "./backend.provider";
 import { useState } from "react";
 import { useSnackbar } from "./snackbar.provider";
+import { useAuthSession } from "./auth-session.provider";
 
 const CourseContext = createContext({
   loading: false,
@@ -21,6 +22,7 @@ const CourseContext = createContext({
   createCourse: async (data) => new Course(),
   updateCourse: async (courseId, data) => new Course(),
   deleteCourse: async (courseId) => new Course(),
+  getCourseId: () => "",
 });
 
 function CourseProvider({ children }) {
@@ -29,6 +31,7 @@ function CourseProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(true);
   const [courseMap, setCourseMap] = useState(new Map());
+  const [courseId, setCourseId] = useState("");
 
   useEffect(() => {
     async function buildCourses() {
@@ -224,6 +227,34 @@ function CourseProvider({ children }) {
     }
   };
 
+  const { isAuth } = useAuthSession();
+  useEffect(() => {
+    async function init() {
+      try {
+        const { status, data } = await makeRequest({
+          method: "get",
+          route: "/user-settings",
+          isPublic: false,
+        });
+
+        if (status === 200) {
+          setCourseId(data?.COURSE_ID);
+        } else {
+          throw new Error(`Failed to retrieve course with status ${status}`);
+        }
+      } catch (error) {
+        console.error(error);
+        pushSnack({
+          message: "Unable to retrieve course",
+          severity: "error",
+        });
+      }
+    }
+
+    if (isAuth()) init();
+  }, [isAuth, makeRequest, pushSnack]);
+  const getCourseId = useCallback(() => courseId, [courseId]);
+
   const values = {
     loading,
     getCourseArray,
@@ -238,6 +269,7 @@ function CourseProvider({ children }) {
     createCourse,
     updateCourse,
     deleteCourse,
+    getCourseId,
   };
 
   return (

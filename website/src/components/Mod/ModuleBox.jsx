@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  Box,
   Button,
   Card,
   CardActionArea,
@@ -19,11 +18,20 @@ import {
 } from "@mui/material";
 import { useMod, useSnackbar } from "../../providers";
 import { Draggable } from "react-beautiful-dnd";
+import { DIMENSIONS } from "../../utils/constants";
 
+/**
+ * A module box that has a detailed information dialog
+ * and can be set up as a Draggable.
+ *
+ * @param {object} props
+ * @returns A module box component.
+ */
 export default function ModuleBox({
   moduleCode,
   actions = null,
   isDraggable = false,
+  draggableId,
   index,
 }) {
   const { getModInfo } = useMod();
@@ -58,9 +66,10 @@ export default function ModuleBox({
   const handleOpenDialog = () => setDialogOpen(!loading);
   const handleCloseDialog = () => setDialogOpen(false);
 
+  // Placeholder for unknown module codes.
   const unknown = (
     <CardContent>
-      <Typography variant="body2">{`Unknown module ${moduleCode}`}</Typography>
+      <Typography variant="body2">Unknown module {moduleCode}</Typography>
     </CardContent>
   );
 
@@ -114,7 +123,9 @@ export default function ModuleBox({
         <Divider />
         <CardActions sx={{ justifyContent: "space-between" }}>
           <Button onClick={handleOpenDialog}>View</Button>
-          {actions}
+          <Stack direction="row" spacing={1}>
+            {actions}
+          </Stack>
         </CardActions>
       </Collapse>
     </>
@@ -123,10 +134,14 @@ export default function ModuleBox({
   return (
     <>
       {isDraggable ? (
-        <Draggable draggableId={moduleCode} index={index} key={moduleCode}>
+        <Draggable
+          draggableId={draggableId || moduleCode}
+          index={index}
+          key={draggableId || moduleCode}
+        >
           {(provided, snapshot) => (
             <Card
-              sx={{ width: 320 }}
+              sx={{ width: DIMENSIONS.BOX_WIDTH }}
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
@@ -137,7 +152,7 @@ export default function ModuleBox({
           )}
         </Draggable>
       ) : (
-        <Card key={moduleCode} sx={{ width: 320 }}>
+        <Card key={moduleCode} sx={{ width: DIMENSIONS.BOX_WIDTH }}>
           {content}
         </Card>
       )}

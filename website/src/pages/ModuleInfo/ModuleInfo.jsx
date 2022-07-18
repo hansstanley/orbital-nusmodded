@@ -1,44 +1,122 @@
 import {
-  CircularProgress,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Chip,
+  Divider,
+  Grid,
   Paper,
+  Skeleton,
   Stack,
   TablePagination,
   Typography,
 } from "@mui/material";
-import { useContext, useState } from "react";
-import { ModuleInfoContext } from "../../contexts";
+import { useEffect, useMemo, useRef, useState } from "react";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useMod, useSnackbar } from "../../providers";
 import SearchBar from "./SearchBar";
+import { LoadingBar } from "../../components";
 
 export default function ModuleInfo() {
+  const { getModArray } = useMod();
+  const { pushSnack } = useSnackbar();
+  const [mods, setMods] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { modules, isLoaded } = useContext(ModuleInfoContext);
+  const [rowsPerPage, setRowsPerpage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
+  const [expanded, setExpanded] = useState(false);
+  const barRef = useRef(null);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  useEffect(() => {
+    async function init() {
+      setLoading(true);
+      try {
+        const arr = await getModArray();
+        setMods(arr);
+      } catch (error) {
+        setMods([]);
+        console.error(error);
+        pushSnack({
+          message: "Unable to load modules :(",
+          severity: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    init();
+  }, [getModArray, pushSnack]);
+
+  const filteredMods = useMemo(
+    () =>
+      mods.filter((mod) => {
+        const { moduleCode, title } = mod;
+
+        if (moduleCode.toLowerCase().includes(searchQuery.toLowerCase())) {
+          return true;
+        } else if (title.toLowerCase().includes(searchQuery.toLowerCase())) {
+          return true;
+        } else {
+          return false;
+        }
+      }),
+    [mods, searchQuery]
+  );
+
+  const sortedMods = useMemo(
+    () =>
+      filteredMods.sort((mod1, mod2) =>
+        mod1.moduleCode < mod2.moduleCode ? -1 : 1
+      ),
+    [filteredMods]
+  );
+
+  const visibleMods = useMemo(
+    () =>
+      sortedMods.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [sortedMods, page, rowsPerPage]
+  );
+
+  const handleChangePage = (event, newPage) => setPage(newPage);
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-  const filterData = (mod) => {
-    if (mod.moduleCode.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return true;
-    }
-    if (mod.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return true;
-    }
-    return false;
+    setRowsPerpage(parseInt(event.target.value, 10));
   };
 
+  const handleSearch = (value) => {
+    setPage(0);
+    setSearchQuery(value);
+  };
+
+  const handleOpen = (panel) => (event, isExpanded) =>
+    setExpanded(isExpanded ? panel : false);
+
+  const BarPlaceholder = () => (
+    <Box sx={{ minHeight: barRef?.current?.clientHeight || 0 }} />
+  );
+
   return (
-    <Stack spacing={2} minWidth="100%">
-      <Stack direction="row" justifyContent="space-between">
-        <Paper sx={{ p: 1 }} elevation={3}>
+    <Stack spacing={1}>
+      <Paper
+        ref={barRef}
+        sx={{ position: "absolute", zIndex: "fab" }}
+        elevation={3}
+      >
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          spacing={1}
+          p={1}
+          alignItems="center"
+        >
+          <SearchBar handleSearch={handleSearch} />
           <TablePagination
-            count={modules.filter(filterData).length}
+            component="div"
+            count={filteredMods.length}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
@@ -46,26 +124,67 @@ export default function ModuleInfo() {
             showFirstButton
             showLastButton
           />
-        </Paper>
-        <SearchBar setSearchQuery={setSearchQuery} />
+        </Stack>
+        <LoadingBar loading={loading} isRounded />
+      </Paper>
+      <BarPlaceholder />
+      <Stack>
+        {loading
+          ? null
+          : visibleMods.map((mod) => (
+              <ModuleAccordion
+                key={mod.moduleCode}
+                moduleCode={mod.moduleCode}
+                expanded={expanded === mod.moduleCode}
+                onChange={handleOpen(mod.moduleCode)}
+              />
+            ))}
       </Stack>
-      {isLoaded ? (
-        modules
-          .filter(filterData)
-          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          .map((mod) => (
-            <Paper key={mod.moduleCode} sx={{ p: 1 }} elevation={3}>
-              <Typography variant="overline">{mod.faculty}</Typography>
-              <Typography variant="h6">{mod.moduleCode}</Typography>
-              <Typography variant="body1">
-                {mod.title} ({mod.moduleCredit} MCs)
-              </Typography>
-              <Typography variant="body2">{mod.description}</Typography>
-            </Paper>
-          ))
-      ) : (
-        <CircularProgress sx={{ alignSelf: "center" }} />
-      )}
+      <Divider />
     </Stack>
+  );
+}
+
+function ModuleAccordion({
+  moduleCode,
+  expanded = false,
+  onChange = (event, isExpanded) => {},
+}) {
+  const { getModInfo } = useMod();
+  const [mod, setMod] = useState(null);
+
+  useEffect(() => {
+    async function init() {
+      const info = await getModInfo(moduleCode);
+      setMod(info);
+    }
+
+    if (moduleCode) init();
+  }, [moduleCode, getModInfo]);
+
+  return (
+    <Accordion expanded={expanded} onChange={onChange}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Grid container spacing={2}>
+          <Grid item xs={3}>
+            <Typography sx={{ fontWeight: "bold" }}>
+              {mod ? moduleCode : <Skeleton />}
+            </Typography>
+          </Grid>
+          <Grid item xs={9}>
+            <Typography>{mod ? mod.title : <Skeleton />}</Typography>
+          </Grid>
+        </Grid>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Stack spacing={1}>
+          <Stack direction="row" spacing={1}>
+            <Chip label={mod ? `${mod.moduleCredit} MC` : null} />
+            <Chip label={mod ? mod.faculty : null} />
+          </Stack>
+          <Typography>{mod ? mod.description : <Skeleton />}</Typography>
+        </Stack>
+      </AccordionDetails>
+    </Accordion>
   );
 }
