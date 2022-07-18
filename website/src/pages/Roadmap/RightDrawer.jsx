@@ -1,6 +1,5 @@
 import {
   Divider,
-  IconButton,
   Card,
   Slide,
   CardHeader,
@@ -8,14 +7,16 @@ import {
   SpeedDial,
   SpeedDialIcon,
   SpeedDialAction,
-  Box,
   Fab,
   Zoom,
+  Stack,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import BlockIcon from "@mui/icons-material/Block";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import EditIcon from "@mui/icons-material/Edit";
+import { DIMENSIONS } from "../../utils/constants";
 
 /**
  * Drawer for roadmap modifications.
@@ -90,7 +91,19 @@ export default function RightDrawer({
         >
           <CardHeader subheader={drawerTitle} />
           <Divider />
-          <CardContent>{children[drawerIndex] || "Nothing here."}</CardContent>
+          <CardContent>
+            <Stack spacing={1} divider={<Divider />}>
+              {items[drawerIndex]?.description ? (
+                <Typography
+                  variant="caption"
+                  sx={{ width: DIMENSIONS.BOX_WIDTH }}
+                >
+                  {items[drawerIndex].description}
+                </Typography>
+              ) : null}
+              {children[drawerIndex] || "Nothing here."}
+            </Stack>
+          </CardContent>
         </Card>
       </Slide>
     </>

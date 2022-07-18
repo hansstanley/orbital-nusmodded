@@ -14,6 +14,7 @@ import ModGroupForm from "./ModGroupForm";
 import { stringToInt } from "../../utils/parsers";
 import EditModGroupButton from "./EditModGroupButton";
 import { Droppable } from "react-beautiful-dnd";
+import { DIMENSIONS } from "../../utils/constants";
 
 export default function ModGroupStack({
   title = "Module groups",
@@ -118,8 +119,13 @@ export default function ModGroupStack({
   );
 
   return (
-    <Stack spacing={1} width={320}>
-      <Stack spacing={2} direction="row" justifyContent="space-between">
+    <Stack spacing={1} width={DIMENSIONS.BOX_WIDTH}>
+      <Stack
+        spacing={2}
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Typography variant="h6">{title}</Typography>
         {!isCourse || isAdmin() ? (
           <IconButton color="primary" onClick={handleOpen}>

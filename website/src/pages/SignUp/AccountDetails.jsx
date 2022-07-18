@@ -10,13 +10,14 @@ import {
   Stack,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { useAuthSession } from "../../providers";
+import { useAuthSession, useSnackbar } from "../../providers";
 import { TransitionGroup } from "react-transition-group";
 
 export default function SignUp({ handleNext }) {
+  const { handleSignup } = useAuthSession();
+  const { pushSnack } = useSnackbar();
   const [validateInput, setValidateInput] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { handleSignup } = useAuthSession();
   const emailCheck =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   const passwordCheck = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/;
@@ -90,7 +91,11 @@ export default function SignUp({ handleNext }) {
         });
         handleNext();
       } catch (error) {
-        console.error(error);
+        console.warn(error);
+        pushSnack({
+          message: error.message || "Unable to sign up",
+          severity: "warning",
+        });
       } finally {
         setLoading(false);
       }

@@ -103,3 +103,7 @@ export const SETTINGS = {
     ID: "EXEMPTED_MODULES",
   },
 };
+
+export const DIMENSIONS = {
+  BOX_WIDTH: 320,
+};

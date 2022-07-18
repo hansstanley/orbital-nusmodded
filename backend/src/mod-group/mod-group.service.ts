@@ -51,7 +51,7 @@ export class ModGroupService {
     const modGroup: ModGroup = await this.find(id);
 
     for (let key in updateDto) {
-      if ((updateDto[key] ?? false) && key in modGroup) {
+      if (updateDto[key] !== undefined && key in modGroup) {
         modGroup[key] = updateDto[key];
       }
     }

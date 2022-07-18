@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { useMod, useSnackbar } from "../../providers";
 import { Draggable } from "react-beautiful-dnd";
+import { DIMENSIONS } from "../../utils/constants";
 
 /**
  * A module box that has a detailed information dialog
@@ -140,7 +141,7 @@ export default function ModuleBox({
         >
           {(provided, snapshot) => (
             <Card
-              sx={{ width: 320 }}
+              sx={{ width: DIMENSIONS.BOX_WIDTH }}
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
@@ -151,7 +152,7 @@ export default function ModuleBox({
           )}
         </Draggable>
       ) : (
-        <Card key={moduleCode} sx={{ width: 320 }}>
+        <Card key={moduleCode} sx={{ width: DIMENSIONS.BOX_WIDTH }}>
           {content}
         </Card>
       )}

@@ -133,8 +133,11 @@ function AuthSessionProvider({ children }) {
       },
       { data: { username } }
     );
-    console.log(user);
     if (error) throw error;
+    if (user?.identities.length === 0) {
+      // Dummy user returned
+      throw new Error(`Email ${email} has already been registered!`);
+    }
   };
 
   const handleSignin = async ({ email, password }) => {

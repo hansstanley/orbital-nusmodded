@@ -1,16 +1,12 @@
 import { Button, Stack, Typography } from "@mui/material";
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { LandingContext } from "../../contexts";
 import { useAuthSession } from "../../providers";
 
 export default function Landing() {
   const navigate = useNavigate();
   const { isAuth } = useAuthSession();
-  const { toggleLanding } = useContext(LandingContext);
 
   const handleStart = () => {
-    toggleLanding();
     navigate(isAuth() ? "/roadmap" : "/signup");
   };
 

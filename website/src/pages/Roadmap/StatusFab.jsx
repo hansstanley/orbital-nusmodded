@@ -103,7 +103,7 @@ export default function StatusFab() {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Ok</Button>
+          <Button onClick={handleClose}>Close</Button>
         </DialogActions>
       </Dialog>
     </>
