@@ -135,7 +135,7 @@ function AuthSessionProvider({ children }) {
     );
     if (error) throw error;
     if (user?.identities.length === 0) {
-      // Dummy user returned
+      // Indicates dummy user returned
       throw new Error(`Email ${email} has already been registered!`);
     }
   };
