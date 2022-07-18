@@ -119,7 +119,12 @@ export default function ModGroupStack({
 
   return (
     <Stack spacing={1} width={320}>
-      <Stack spacing={2} direction="row" justifyContent="space-between">
+      <Stack
+        spacing={2}
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Typography variant="h6">{title}</Typography>
         {!isCourse || isAdmin() ? (
           <IconButton color="primary" onClick={handleOpen}>

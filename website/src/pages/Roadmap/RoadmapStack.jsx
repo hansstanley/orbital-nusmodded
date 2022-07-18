@@ -39,7 +39,7 @@ import {
   SETTINGS,
 } from "../../utils/constants";
 import SemesterOrderer from "./SemesterOrderer";
-import RoadmapGenerator from "./RoadmapGenerator";
+// import RoadmapGenerator from "./RoadmapGenerator";
 
 export default function RoadmapStack() {
   const {
@@ -82,7 +82,8 @@ export default function RoadmapStack() {
   );
 
   const onDragEnd = ({ source, destination, draggableId }) => {
-    if (!source || !destination || destination.droppableId === ROADMAP.COURSE_MODS_ID || destination.droppableId === ROADMAP.COURSE_MOD_GROUPS_ID) return;
+    if (!source || !destination) return;
+
     dragMods(
       source.index,
       source.droppableId,
@@ -187,18 +188,25 @@ export default function RoadmapStack() {
               {
                 icon: <BookIcon />,
                 label: "My modules",
-              },
-              {
-                icon: <BackpackIcon />,
-                label: "My module groups",
+                description: "Modules you wish to take can be added below.",
               },
               {
                 icon: <SchoolIcon />,
                 label: "Course modules",
+                description:
+                  "Modules from your course of choice will be shown below.",
+              },
+              {
+                icon: <BackpackIcon />,
+                label: "Course module groups",
+                description:
+                  "Module groups from your course of choice will be shown below.",
               },
               {
                 icon: <NotInterestedIcon />,
                 label: "Exempted modules",
+                description:
+                  "Modules you are exempted from or have already taken can be added below to appease the prerequisite checker.",
               },
             ]}
           >
@@ -208,12 +216,6 @@ export default function RoadmapStack() {
               droppableId={ROADMAP.MY_MODS_ID}
               handleAddMods={handleAddMyMods}
               handleDeleteMod={handleDeleteMyMod}
-            />
-            <ModGroupStack
-              modGroups={modGroups}
-              isDroppable={!locked}
-              droppableId={ROADMAP.COURSE_MOD_GROUPS_ID}
-              isCourse={true}
             />
             <Droppable droppableId={ROADMAP.COURSE_MODS_ID}>
               {(provided) => (
@@ -237,6 +239,12 @@ export default function RoadmapStack() {
                 </Stack>
               )}
             </Droppable>
+            <ModGroupStack
+              modGroups={modGroups}
+              isDroppable={!locked}
+              droppableId={ROADMAP.COURSE_MOD_GROUPS_ID}
+              isCourse={true}
+            />
             <ModStack
               mods={exemptedMods}
               handleAddMods={handleAddExemptedMods}

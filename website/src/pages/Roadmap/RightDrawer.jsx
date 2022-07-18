@@ -1,6 +1,5 @@
 import {
   Divider,
-  IconButton,
   Card,
   Slide,
   CardHeader,
@@ -8,9 +7,10 @@ import {
   SpeedDial,
   SpeedDialIcon,
   SpeedDialAction,
-  Box,
   Fab,
   Zoom,
+  Stack,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import BlockIcon from "@mui/icons-material/Block";
@@ -90,7 +90,16 @@ export default function RightDrawer({
         >
           <CardHeader subheader={drawerTitle} />
           <Divider />
-          <CardContent>{children[drawerIndex] || "Nothing here."}</CardContent>
+          <CardContent>
+            <Stack spacing={1} divider={<Divider />}>
+              {items[drawerIndex]?.description ? (
+                <Typography variant="caption" sx={{ width: 320 }}>
+                  {items[drawerIndex].description}
+                </Typography>
+              ) : null}
+              {children[drawerIndex] || "Nothing here."}
+            </Stack>
+          </CardContent>
         </Card>
       </Slide>
     </>
