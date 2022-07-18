@@ -81,16 +81,18 @@ function AuthSessionProvider({ children }) {
       return null;
     }
 
-    const result = new Profile();
     if (data) {
-      result
+      const result = new Profile()
+        .updateProperty("id", data.id)
         .updateProperty("username", data.username)
         .updateProperty("avatarUrl", data.avatar_url)
         .updateProperty("roadmap", data.roadmap);
 
       setAdmin(data.admin || false);
+      return result;
+    } else {
+      return null;
     }
-    return result;
   }, []);
 
   const isAdmin = useCallback(() => !!admin, [admin]);
