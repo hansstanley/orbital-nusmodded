@@ -70,12 +70,13 @@ function AuthSessionProvider({ children }) {
   };
 
   const getProfile = useCallback(async (userId) => {
-    const { data, error } = await supabase
+    const { data, error, status } = await supabase
       .from("profiles")
       .select()
       .eq("id", userId)
       .single();
-    if (error) {
+
+    if (error && status !== 406) {
       console.error("getProfile", error);
       return null;
     }
@@ -193,19 +194,19 @@ function AuthSessionProvider({ children }) {
       if (user) {
         setLoading(true);
 
-        let userProfile = await getProfile(user.id);
-        if (!userProfile) {
-          userProfile = await createProfile(
-            user.id,
-            user.user_metadata.username
-          );
-        }
-        userProfile = userProfile
-          .updateProperty("id", user.id)
-          .updateProperty("email", user.email);
-        setProfile(userProfile);
-
         try {
+          let userProfile = await getProfile(user.id);
+          if (!userProfile) {
+            userProfile = await createProfile(
+              user.id,
+              user.user_metadata.username
+            );
+          }
+          userProfile = userProfile
+            .updateProperty("id", user.id)
+            .updateProperty("email", user.email);
+          setProfile(userProfile);
+
           await getAccessToken(user.id, userProfile.username);
         } catch (error) {
           console.error(error);
