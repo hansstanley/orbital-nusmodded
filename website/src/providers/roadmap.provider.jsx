@@ -502,7 +502,7 @@ function RoadmapProvider({ children }) {
         );
         return name === temp
           ? getModGroupString(name, 1)
-          : getModGroupString(temp, parseInt(name[name.length - 2]) + 1);
+          : getModGroupString(temp, parseModGroupString(name).count + 1);
       }
 
       let srcDroppable;
