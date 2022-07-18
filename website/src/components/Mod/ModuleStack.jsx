@@ -30,6 +30,7 @@ import {
 import ModuleBox from "./ModuleBox";
 import { Droppable } from "react-beautiful-dnd";
 import ModGroupBox from "../../pages/Roadmap/ModGroupBox";
+import { DIMENSIONS } from "../../utils/constants";
 
 export default function ModuleStack({
   title = "Modules",
@@ -134,7 +135,9 @@ export default function ModuleStack({
       await handleDeleteMod(moduleCode);
       pushSnack({
         message: `${
-          parseModGroupString(moduleCode)?.moduleCode || parseModGroupString(moduleCode)?.name || moduleCode
+          parseModGroupString(moduleCode)?.moduleCode ||
+          parseModGroupString(moduleCode)?.name ||
+          moduleCode
         } deleted!`,
         severity: "success",
       });
@@ -242,7 +245,7 @@ export default function ModuleStack({
   );
 
   return (
-    <Stack spacing={1} width={320}>
+    <Stack spacing={1} width={DIMENSIONS.BOX_WIDTH}>
       <Stack
         spacing={2}
         direction="row"

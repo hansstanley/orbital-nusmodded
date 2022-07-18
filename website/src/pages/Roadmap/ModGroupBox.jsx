@@ -20,6 +20,7 @@ import { useRoadmap, useMod, useSnackbar, useModGroup } from "../../providers";
 import { Draggable } from "react-beautiful-dnd";
 import ResponsiveStack from "../../components/ResponsiveStack";
 import { ModuleStack } from "../../components/Mod";
+import { DIMENSIONS } from "../../utils/constants";
 
 export default function ModGroupBox({
   name = "",
@@ -252,7 +253,7 @@ export default function ModGroupBox({
         <Draggable draggableId={name} index={index} key={name}>
           {(provided, snapshot) => (
             <Card
-              sx={{ width: 320 }}
+              sx={{ width: DIMENSIONS.BOX_WIDTH }}
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
@@ -263,7 +264,7 @@ export default function ModGroupBox({
           )}
         </Draggable>
       ) : (
-        <Card key={name} sx={{ width: 320 }}>
+        <Card key={name} sx={{ width: DIMENSIONS.BOX_WIDTH }}>
           {content}
         </Card>
       )}

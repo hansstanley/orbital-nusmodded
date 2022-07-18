@@ -34,6 +34,7 @@ import {
 } from "../../providers";
 import {
   COLORS,
+  DIMENSIONS,
   ROADMAP,
   SEMESTER_TITLE,
   SETTINGS,
@@ -368,7 +369,7 @@ function ModulePlaceholer({ show = false }) {
           borderRadius: 1,
           borderStyle: "dashed",
           py: 4,
-          width: 320,
+          width: DIMENSIONS.BOX_WIDTH,
         }}
       >
         <Stack direction="row" spacing={1}>

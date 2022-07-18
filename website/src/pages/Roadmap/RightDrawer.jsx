@@ -16,6 +16,7 @@ import { useState } from "react";
 import BlockIcon from "@mui/icons-material/Block";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import EditIcon from "@mui/icons-material/Edit";
+import { DIMENSIONS } from "../../utils/constants";
 
 /**
  * Drawer for roadmap modifications.
@@ -93,7 +94,10 @@ export default function RightDrawer({
           <CardContent>
             <Stack spacing={1} divider={<Divider />}>
               {items[drawerIndex]?.description ? (
-                <Typography variant="caption" sx={{ width: 320 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ width: DIMENSIONS.BOX_WIDTH }}
+                >
                   {items[drawerIndex].description}
                 </Typography>
               ) : null}
