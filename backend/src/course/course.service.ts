@@ -83,7 +83,7 @@ export class CourseService {
     course.id = uuidv4();
 
     for (let key in createDto) {
-      if ((createDto[key] ?? false) && key in course) {
+      if ((createDto[key] !== undefined) && key in course) {
         course[key] = createDto[key];
       }
     }
@@ -101,7 +101,7 @@ export class CourseService {
     const course: Course = await this.find(id);
 
     for (let key in updateDto) {
-      if ((updateDto[key] ?? false) && key in course) {
+      if ((updateDto[key] !== undefined) && key in course) {
         course[key] = updateDto[key];
       }
     }

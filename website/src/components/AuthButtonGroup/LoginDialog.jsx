@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Button,
   TextField,
-  DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
@@ -67,8 +66,10 @@ export default function LoginDialog({ open = false, handleClose = () => {} }) {
 
   return (
     <ResponsiveDialog component="form" open={open} onClose={handleClose}>
-      <DialogTitle>Login</DialogTitle>
       <DialogContent>
+        <DialogContentText variant="h5" sx={{ fontWeight: "bold" }}>
+          Login
+        </DialogContentText>
         <DialogContentText
           variant="h3"
           color="primary"

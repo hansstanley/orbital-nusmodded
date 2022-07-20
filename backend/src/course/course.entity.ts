@@ -28,6 +28,9 @@ export class Course extends Model {
   @Column
   description: string;
 
+  @Column
+  url: string;
+
   @BelongsToMany(() => Mod, () => CourseMod)
   mods: Mod[];
 

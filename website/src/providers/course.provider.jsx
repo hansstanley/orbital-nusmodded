@@ -175,11 +175,11 @@ function CourseProvider({ children }) {
     }
   };
 
-  const createCourse = async ({ title, department, description }) => {
+  const createCourse = async ({ title, department, description, url }) => {
     const { status, data } = await makeRequest({
       method: "post",
       route: "/course/new",
-      data: { title, department, description },
+      data: { title, department, description, url },
       isPublic: false,
     });
 
@@ -191,11 +191,15 @@ function CourseProvider({ children }) {
     }
   };
 
-  const updateCourse = async (courseId, { title, department, description }) => {
+  const updateCourse = async (
+    courseId,
+    { title, department, description, url }
+  ) => {
     const params = {};
     if (title) params.title = title;
     if (department) params.department = department;
     if (description) params.description = description;
+    params.url = url;
 
     const { status, data } = await makeRequest({
       method: "post",

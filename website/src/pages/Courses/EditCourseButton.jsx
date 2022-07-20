@@ -32,6 +32,7 @@ export default function EditCourseButton({
         title: data.get("title"),
         department: data.get("department"),
         description: data.get("description"),
+        url: data.get("url"),
       });
       pushSnack({
         message: `Updated ${newCourse.title}!`,

@@ -61,6 +61,15 @@ export default function CourseFormDialog({
             minRows={4}
             maxRows={10}
           />
+          <TextField
+            name="url"
+            label="Official URL"
+            type="url"
+            margin="dense"
+            helperText="Link to the NUS official page of the course"
+            defaultValue={course.url}
+            fullWidth
+          />
           <Collapse in={!!validationMessage}>
             <Alert severity="error">{validationMessage}</Alert>
           </Collapse>
