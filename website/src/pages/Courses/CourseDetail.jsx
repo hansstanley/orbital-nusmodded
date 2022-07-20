@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import {
+  Box,
+  Button,
   Divider,
   LinearProgress,
   Skeleton,
@@ -8,7 +10,7 @@ import {
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { NIL as NIL_UUID } from "uuid";
-import { Box } from "@mui/system";
+import LaunchIcon from "@mui/icons-material/Launch";
 import { Course } from "../../models";
 import { ResponsiveStack } from "../../components";
 import { useCourse } from "../../providers";
@@ -146,9 +148,28 @@ export default function CourseDetail() {
           <DeleteCourseButton variant="outlined" course={course} />
         </Stack>
       </Stack>
-      <Typography variant="h3" color="primary">
-        {loading ? <Skeleton /> : course.title}
-      </Typography>
+      <Stack
+        direction="row"
+        spacing={1}
+        justifyContent="space-between"
+        alignItems="flex-end"
+      >
+        <Typography variant="h3" color="primary">
+          {loading ? <Skeleton /> : course.title}
+        </Typography>
+        {course.url ? (
+          <a
+            href={course.url}
+            target="_blank"
+            rel="noreferrer"
+            style={{ textDecoration: "none" }}
+          >
+            <Button variant="outlined" endIcon={<LaunchIcon />}>
+              Official page
+            </Button>
+          </a>
+        ) : null}
+      </Stack>
       <Box>
         <LinearProgress
           variant={loading ? "indeterminate" : "determinate"}

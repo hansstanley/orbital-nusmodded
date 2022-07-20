@@ -1,4 +1,4 @@
-import { IsString } from "class-validator";
+import { IsString, IsUrl } from "class-validator";
 
 export class CreateCourseDto {
   @IsString()
@@ -9,4 +9,7 @@ export class CreateCourseDto {
 
   @IsString()
   department: string;
+
+  @IsUrl()
+  url: string;
 }
