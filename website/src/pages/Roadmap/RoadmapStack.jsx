@@ -289,7 +289,7 @@ function Semester({
     try {
       await handleUndoMod();
       pushSnack({
-        message: `Delete undoed!`,
+        message: `Delete undone!`,
         severity: "success",
       });
     } catch (error) {
@@ -300,7 +300,7 @@ function Semester({
       });
     }
   }
-  
+
   const handleDeleteMod = (moduleCode) => () => {
     try {
       onDeleteMod(moduleCode);
