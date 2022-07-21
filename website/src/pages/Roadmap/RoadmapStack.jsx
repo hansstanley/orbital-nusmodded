@@ -63,6 +63,8 @@ export default function RoadmapStack() {
   const [locked, setLocked] = useState(false);
   const [courseMods, setCourseMods] = useState([]);
   const [modGroups, setModGroups] = useState([]);
+  let deletedSem = "";
+  let deletedSemCodes = [];
 
   const allMods = getAllMods();
 
@@ -110,6 +112,8 @@ export default function RoadmapStack() {
     const targetCodes =
       targetSem?.modules?.filter((code) => code !== moduleCode) || [];
 
+    deletedSem = semesterId;
+    deletedSemCodes = targetSem?.modules || [];
     setModulesById(semesterId, targetCodes);
   };
 
@@ -118,6 +122,12 @@ export default function RoadmapStack() {
 
   const handleAddExemptedMods = handleAddMods(ROADMAP.EXEMPTED_MODS_ID);
   const handleDeleteExemptedMod = handleDeleteMod(ROADMAP.EXEMPTED_MODS_ID);
+
+  const handleUndo = () => {
+    if (deletedSem !== "" && deletedSemCodes !== []) {
+      setModulesById(deletedSem, deletedSemCodes);
+    }
+  };
 
   const toggleLocked = () => setLocked((prev) => !prev);
 
@@ -180,6 +190,7 @@ export default function RoadmapStack() {
                 key={sem.id}
                 sem={sem}
                 onDeleteMod={handleDeleteMod(sem.id)}
+                handleUndoMod={handleUndo}
                 disableDrag={locked}
               />
             ))
@@ -217,6 +228,7 @@ export default function RoadmapStack() {
               droppableId={ROADMAP.MY_MODS_ID}
               handleAddMods={handleAddMyMods}
               handleDeleteMod={handleDeleteMyMod}
+              handleUndoMod={handleUndo}
             />
             <Droppable droppableId={ROADMAP.COURSE_MODS_ID}>
               {(provided) => (
@@ -263,6 +275,7 @@ export default function RoadmapStack() {
 function Semester({
   sem,
   onDeleteMod = (moduleCode) => {},
+  handleUndoMod = async () => {},
   disableDrag = false,
 }) {
   const { id, year, semester, modules, bgColor } = sem;
@@ -272,12 +285,29 @@ function Semester({
   const isDarkTheme = useTheme().palette.mode === "dark";
   const bgHex = COLORS[bgColor || "deepOrange"][isDarkTheme ? 900 : 100];
 
+  const handleUndo = async () => {
+    try {
+      await handleUndoMod();
+      pushSnack({
+        message: `Delete undoed!`,
+        severity: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: error.message || `Unable to undo delete!`,
+        severity: "error",
+      });
+    }
+  }
+  
   const handleDeleteMod = (moduleCode) => () => {
     try {
       onDeleteMod(moduleCode);
       pushSnack({
         message: `${moduleCode} deleted!`,
         severity: "success",
+        action: <Button color="inherit" size="small" onClick={handleUndo}>Undo</Button>
       });
     } catch (error) {
       console.error(error);
