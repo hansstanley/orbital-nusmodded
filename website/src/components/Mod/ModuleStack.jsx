@@ -40,6 +40,7 @@ export default function ModuleStack({
   handleAddMods = async (moduleCodes = []) => [],
   handleDeleteMod = async (moduleCode) => {},
   handleSelectMod = async (moduleCode) => {},
+  handleUndoMod = async () => {},
   isCourse = false,
   isSelect = false,
 }) {
@@ -129,6 +130,25 @@ export default function ModuleStack({
     [mods, search]
   );
 
+  const handleUndo = async () => {
+    setLoading(true);
+    try {
+      await handleUndoMod();
+      pushSnack({
+        message: `Delete undoed!`,
+        severity: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      pushSnack({
+        message: error.message || `Unable to undo delete!`,
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const handleDelete = (moduleCode) => async () => {
     setLoading(true);
     try {
@@ -140,6 +160,7 @@ export default function ModuleStack({
           moduleCode
         } deleted!`,
         severity: "success",
+        action: <Button color="inherit" size="small" onClick={handleUndo}>Undo</Button>
       });
     } catch (error) {
       console.error(error);
