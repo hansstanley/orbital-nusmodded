@@ -1,6 +1,9 @@
 # NUSModded
 
-NUSModded is a project that aims to produce a module roadmap for incoming students to NUS.
+NUSModded is a project that aims to assist students of NUS, especially freshmen with module planning.
+
+We hope to make the module planning process significantly easier for most students, by being a central place for the module requirements of each course and enabling each student to plan their module roadmap over the entire course of study based on their requirements and preferences. The students would also be able to view issues, if any, in their roadmap such as not meeting the module application criteria.
+
 
 ## Installation
 
