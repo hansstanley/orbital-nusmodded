@@ -9,6 +9,7 @@ import {
   Zoom,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { v4 } from "uuid";
 import { LoadingBar } from "../../components";
 
 export default function SettingsRow({
@@ -17,19 +18,23 @@ export default function SettingsRow({
   showSuccess = false,
   children,
 }) {
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState({
+    id: null,
+    value: false,
+  });
 
   useEffect(() => {
     if (showSuccess) {
-      setSuccess(true);
+      const id = v4();
+      setSuccess({ id, value: true });
       setTimeout(() => {
-        setSuccess(false);
+        setSuccess((prev) => (prev.id === id ? { id, value: false } : prev));
       }, 3000);
     }
   }, [showSuccess]);
 
   useEffect(() => {
-    if (loading) setSuccess(false);
+    if (loading) setSuccess(({ id, value }) => ({ id, value: false }));
   }, [loading]);
 
   return (
@@ -47,7 +52,7 @@ export default function SettingsRow({
         </Typography>
         <Divider orientation="vertical" />
         {children}
-        <Collapse in={success} orientation="horizontal">
+        <Collapse in={success.value} orientation="horizontal">
           <Alert severity="success">Saved!</Alert>
         </Collapse>
         <Zoom in={loading}>
@@ -57,7 +62,7 @@ export default function SettingsRow({
       <Stack display={{ sm: "none", xs: "flow" }} spacing={1} width="100%">
         <Typography variant="h6">{title}</Typography>
         <Box>{children}</Box>
-        <Collapse in={success}>
+        <Collapse in={success.value}>
           <Alert severity="success">Saved!</Alert>
         </Collapse>
         <LoadingBar loading={loading} isRounded />

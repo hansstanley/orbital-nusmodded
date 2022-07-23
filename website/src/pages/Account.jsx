@@ -5,18 +5,23 @@ import {
   Button,
   Card,
   CardContent,
+  Collapse,
+  IconButton,
   Stack,
   TextField,
+  Tooltip,
 } from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { AuthGuard, ResponsiveStack } from "../components";
 import { useAuthSession, useSnackbar } from "../providers";
 
 export default function Account() {
+  const { profile, updateProfile } = useAuthSession();
+  const { pushSnack } = useSnackbar();
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  const { profile, updateProfile } = useAuthSession();
-  const { pushSnack } = useSnackbar();
+  const [highlight, setHighlight] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -55,14 +60,26 @@ export default function Account() {
     }
   };
 
+  const handleAvatarClick = () => setHighlight((prev) => !prev);
+
   return (
     <AuthGuard>
       <ResponsiveStack>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Avatar
-            src={avatarUrl}
-            sx={{ height: 240, width: 240, bgcolor: "primary.main" }}
-          />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-start",
+          }}
+        >
+          <Tooltip title="Change avatar">
+            <IconButton onClick={handleAvatarClick}>
+              <Avatar
+                src={avatarUrl}
+                sx={{ height: 240, width: 240, bgcolor: "primary.main" }}
+              />
+            </IconButton>
+          </Tooltip>
         </Box>
         <Card sx={{ flex: 1 }}>
           <CardContent
@@ -83,13 +100,21 @@ export default function Account() {
                 value={username || ""}
                 onChange={(e) => setUsername(e.target.value)}
               />
-              <TextField
-                id="avatar"
-                label="Avatar URL"
-                variant="outlined"
-                value={avatarUrl || ""}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-              />
+              <Stack direction="row" alignItems="center">
+                <Collapse in={highlight} orientation="horizontal" unmountOnExit>
+                  <Avatar sx={{ bgcolor: "green", mr: 2 }}>
+                    <ArrowForwardIcon />
+                  </Avatar>
+                </Collapse>
+                <TextField
+                  id="avatar"
+                  label="Avatar URL"
+                  variant="outlined"
+                  value={avatarUrl || ""}
+                  onChange={(e) => setAvatarUrl(e.target.value)}
+                  fullWidth
+                />
+              </Stack>
               <Button
                 variant="contained"
                 onClick={handleUpdate}

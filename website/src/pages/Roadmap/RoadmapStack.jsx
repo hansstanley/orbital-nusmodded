@@ -40,6 +40,7 @@ import {
   SETTINGS,
 } from "../../utils/constants";
 import SemesterOrderer from "./SemesterOrderer";
+import { useNavigate } from "react-router-dom";
 // import RoadmapGenerator from "./RoadmapGenerator";
 
 export default function RoadmapStack() {
@@ -61,6 +62,7 @@ export default function RoadmapStack() {
   const { pushSnack } = useSnackbar();
 
   const [locked, setLocked] = useState(false);
+  const [courseId, setCourseId] = useState(null);
   const [courseMods, setCourseMods] = useState([]);
   const [modGroups, setModGroups] = useState([]);
   let deletedSem = "";
@@ -149,6 +151,7 @@ export default function RoadmapStack() {
     async function loadCourseMods() {
       try {
         const courseId = getSetting(SETTINGS.COURSE.ID);
+        setCourseId(courseId);
         if (!courseId) return;
 
         const mods = await getCourseMods(courseId);
@@ -169,6 +172,48 @@ export default function RoadmapStack() {
     getSetting,
     pushSnack,
   ]);
+
+  const handleCourseMods = () => {
+    const visibleMods = courseMods.filter(
+      (mod) => !getAllMods().includes(mod.moduleCode)
+    );
+
+    return (
+      <Droppable droppableId={ROADMAP.COURSE_MODS_ID}>
+        {(provided) => (
+          <Stack
+            spacing={2}
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+          >
+            {visibleMods.length ? (
+              visibleMods.map((mod, index) => (
+                <ModuleBox
+                  key={mod.moduleCode + ROADMAP.COURSE_MODS_ID}
+                  moduleCode={mod.moduleCode}
+                  isDraggable={!locked}
+                  draggableId={mod.moduleCode + ROADMAP.COURSE_MODS_ID}
+                  index={index}
+                />
+              ))
+            ) : (
+              <Box
+                sx={{
+                  width: 320,
+                  borderStyle: "dashed",
+                  borderRadius: 1,
+                  p: 2,
+                }}
+              >
+                <Typography>All course modules have been added!</Typography>
+              </Box>
+            )}
+            {provided.placeholder}
+          </Stack>
+        )}
+      </Droppable>
+    );
+  };
 
   return (
     <>
@@ -230,34 +275,17 @@ export default function RoadmapStack() {
               handleDeleteMod={handleDeleteMyMod}
               handleUndoMod={handleUndo}
             />
-            <Droppable droppableId={ROADMAP.COURSE_MODS_ID}>
-              {(provided) => (
-                <Stack
-                  spacing={2}
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                >
-                  {courseMods.map((mod, index) =>
-                    getAllMods().includes(mod.moduleCode) ? null : (
-                      <ModuleBox
-                        key={mod.moduleCode + ROADMAP.COURSE_MODS_ID}
-                        moduleCode={mod.moduleCode}
-                        isDraggable={!locked}
-                        draggableId={mod.moduleCode + ROADMAP.COURSE_MODS_ID}
-                        index={index}
-                      />
-                    )
-                  )}
-                  {provided.placeholder}
-                </Stack>
-              )}
-            </Droppable>
-            <ModGroupStack
-              modGroups={modGroups}
-              isDroppable={!locked}
-              droppableId={ROADMAP.COURSE_MOD_GROUPS_ID}
-              isCourse={true}
-            />
+            {courseId ? handleCourseMods() : <CourseItemPlaceholder />}
+            {courseId ? (
+              <ModGroupStack
+                modGroups={modGroups}
+                isDroppable={!locked}
+                droppableId={ROADMAP.COURSE_MOD_GROUPS_ID}
+                isCourse={true}
+              />
+            ) : (
+              <CourseItemPlaceholder />
+            )}
             <ModStack
               mods={exemptedMods}
               handleAddMods={handleAddExemptedMods}
@@ -299,7 +327,7 @@ function Semester({
         severity: "error",
       });
     }
-  }
+  };
 
   const handleDeleteMod = (moduleCode) => () => {
     try {
@@ -307,7 +335,11 @@ function Semester({
       pushSnack({
         message: `${moduleCode} deleted!`,
         severity: "success",
-        action: <Button color="inherit" size="small" onClick={handleUndo}>Undo</Button>
+        action: (
+          <Button color="inherit" size="small" onClick={handleUndo}>
+            Undo
+          </Button>
+        ),
       });
     } catch (error) {
       console.error(error);
@@ -420,5 +452,20 @@ function SemesterSkeleton() {
         </Skeleton>
       ))}
     </Stack>
+  );
+}
+
+function CourseItemPlaceholder() {
+  const navigate = useNavigate();
+
+  const handleNavigateSettings = () => navigate("/settings");
+
+  return (
+    <Box sx={{ width: 320 }}>
+      <Typography>
+        Please choose a course from
+        <Button onClick={handleNavigateSettings}>Settings</Button>
+      </Typography>
+    </Box>
   );
 }

@@ -7,14 +7,7 @@ import {
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { AuthGuard } from "../../components";
-import { ModuleStack } from "../../components/Mod";
-import {
-  useAuthSession,
-  useBackend,
-  useCourse,
-  useSettings,
-  useSnackbar,
-} from "../../providers";
+import { useCourse, useSettings, useSnackbar } from "../../providers";
 import { SETTINGS } from "../../utils/constants";
 import SettingsRow from "./SettingsRow";
 
@@ -25,28 +18,28 @@ const rowIds = {
 };
 
 export default function Settings() {
-  const { isAuth } = useAuthSession();
-  const { makeRequest } = useBackend();
   const { loading: loadingCourses, getCourseArray } = useCourse();
   const { pushSnack } = useSnackbar();
-  const { loading, getSetting, setCourseId, setMCLimit, setExemptedModules } = useSettings();
+  const { loading, getSetting, setCourseId, setMCLimit } = useSettings();
+  const [init, setInit] = useState(true);
   const [loadingRow, setLoadingRow] = useState([]);
   const [successRow, setSuccessRow] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [maxMCs, setMaxMCs] = useState(23);
-  const [exemptedMods, setExemptedMods] = useState([]);
   const arrMCs = [...Array(39).keys()].map((x) => (x += 12));
 
   useEffect(() => {
     if (loading) {
-      setLoadingRow([SETTINGS.COURSE.ID, SETTINGS.MC_LIMIT.ID]);
+      if (init) {
+        setLoadingRow([SETTINGS.COURSE.ID, SETTINGS.MC_LIMIT.ID]);
+        setInit(false);
+      }
     } else {
       setSelectedCourse(getSetting(SETTINGS.COURSE.ID) || "");
       setMaxMCs(getSetting(SETTINGS.MC_LIMIT.ID) || 23);
-      setExemptedMods(getSetting(SETTINGS.EXEMPTED_MODULES) || []);
       setLoadingRow([]);
     }
-  }, [loading, getSetting]);
+  }, [init, loading, getSetting]);
 
   const sortCourses = useCallback(() => {
     let courses = getCourseArray();
@@ -62,6 +55,7 @@ export default function Settings() {
 
     try {
       await setCourseId(newCourseId);
+      setSuccessRow(rowIds.course);
     } catch (error) {
       console.error(error);
       pushSnack({
@@ -82,6 +76,7 @@ export default function Settings() {
 
     try {
       await setMCLimit(newMaxMCs);
+      setSuccessRow(rowIds.maxMCs);
     } catch (error) {
       console.error(error);
       pushSnack({
@@ -90,47 +85,6 @@ export default function Settings() {
       });
     } finally {
       setLoadingRow((prev) => prev.filter((id) => id !== rowIds.maxMCs));
-    }
-  };
-
-  const handleAddExemptedModules = async (moduleCodes = []) => {
-    const newCodes = moduleCodes.filter((code) => !exemptedMods.includes(code));
-
-    const holdingCodes = newCodes.concat(exemptedMods?.modules || []);
-
-    setSuccessRow(null);
-    setLoadingRow((prev) => prev.concat([rowIds.exemptedModules]));
-
-    try {
-      await setExemptedModules(holdingCodes);
-    } catch (error) {
-      console.error(error);
-      pushSnack({
-        message: error.message || "Unable to save exempted modules",
-        severity: "error",
-      });
-    } finally {
-      setLoadingRow((prev) => prev.filter((id) => id !== rowIds.exemptedModules));
-    }
-    return newCodes;
-  };
-
-  const handleDeleteExemptedModules = async (moduleCode) => {
-    const holdingCodes = exemptedMods?.modules?.filter((code) => code !== moduleCode) || [];
-
-    setSuccessRow(null);
-    setLoadingRow((prev) => prev.concat([rowIds.exemptedModules]));
-
-    try {
-      await setExemptedModules(holdingCodes);
-    } catch (error) {
-      console.error(error);
-      pushSnack({
-        message: error.message || "Unable to save exempted modules",
-        severity: "error",
-      });
-    } finally {
-      setLoadingRow((prev) => prev.filter((id) => id !== rowIds.exemptedModules));
     }
   };
 
