@@ -20,7 +20,8 @@ import { useRoadmap, useMod, useSnackbar, useModGroup } from "../../providers";
 import { Draggable } from "react-beautiful-dnd";
 import ResponsiveStack from "../../components/ResponsiveStack";
 import { ModuleStack } from "../../components/Mod";
-import { DIMENSIONS } from "../../utils/constants";
+import { NUSMODS, DIMENSIONS } from "../../utils/constants";
+import LaunchIcon from "@mui/icons-material/Launch";
 
 export default function ModGroupBox({
   name = "",
@@ -138,11 +139,32 @@ export default function ModGroupBox({
               <DialogContentText>
                 {loading ? <Skeleton /> : mod.description || "No description."}
               </DialogContentText>
+              <Divider />
+              <DialogContentText>
+                {loading ? <Skeleton /> : mod.prerequisite ? "Prerequisites: " + mod.prerequisite :  "No prerequisites."}
+              </DialogContentText>
+              <Divider />
+              <DialogContentText>
+                {loading ? <Skeleton /> : mod.preclusion.length !== 0 
+                ? "Preclusion" + (mod.preclusion.length > 1 ? "s: " : ": ") + mod.preclusion.join(", ") :  "No preclusions."}
+              </DialogContentText>
             </Stack>
           </DialogContent>
           <Divider />
           <DialogActions>
-            <Button onClick={handleCloseDialog}>Close</Button>
+            <Stack direction="row" spacing={1}>
+              <a
+                href={`${NUSMODS.MOD_PAGE_URL}/${mod.moduleCode}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{ textDecoration: "none" }}
+              >
+                <Button variant="outlined" endIcon={<LaunchIcon />}>
+                  NUSMods page
+                </Button>
+              </a>
+              <Button onClick={handleCloseDialog}>Close</Button>
+            </Stack>
           </DialogActions>
         </Dialog>
       ) : null}

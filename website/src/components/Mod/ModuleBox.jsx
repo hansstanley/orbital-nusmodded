@@ -16,9 +16,10 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import LaunchIcon from "@mui/icons-material/Launch";
 import { useMod, useSnackbar } from "../../providers";
 import { Draggable } from "react-beautiful-dnd";
-import { DIMENSIONS } from "../../utils/constants";
+import { NUSMODS, DIMENSIONS } from "../../utils/constants";
 
 /**
  * A module box that has a detailed information dialog
@@ -72,6 +73,8 @@ export default function ModuleBox({
       <Typography variant="body2">Unknown module {moduleCode}</Typography>
     </CardContent>
   );
+  
+  const nusmodsUrl = `${NUSMODS.MOD_PAGE_URL}/${moduleCode}`;
 
   const dialog = mod ? (
     <Dialog onClose={handleCloseDialog} open={dialogOpen} maxWidth="md">
@@ -91,11 +94,32 @@ export default function ModuleBox({
           <DialogContentText>
             {loading ? <Skeleton /> : mod.description || "No description."}
           </DialogContentText>
+          <Divider />
+          <DialogContentText>
+            {loading ? <Skeleton /> : mod.prerequisite ? "Prerequisites: " + mod.prerequisite :  "No prerequisites."}
+          </DialogContentText>
+          <Divider />
+          <DialogContentText>
+            {loading ? <Skeleton /> : mod.preclusion.length !== 0 
+            ? "Preclusion" + (mod.preclusion.length > 1 ? "s: " : ": ") + mod.preclusion.join(", ") :  "No preclusions."}
+          </DialogContentText>
         </Stack>
       </DialogContent>
       <Divider />
       <DialogActions>
-        <Button onClick={handleCloseDialog}>Close</Button>
+        <Stack direction="row" spacing={1}>
+          <a
+            href={nusmodsUrl}
+            target="_blank"
+            rel="noreferrer"
+            style={{ textDecoration: "none" }}
+          >
+            <Button variant="outlined" endIcon={<LaunchIcon />}>
+              NUSMods page
+            </Button>
+          </a>
+          <Button onClick={handleCloseDialog}>Close</Button>
+        </Stack>
       </DialogActions>
     </Dialog>
   ) : null;

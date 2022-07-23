@@ -404,7 +404,7 @@ function RoadmapProvider({ children }) {
   );
 
   const checkSemestersPreclusion = useCallback(
-    async (roadmap, module) => {
+    async (roadmap = []) => {
       let issues = [];
 
       for (let sem of roadmap) {
@@ -450,6 +450,44 @@ function RoadmapProvider({ children }) {
     [getModInfo, isModGroupString, parseModGroupString]
   );
 
+  const checkSemestersAvailability = useCallback(
+    async (roadmap = []) => {
+      let issues = [];
+
+      for (let sem of roadmap) {
+        if (!sem) continue;
+        if (!Object.keys(SEMESTER_TITLE).includes(`${sem.semester}`)) continue;
+
+        const semester = sem.semester;
+
+        const mods = sem.modules || [];
+        const moduleCodes = mods.map((mod) =>
+          isModGroupString(mod) ? parseModGroupString(mod)?.moduleCode : mod
+        );
+        const modInfos = await Promise.all(
+          moduleCodes.map((code) => getModInfo(code))
+        );
+
+        for (let info of modInfos) {
+          if (!info || !Array.isArray(info.semesterData)) continue;
+          const isAvailable = info.semesterData.reduce(
+            (prev, curr) => prev || curr.semester === semester,
+            false
+          );
+          if (!isAvailable) {
+            issues.push({
+              severity: "error",
+              message: `${info.moduleCode} is not offered in ${SEMESTER_TITLE[semester]}.`,
+            });
+          }
+        }
+      }
+
+      return issues;
+    },
+    [getModInfo, isModGroupString, parseModGroupString]
+  );
+
   const updateModuleGroup = useCallback(
     ({ name, count, moduleCode }, newModuleCode) => {
       if (!Array.isArray(roadmap)) return null;
@@ -479,7 +517,8 @@ function RoadmapProvider({ children }) {
     issues = issues
       .concat(await checkSemestersMC(roadmap))
       .concat(await checkSemestersPrereq(roadmap))
-      .concat(await checkSemestersPreclusion(roadmap));
+      .concat(await checkSemestersPreclusion(roadmap))
+      .concat(await checkSemestersAvailability(roadmap));
 
     return issues;
   }, [
@@ -487,6 +526,7 @@ function RoadmapProvider({ children }) {
     checkSemestersMC,
     checkSemestersPrereq,
     checkSemestersPreclusion,
+    checkSemestersAvailability,
   ]);
 
   const dragMods = useCallback(

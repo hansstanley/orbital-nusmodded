@@ -20,7 +20,9 @@ const AuthSessionContext = createContext({
   isAdmin: () => false,
   handleSignup: async ({ username, email, password }) => {},
   handleSignin: async ({ email, password }) => {},
+  handleSigninWithGoogle: async () => {},
   handleSignout: async () => {},
+  handlePasswordReset: async ({ email }) => {},
   updateProfile: async ({ id, ...updates }) => new Profile(),
 });
 
@@ -154,8 +156,19 @@ function AuthSessionProvider({ children }) {
     if (error) throw error;
   };
 
+  const handleSigninWithGoogle = async () => {
+    const { error } = await supabase.auth.signIn({
+      provider: "google",
+    });
+    if (error) throw error;
+  };
+
   const handleSignout = useCallback(async () => {
     await supabase.auth.signOut();
+  }, []);
+
+  const handlePasswordReset = useCallback(async ({ email }) => {
+    await supabase.auth.api.resetPasswordForEmail(email);
   }, []);
 
   useEffect(() => {
@@ -171,6 +184,7 @@ function AuthSessionProvider({ children }) {
         case AUTH_EVENT.USER_DELETED:
           setUser(null);
           break;
+        case AUTH_EVENT.PASSWORD_RECOVERY:
         default:
       }
     });
@@ -236,7 +250,9 @@ function AuthSessionProvider({ children }) {
     isAdmin,
     handleSignup,
     handleSignin,
+    handleSigninWithGoogle,
     handleSignout,
+    handlePasswordReset,
     updateProfile,
   };
 

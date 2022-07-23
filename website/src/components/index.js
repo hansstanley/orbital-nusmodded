@@ -1,3 +1,4 @@
+import AltAuth from "./AltAuth";
 import AppBar from "./AppBar";
 import AuthGuard from "./AuthGuard";
 import LoadingBar from "./LoadingBar";
@@ -11,6 +12,7 @@ import ResponsiveStack from "./ResponsiveStack";
 import Router from "./routes/Router";
 
 export {
+  AltAuth,
   AppBar,
   AuthGuard,
   LoadingBar,

@@ -1,8 +1,10 @@
 import {
   Accordion,
+  AccordionActions,
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Chip,
   Divider,
   Grid,
@@ -14,9 +16,11 @@ import {
 } from "@mui/material";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useMod, useSnackbar } from "../../providers";
+import LaunchIcon from "@mui/icons-material/Launch";
+import { useMod, useRoadmap, useSnackbar } from "../../providers";
 import SearchBar from "./SearchBar";
 import { LoadingBar } from "../../components";
+import { NUSMODS, ROADMAP } from "../../utils/constants";
 
 export default function ModuleInfo() {
   const { getModArray } = useMod();
@@ -151,6 +155,8 @@ function ModuleAccordion({
   onChange = (event, isExpanded) => {},
 }) {
   const { getModInfo } = useMod();
+  const { getAllMods, getSemesterById, setModulesById } = useRoadmap();
+  const { pushSnack } = useSnackbar();
   const [mod, setMod] = useState(null);
 
   useEffect(() => {
@@ -161,6 +167,25 @@ function ModuleAccordion({
 
     if (moduleCode) init();
   }, [moduleCode, getModInfo]);
+
+  const handleAddMod = () => {
+    if (getAllMods().includes(moduleCode)) {
+      pushSnack({
+        message: `${moduleCode} is already in the roadmap.`,
+        severity: "warning",
+      });
+      return;
+    }
+
+    const myMods = getSemesterById(ROADMAP.MY_MODS_ID)?.modules || [];
+    setModulesById(ROADMAP.MY_MODS_ID, myMods.concat([moduleCode]));
+    pushSnack({
+      message: `${moduleCode} has been added to My Modules!`,
+      severity: "success",
+    });
+  };
+
+  const nusmodsUrl = `${NUSMODS.MOD_PAGE_URL}/${moduleCode}`;
 
   return (
     <Accordion expanded={expanded} onChange={onChange}>
@@ -182,9 +207,35 @@ function ModuleAccordion({
             <Chip label={mod ? `${mod.moduleCredit} MC` : null} />
             <Chip label={mod ? mod.faculty : null} />
           </Stack>
-          <Typography>{mod ? mod.description : <Skeleton />}</Typography>
+          <Divider />
+          <Typography>{mod ? mod.description || "This module does not have a description" : <Skeleton />}</Typography>
+          <Divider />
+          <Stack direction="row" spacing={1}>
+          {mod ? mod.prerequisite ? "Prerequisites: " + mod.prerequisite : "No prerequisites" : null}
+          </Stack>
+          <Divider />
+          <Stack direction="row" spacing={1}>
+            <Typography position={"relative"} top={3}>{mod ? mod.preclusion.length !== 0  ? "Preclusions: " : null : null}</Typography>
+            {mod ? mod.preclusion.length !== 0  ? mod.preclusion.map(mod => <Chip label={mod} />) : "No preclusions" : null}
+          </Stack>
+          <Divider />
         </Stack>
       </AccordionDetails>
+      <AccordionActions>
+        <Stack direction="row" spacing={1}>
+          <Button onClick={handleAddMod}>Add to roadmap</Button>
+          <a
+            href={nusmodsUrl}
+            target="_blank"
+            rel="noreferrer"
+            style={{ textDecoration: "none" }}
+          >
+            <Button variant="outlined" endIcon={<LaunchIcon />}>
+              NUSMods page
+            </Button>
+          </a>
+        </Stack>
+      </AccordionActions>
     </Accordion>
   );
 }
