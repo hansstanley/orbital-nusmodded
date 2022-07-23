@@ -17,7 +17,12 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LaunchIcon from "@mui/icons-material/Launch";
-import { useMod, useRoadmap, useSnackbar } from "../../providers";
+import {
+  useAuthSession,
+  useMod,
+  useRoadmap,
+  useSnackbar,
+} from "../../providers";
 import SearchBar from "./SearchBar";
 import { LoadingBar } from "../../components";
 import { NUSMODS, ROADMAP } from "../../utils/constants";
@@ -154,6 +159,7 @@ function ModuleAccordion({
   expanded = false,
   onChange = (event, isExpanded) => {},
 }) {
+  const { isAuth } = useAuthSession();
   const { getModInfo } = useMod();
   const { getAllMods, getSemesterById, setModulesById } = useRoadmap();
   const { pushSnack } = useSnackbar();
@@ -208,22 +214,44 @@ function ModuleAccordion({
             <Chip label={mod ? mod.faculty : null} />
           </Stack>
           <Divider />
-          <Typography>{mod ? mod.description || "This module does not have a description" : <Skeleton />}</Typography>
+          <Typography>
+            {mod ? (
+              mod.description || "This module does not have a description"
+            ) : (
+              <Skeleton />
+            )}
+          </Typography>
           <Divider />
           <Stack direction="row" spacing={1}>
-          {mod ? mod.prerequisite ? "Prerequisites: " + mod.prerequisite : "No prerequisites" : null}
+            {mod
+              ? mod.prerequisite
+                ? "Prerequisites: " + mod.prerequisite
+                : "No prerequisites"
+              : null}
           </Stack>
           <Divider />
           <Stack direction="row" spacing={1}>
-            <Typography position={"relative"} top={3}>{mod ? mod.preclusion.length !== 0  ? "Preclusions: " : null : null}</Typography>
-            {mod ? mod.preclusion.length !== 0  ? mod.preclusion.map(mod => <Chip label={mod} />) : "No preclusions" : null}
+            <Typography position={"relative"} top={3}>
+              {mod
+                ? mod.preclusion.length !== 0
+                  ? "Preclusions: "
+                  : null
+                : null}
+            </Typography>
+            {mod
+              ? mod.preclusion.length !== 0
+                ? mod.preclusion.map((mod) => <Chip label={mod} />)
+                : "No preclusions"
+              : null}
           </Stack>
           <Divider />
         </Stack>
       </AccordionDetails>
       <AccordionActions>
         <Stack direction="row" spacing={1}>
-          <Button onClick={handleAddMod}>Add to roadmap</Button>
+          <Button onClick={handleAddMod} disabled={!isAuth()}>
+            Add to roadmap
+          </Button>
           <a
             href={nusmodsUrl}
             target="_blank"
