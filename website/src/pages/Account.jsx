@@ -19,12 +19,14 @@ export default function Account() {
   const { profile, updateProfile } = useAuthSession();
   const { pushSnack } = useSnackbar();
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [highlight, setHighlight] = useState(false);
 
   useEffect(() => {
     if (profile) {
+      setEmail(profile.email);
       setUsername(profile.username);
       setAvatarUrl(profile.avatarUrl);
     }
@@ -85,29 +87,32 @@ export default function Account() {
           <CardContent
             sx={{ display: "flex", flex: 1, justifyContent: "center" }}
           >
-            <Stack spacing={2} width={{ xs: "100%", sm: "80%" }}>
+            <Stack
+              spacing={2}
+              width={{ xs: "100%", sm: "80%" }}
+              alignItems="flex-start"
+            >
               <TextField
-                id="email"
                 label="Email"
                 variant="outlined"
-                value={profile?.email || "No email found"}
+                value={email || "No email found"}
+                fullWidth
                 disabled
               />
               <TextField
-                id="username"
                 label="Username"
                 variant="outlined"
                 value={username || ""}
                 onChange={(e) => setUsername(e.target.value)}
+                fullWidth
               />
-              <Stack direction="row" alignItems="center">
+              <Stack direction="row" alignItems="center" width="100%">
                 <Collapse in={highlight} orientation="horizontal" unmountOnExit>
                   <Avatar sx={{ bgcolor: "green", mr: 2 }}>
                     <ArrowForwardIcon />
                   </Avatar>
                 </Collapse>
                 <TextField
-                  id="avatar"
                   label="Avatar URL"
                   variant="outlined"
                   value={avatarUrl || ""}

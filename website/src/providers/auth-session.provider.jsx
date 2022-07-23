@@ -21,6 +21,7 @@ const AuthSessionContext = createContext({
   handleSignup: async ({ username, email, password }) => {},
   handleSignin: async ({ email, password }) => {},
   handleSignout: async () => {},
+  handlePasswordReset: async ({ email }) => {},
   updateProfile: async ({ id, ...updates }) => new Profile(),
 });
 
@@ -158,6 +159,10 @@ function AuthSessionProvider({ children }) {
     await supabase.auth.signOut();
   }, []);
 
+  const handlePasswordReset = useCallback(async ({ email }) => {
+    await supabase.auth.api.resetPasswordForEmail(email);
+  }, []);
+
   useEffect(() => {
     supabase.auth.onAuthStateChange((event, session) => {
       setAuthEvent(event);
@@ -171,6 +176,7 @@ function AuthSessionProvider({ children }) {
         case AUTH_EVENT.USER_DELETED:
           setUser(null);
           break;
+        case AUTH_EVENT.PASSWORD_RECOVERY:
         default:
       }
     });
@@ -237,6 +243,7 @@ function AuthSessionProvider({ children }) {
     handleSignup,
     handleSignin,
     handleSignout,
+    handlePasswordReset,
     updateProfile,
   };
 

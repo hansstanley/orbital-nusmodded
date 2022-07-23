@@ -43,6 +43,7 @@ export default function ModuleStack({
   handleUndoMod = async () => {},
   isCourse = false,
   isSelect = false,
+  showSearch = true,
 }) {
   const { isAuth, isAdmin } = useAuthSession();
   const { getModArray } = useMod();
@@ -147,7 +148,7 @@ export default function ModuleStack({
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleDelete = (moduleCode) => async () => {
     setLoading(true);
@@ -160,7 +161,11 @@ export default function ModuleStack({
           moduleCode
         } deleted!`,
         severity: "success",
-        action: <Button color="inherit" size="small" onClick={handleUndo}>Undo</Button>
+        action: (
+          <Button color="inherit" size="small" onClick={handleUndo}>
+            Undo
+          </Button>
+        ),
       });
     } catch (error) {
       console.error(error);
@@ -287,25 +292,27 @@ export default function ModuleStack({
           </Zoom>
         ) : null}
       </Stack>
-      <TextField
-        fullWidth
-        size="small"
-        margin="dense"
-        label="Search module code"
-        value={search}
-        onChange={handleSearch}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <Zoom in={!!search}>
-                <IconButton edge="end" onClick={handleClearSearch}>
-                  <ClearIcon />
-                </IconButton>
-              </Zoom>
-            </InputAdornment>
-          ),
-        }}
-      />
+      {showSearch ? (
+        <TextField
+          fullWidth
+          size="small"
+          margin="dense"
+          label="Search module code"
+          value={search}
+          onChange={handleSearch}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Zoom in={!!search}>
+                  <IconButton edge="end" onClick={handleClearSearch}>
+                    <ClearIcon />
+                  </IconButton>
+                </Zoom>
+              </InputAdornment>
+            ),
+          }}
+        />
+      ) : null}
       <Divider />
       <Collapse in={open}>
         <Card>

@@ -274,6 +274,7 @@ export default function RoadmapStack() {
               handleAddMods={handleAddMyMods}
               handleDeleteMod={handleDeleteMyMod}
               handleUndoMod={handleUndo}
+              showSearch={false}
             />
             {courseId ? handleCourseMods() : <CourseItemPlaceholder />}
             {courseId ? (
@@ -290,6 +291,7 @@ export default function RoadmapStack() {
               mods={exemptedMods}
               handleAddMods={handleAddExemptedMods}
               handleDeleteMod={handleDeleteExemptedMod}
+              showSearch={false}
             />
           </RightDrawer>
         </DragDropContext>
