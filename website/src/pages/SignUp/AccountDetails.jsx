@@ -12,8 +12,11 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useAuthSession, useSnackbar } from "../../providers";
 import { TransitionGroup } from "react-transition-group";
+import { AltAuth } from "../../components";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUp({ handleNext }) {
+  const navigate = useNavigate();
   const { handleSignup } = useAuthSession();
   const { pushSnack } = useSnackbar();
   const [validateInput, setValidateInput] = useState([]);
@@ -168,6 +171,7 @@ export default function SignUp({ handleNext }) {
         <Button disabled={loading} type="submit" variant="contained" fullWidth>
           Sign Up
         </Button>
+        <AltAuth onDone={() => navigate("/signup")} />
       </Stack>
     </Box>
   );
