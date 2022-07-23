@@ -32,13 +32,14 @@ export default function Settings() {
     if (loading) {
       if (init) {
         setLoadingRow([SETTINGS.COURSE.ID, SETTINGS.MC_LIMIT.ID]);
-        setInit(false);
       }
     } else {
       setSelectedCourse(getSetting(SETTINGS.COURSE.ID) || "");
       setMaxMCs(getSetting(SETTINGS.MC_LIMIT.ID) || 23);
       setLoadingRow([]);
     }
+
+    setInit(false);
   }, [init, loading, getSetting]);
 
   const sortCourses = useCallback(() => {

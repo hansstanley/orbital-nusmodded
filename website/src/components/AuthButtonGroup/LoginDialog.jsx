@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthSession, useSnackbar } from "../../providers";
 import ResponsiveDialog from "../ResponsiveDialog";
 import LoadingBar from "../LoadingBar";
+import AltAuth from "../AltAuth";
 
 export default function LoginDialog({ open = false, handleClose = () => {} }) {
   const navigate = useNavigate();
@@ -27,6 +28,11 @@ export default function LoginDialog({ open = false, handleClose = () => {} }) {
     setPassword("");
     setValidateInput("");
     handleClose();
+  };
+
+  const handleDone = () => {
+    handleCloseReset();
+    navigate("/roadmap");
   };
 
   const handleEmailChange = (e) => {
@@ -46,8 +52,7 @@ export default function LoginDialog({ open = false, handleClose = () => {} }) {
         email: email,
         password: password,
       });
-      handleCloseReset();
-      navigate("/roadmap");
+      handleDone();
     } catch (error) {
       console.error(error);
       setValidateInput(error.message || "Error logging in");
@@ -104,6 +109,7 @@ export default function LoginDialog({ open = false, handleClose = () => {} }) {
         <Collapse in={!!validateInput}>
           <Alert severity="error">{validateInput}</Alert>
         </Collapse>
+        <AltAuth onDone={handleDone} />
       </DialogContent>
       <DialogActions>
         <Button

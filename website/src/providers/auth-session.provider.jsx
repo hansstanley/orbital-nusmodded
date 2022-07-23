@@ -20,6 +20,7 @@ const AuthSessionContext = createContext({
   isAdmin: () => false,
   handleSignup: async ({ username, email, password }) => {},
   handleSignin: async ({ email, password }) => {},
+  handleSigninWithGoogle: async () => {},
   handleSignout: async () => {},
   handlePasswordReset: async ({ email }) => {},
   updateProfile: async ({ id, ...updates }) => new Profile(),
@@ -155,6 +156,13 @@ function AuthSessionProvider({ children }) {
     if (error) throw error;
   };
 
+  const handleSigninWithGoogle = async () => {
+    const { error } = await supabase.auth.signIn({
+      provider: "google",
+    });
+    if (error) throw error;
+  };
+
   const handleSignout = useCallback(async () => {
     await supabase.auth.signOut();
   }, []);
@@ -242,6 +250,7 @@ function AuthSessionProvider({ children }) {
     isAdmin,
     handleSignup,
     handleSignin,
+    handleSigninWithGoogle,
     handleSignout,
     handlePasswordReset,
     updateProfile,
