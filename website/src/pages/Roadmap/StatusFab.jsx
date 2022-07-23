@@ -94,6 +94,7 @@ export default function StatusFab() {
                 "When the number of MCs from the modules in a semester exceeds the MC limit set by the user",
                 "When certain modules do not have their prerequisites fulfilled",
                 "When modules are preclusions of each other in the same semester",
+                "When modules are not offered in the respective semester",
               ].map((bulletPoint, index) => (
                 <Typography key={index} variant="caption">
                   • {bulletPoint}
