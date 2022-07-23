@@ -1,8 +1,10 @@
 import {
   Accordion,
+  AccordionActions,
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Chip,
   Divider,
   Grid,
@@ -14,9 +16,10 @@ import {
 } from "@mui/material";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useMod, useSnackbar } from "../../providers";
+import { useMod, useRoadmap, useSnackbar } from "../../providers";
 import SearchBar from "./SearchBar";
 import { LoadingBar } from "../../components";
+import { ROADMAP } from "../../utils/constants";
 
 export default function ModuleInfo() {
   const { getModArray } = useMod();
@@ -151,6 +154,8 @@ function ModuleAccordion({
   onChange = (event, isExpanded) => {},
 }) {
   const { getModInfo } = useMod();
+  const { getAllMods, getSemesterById, setModulesById } = useRoadmap();
+  const { pushSnack } = useSnackbar();
   const [mod, setMod] = useState(null);
 
   useEffect(() => {
@@ -161,6 +166,23 @@ function ModuleAccordion({
 
     if (moduleCode) init();
   }, [moduleCode, getModInfo]);
+
+  const handleAddMod = () => {
+    if (getAllMods().includes(moduleCode)) {
+      pushSnack({
+        message: `${moduleCode} is already in the roadmap.`,
+        severity: "warning",
+      });
+      return;
+    }
+
+    const myMods = getSemesterById(ROADMAP.MY_MODS_ID)?.modules || [];
+    setModulesById(ROADMAP.MY_MODS_ID, myMods.concat([moduleCode]));
+    pushSnack({
+      message: `${moduleCode} has been added to My Modules!`,
+      severity: "success",
+    });
+  };
 
   return (
     <Accordion expanded={expanded} onChange={onChange}>
@@ -185,6 +207,9 @@ function ModuleAccordion({
           <Typography>{mod ? mod.description : <Skeleton />}</Typography>
         </Stack>
       </AccordionDetails>
+      <AccordionActions>
+        <Button onClick={handleAddMod}>Add to roadmap</Button>
+      </AccordionActions>
     </Accordion>
   );
 }
