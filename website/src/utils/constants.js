@@ -24,6 +24,10 @@ import {
 export const BACKEND_DOMAIN = "https://nusmodded.herokuapp.com";
 // export const BACKEND_DOMAIN = "http://localhost:3002";
 
+export const NUSMODS = {
+  MOD_PAGE_URL: "https://nusmods.com/modules",
+};
+
 export const COLORS = {
   red,
   pink,

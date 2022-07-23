@@ -16,10 +16,11 @@ import {
 } from "@mui/material";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LaunchIcon from "@mui/icons-material/Launch";
 import { useMod, useRoadmap, useSnackbar } from "../../providers";
 import SearchBar from "./SearchBar";
 import { LoadingBar } from "../../components";
-import { ROADMAP } from "../../utils/constants";
+import { NUSMODS, ROADMAP } from "../../utils/constants";
 
 export default function ModuleInfo() {
   const { getModArray } = useMod();
@@ -184,6 +185,8 @@ function ModuleAccordion({
     });
   };
 
+  const nusmodsUrl = `${NUSMODS.MOD_PAGE_URL}/${moduleCode}`;
+
   return (
     <Accordion expanded={expanded} onChange={onChange}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -208,7 +211,19 @@ function ModuleAccordion({
         </Stack>
       </AccordionDetails>
       <AccordionActions>
-        <Button onClick={handleAddMod}>Add to roadmap</Button>
+        <Stack direction="row" spacing={1}>
+          <Button onClick={handleAddMod}>Add to roadmap</Button>
+          <a
+            href={nusmodsUrl}
+            target="_blank"
+            rel="noreferrer"
+            style={{ textDecoration: "none" }}
+          >
+            <Button variant="outlined" endIcon={<LaunchIcon />}>
+              NUSMods page
+            </Button>
+          </a>
+        </Stack>
       </AccordionActions>
     </Accordion>
   );
