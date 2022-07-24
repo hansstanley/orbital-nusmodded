@@ -12,7 +12,7 @@ import LogoutDialog from "./LogoutDialog";
  */
 export default function AuthButtonGroup() {
   const navigate = useNavigate();
-  const { isAuth } = useAuthSession();
+  const { loading, isAuth } = useAuthSession();
   const [loginOpen, setLoginOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
 
@@ -29,13 +29,21 @@ export default function AuthButtonGroup() {
       <LoginDialog open={loginOpen} handleClose={handleLoginClose} />
       <LogoutDialog open={logoutOpen} handleClose={handleLogoutClose} />
       {isAuth() ? (
-        <Button variant="outlined" onClick={handleLogoutOpen}>
+        <Button
+          variant="outlined"
+          onClick={handleLogoutOpen}
+          disabled={logoutOpen}
+        >
           Logout
         </Button>
       ) : (
         <ButtonGroup variant="contained">
-          <Button onClick={handleLoginOpen}>Login</Button>
-          <Button onClick={handleSignup}>Sign up</Button>
+          <Button onClick={handleLoginOpen} disabled={loading || loginOpen}>
+            Login
+          </Button>
+          <Button onClick={handleSignup} disabled={loading}>
+            Sign up
+          </Button>
         </ButtonGroup>
       )}
     </>
