@@ -45,9 +45,17 @@ export default function LoginDialog({ open = false, handleClose = () => {} }) {
 
   const handleSubmit = async (event) => {
     setLoading(true);
+    setValidateInput("");
     event.preventDefault();
 
     try {
+      if (!email) {
+        throw new Error("Please provide an email.");
+      }
+      if (!password) {
+        throw new Error("Please provide a password.");
+      }
+
       await handleSignin({
         email: email,
         password: password,
