@@ -29,7 +29,7 @@ export default function ModGroupBox({
   isDraggable = false,
   index,
 }) {
-  const { getModInfo } = useMod();
+  const { getModArray, getModInfo } = useMod();
   const { getModGroupMods, getModGroupArray, parseModGroupString } =
     useModGroup();
   const { updateModuleGroup, getAllMods, roadmap } = useRoadmap();
@@ -56,6 +56,10 @@ export default function ModGroupBox({
         const modGroup = modGroupArray.find((mg) => mg.name === modGroupName);
         const data = await getModGroupMods(modGroup.id);
         setModGroupMods(data);
+        if (data.length === 0) {
+            const data = await getModArray();
+            setModGroupMods(data);
+        }
         setModGroup(modGroup);
         if (modGroupData?.moduleCode) {
           const mod = await getModInfo(modGroupData.moduleCode);

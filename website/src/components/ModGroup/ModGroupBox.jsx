@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ModGroup } from "../../models";
-import { useModGroup, useSnackbar } from "../../providers";
+import { useModGroup, useSnackbar, useMod } from "../../providers";
 import ModuleStack from "../Mod/ModuleStack";
 import ResponsiveStack from "../ResponsiveStack";
 
@@ -30,16 +30,23 @@ export default function ModGroupBox({
 }) {
   const { getModGroupMods, bindModGroupMods, unbindModGroupMods } =
     useModGroup();
+  const { getModArray } = useMod();
   const { pushSnack } = useSnackbar();
   const [open, setOpen] = useState(false);
   const [mods, setMods] = useState([]);
   const [refreshMods, setRefreshMods] = useState(true);
+  const [isEmpty, setIsEmpty] = useState(false);
 
   useEffect(() => {
     async function loadMods() {
       try {
         const data = await getModGroupMods(modGroup.id);
         setMods(data);
+        if (data.length === 0) {
+          setIsEmpty(true);
+          const data = await getModArray();
+          setMods(data);
+      }
       } catch (error) {
         console.error(error);
         pushSnack({
@@ -73,7 +80,7 @@ export default function ModGroupBox({
   };
 
   const handleModChips = () =>
-    mods.length ? (
+    !isEmpty ? (
       mods.map((mod) => (
         <Chip
           key={mod.moduleCode}
@@ -82,7 +89,7 @@ export default function ModGroupBox({
         />
       ))
     ) : (
-      <Typography variant="body2">No modules.</Typography>
+      <Typography variant="body2">Any module.</Typography>
     );
 
   const content = (
