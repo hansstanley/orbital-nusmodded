@@ -127,7 +127,7 @@ export default function ModuleStack({
     () =>
       mods.filter((mod) =>
         mod.moduleCode.includes((search || "").trim().toUpperCase())
-      ),
+      ).slice(0, 20),
     [mods, search]
   );
 

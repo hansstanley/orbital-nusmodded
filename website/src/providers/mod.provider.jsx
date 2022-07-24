@@ -12,14 +12,18 @@ const ModContext = createContext({
 function ModProvider({ children }) {
   const { makeRequest } = useBackend();
   const [modMap, setModMap] = useState(new Map());
+  const [modArray, setModArray] = useState([]);
 
   const getModArray = async () => {
+    if (modArray.length !== 0) return modArray;
+
     const { status, data } = await makeRequest({
       method: "get",
       route: "/module",
     });
 
     if (status === 200 && Array.isArray(data)) {
+      setModArray(data);
       return data;
     } else {
       throw new Error("Unable to retrieve modules");
