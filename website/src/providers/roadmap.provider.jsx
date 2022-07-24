@@ -550,7 +550,11 @@ function RoadmapProvider({ children }) {
 
       switch (srcDroppableId) {
         case ROADMAP.COURSE_MODS_ID:
-          srcDroppable = { modules: courseMods.map((mod) => mod.moduleCode) };
+          srcDroppable = {
+            modules: courseMods
+              .filter(({ moduleCode }) => !getAllMods().includes(moduleCode))
+              .map(({ moduleCode }) => moduleCode),
+          };
           break;
         case ROADMAP.COURSE_MOD_GROUPS_ID:
           srcDroppable = {
@@ -596,6 +600,7 @@ function RoadmapProvider({ children }) {
     },
     [
       roadmap,
+      getAllMods,
       getSemesterById,
       courseMods,
       courseModGroups,
