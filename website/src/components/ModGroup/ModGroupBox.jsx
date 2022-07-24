@@ -81,7 +81,7 @@ export default function ModGroupBox({
 
   const handleModChips = () =>
     !isEmpty ? (
-      mods.map((mod) => (
+      mods.slice(0, 9).map((mod) => (
         <Chip
           key={mod.moduleCode}
           label={mod.moduleCode}
