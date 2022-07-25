@@ -9,9 +9,10 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Parallax, ParallaxLayer } from "@react-spring/parallax";
-import EastIcon from "@mui/icons-material/East";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useAuthSession } from "../../providers";
+import background from "../../res/wallpaper.jpg";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -33,6 +34,22 @@ export default function Landing() {
       enabled={!loading}
       style={{ top: 0, left: 0 }}
     >
+      <ParallaxLayer
+        offset={0}
+        speed={0}
+        factor={2}
+        style={{ backgroundColor: "black" }}
+      />
+      <ParallaxLayer
+        offset={0}
+        speed={0}
+        factor={2}
+        style={{
+          opacity: theme.palette.mode === "light" ? "100%" : "90%",
+          backgroundImage: `url(${background})`,
+          backgroundSize: "cover",
+        }}
+      />
       <ParallaxLayer offset={0} speed={2} style={styles.centered}>
         <Typography
           display={sx.desktopTitle.display}
@@ -51,7 +68,7 @@ export default function Landing() {
           NUSMODDED
         </Typography>
       </ParallaxLayer>
-      <ParallaxLayer offset={0} speed={-1} style={styles.centered}>
+      <ParallaxLayer offset={0} speed={0.5} style={styles.centered}>
         <IconButton
           disabled={loading}
           onClick={handleScrollDown}
@@ -60,18 +77,12 @@ export default function Landing() {
           {loading ? (
             <CircularProgress />
           ) : (
-            <Avatar>
-              <KeyboardArrowDownIcon />
+            <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
+              <ArrowDownwardIcon />
             </Avatar>
           )}
         </IconButton>
       </ParallaxLayer>
-      <ParallaxLayer
-        offset={1}
-        speed={2}
-        onClick={handleScrollUp}
-        style={{ backgroundColor: theme.palette.primary.main }}
-      />
       <ParallaxLayer
         offset={1}
         speed={0.5}
@@ -81,8 +92,8 @@ export default function Landing() {
         <Typography
           display={sx.desktopTitle.display}
           variant="h3"
-          color={theme.palette.background.paper}
           fontWeight="bold"
+          color="white"
           mx={4}
         >
           Your module roadmap planner.
@@ -90,8 +101,8 @@ export default function Landing() {
         <Typography
           display={sx.mobileTitle.display}
           variant="h4"
-          color={theme.palette.background.paper}
           fontWeight="bold"
+          color="white"
           mx={4}
         >
           Your module roadmap planner.
@@ -106,12 +117,8 @@ export default function Landing() {
         <Button
           variant="contained"
           onClick={handleStart}
-          endIcon={<EastIcon />}
-          sx={{
-            mt: 20,
-            color: theme.palette.primary.main,
-            backgroundColor: theme.palette.background.default,
-          }}
+          endIcon={<ArrowForwardIcon />}
+          sx={{ mt: 20 }}
         >
           {isAuth() ? "To roadmap" : "Get started"}
         </Button>
