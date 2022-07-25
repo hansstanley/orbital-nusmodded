@@ -36,27 +36,7 @@ export default function Landing() {
     >
       <ParallaxBackground />
       <ParallaxTitle />
-      <ParallaxLayer offset={0} speed={0.5} style={styles.centered}>
-        <IconButton
-          disabled={loading}
-          onClick={handleScrollDown}
-          sx={{ mt: 20 }}
-        >
-          {loading ? (
-            <CircularProgress />
-          ) : (
-            <Avatar
-              sx={{
-                bgcolor: theme.palette.primary.main,
-                border: 2,
-                borderColor: theme.palette.primary[theme.palette.mode],
-              }}
-            >
-              <ArrowDownwardIcon sx={{ color: "white" }} />
-            </Avatar>
-          )}
-        </IconButton>
-      </ParallaxLayer>
+      <ParallaxDown loading={loading} onClick={handleScrollDown} />
       <ParallaxSlogan />
       <ParallaxLayer
         offset={1}
@@ -177,6 +157,37 @@ function ParallaxSlogan() {
         Your module roadmap planner.
       </Typography>
     </ParallaxLayer>
+  );
+}
+
+function ParallaxDown({ onClick = () => {}, loading = false }) {
+  const theme = useTheme();
+
+  return (
+    <>
+      <ParallaxLayer offset={0} speed={1} style={styles.centered}>
+        <IconButton disabled sx={{ mt: 20.8, ml: 0.8 }}>
+          {loading ? (
+            <CircularProgress sx={{ color: "black" }} />
+          ) : (
+            <Avatar sx={{ bgcolor: "black" }}>
+              <ArrowDownwardIcon sx={{ color: "white" }} />
+            </Avatar>
+          )}
+        </IconButton>
+      </ParallaxLayer>
+      <ParallaxLayer offset={0} speed={0.5} style={styles.centered}>
+        <IconButton disabled={loading} onClick={onClick} sx={{ mt: 20 }}>
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
+              <ArrowDownwardIcon sx={{ color: "white" }} />
+            </Avatar>
+          )}
+        </IconButton>
+      </ParallaxLayer>
+    </>
   );
 }
 
