@@ -34,40 +34,8 @@ export default function Landing() {
       enabled={!loading}
       style={{ top: 0, left: 0 }}
     >
-      <ParallaxLayer
-        offset={0}
-        speed={0}
-        factor={2}
-        style={{ backgroundColor: "black" }}
-      />
-      <ParallaxLayer
-        offset={0}
-        speed={0}
-        factor={2}
-        style={{
-          opacity: theme.palette.mode === "light" ? "100%" : "90%",
-          backgroundImage: `url(${background})`,
-          backgroundSize: "cover",
-        }}
-      />
-      <ParallaxLayer offset={0} speed={2} style={styles.centered}>
-        <Typography
-          display={sx.desktopTitle.display}
-          variant="h1"
-          color="primary"
-          fontWeight="bold"
-        >
-          NUSMODDED
-        </Typography>
-        <Typography
-          display={sx.mobileTitle.display}
-          variant="h3"
-          color="primary"
-          fontWeight="bold"
-        >
-          NUSMODDED
-        </Typography>
-      </ParallaxLayer>
+      <ParallaxBackground />
+      <ParallaxTitle />
       <ParallaxLayer offset={0} speed={0.5} style={styles.centered}>
         <IconButton
           disabled={loading}
@@ -77,37 +45,19 @@ export default function Landing() {
           {loading ? (
             <CircularProgress />
           ) : (
-            <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
-              <ArrowDownwardIcon />
+            <Avatar
+              sx={{
+                bgcolor: theme.palette.primary.main,
+                border: 2,
+                borderColor: theme.palette.primary[theme.palette.mode],
+              }}
+            >
+              <ArrowDownwardIcon sx={{ color: "white" }} />
             </Avatar>
           )}
         </IconButton>
       </ParallaxLayer>
-      <ParallaxLayer
-        offset={1}
-        speed={0.5}
-        onClick={handleScrollUp}
-        style={styles.centered}
-      >
-        <Typography
-          display={sx.desktopTitle.display}
-          variant="h3"
-          fontWeight="bold"
-          color="white"
-          mx={4}
-        >
-          Your module roadmap planner.
-        </Typography>
-        <Typography
-          display={sx.mobileTitle.display}
-          variant="h4"
-          fontWeight="bold"
-          color="white"
-          mx={4}
-        >
-          Your module roadmap planner.
-        </Typography>
-      </ParallaxLayer>
+      <ParallaxSlogan />
       <ParallaxLayer
         offset={1}
         speed={2}
@@ -124,6 +74,109 @@ export default function Landing() {
         </Button>
       </ParallaxLayer>
     </Parallax>
+  );
+}
+
+function ParallaxBackground() {
+  const theme = useTheme();
+
+  return (
+    <>
+      <ParallaxLayer
+        offset={0}
+        speed={0}
+        factor={2}
+        style={{ backgroundColor: "black" }}
+      />
+      <ParallaxLayer
+        offset={0}
+        speed={0}
+        factor={2}
+        style={{
+          opacity: theme.palette.mode === "light" ? "100%" : "90%",
+          backgroundImage: `url(${background})`,
+          backgroundSize: "cover",
+        }}
+      />
+    </>
+  );
+}
+
+function ParallaxTitle() {
+  const theme = useTheme();
+
+  return (
+    <>
+      <ParallaxLayer offset={0} speed={2.5} style={styles.centered}>
+        <Typography
+          position="absolute"
+          display={sx.desktopTitle.display}
+          variant="h1"
+          color="black"
+          fontWeight="bold"
+          ml={1}
+          mt={1}
+        >
+          NUSMODDED
+        </Typography>
+        <Typography
+          position="absolute"
+          display={sx.mobileTitle.display}
+          variant="h3"
+          color="black"
+          fontWeight="bold"
+          ml={1}
+          mt={1}
+        >
+          NUSMODDED
+        </Typography>
+      </ParallaxLayer>
+      <ParallaxLayer offset={0} speed={2} style={styles.centered}>
+        <Typography
+          position="absolute"
+          display={sx.desktopTitle.display}
+          variant="h1"
+          color="primary"
+          fontWeight="bold"
+        >
+          NUSMODDED
+        </Typography>
+        <Typography
+          position="absolute"
+          display={sx.mobileTitle.display}
+          variant="h3"
+          color="primary"
+          fontWeight="bold"
+        >
+          NUSMODDED
+        </Typography>
+      </ParallaxLayer>
+    </>
+  );
+}
+
+function ParallaxSlogan() {
+  return (
+    <ParallaxLayer offset={1} speed={0.5} style={styles.centered}>
+      <Typography
+        display={sx.desktopTitle.display}
+        variant="h3"
+        fontWeight="bold"
+        color="white"
+        mx={4}
+      >
+        Your module roadmap planner.
+      </Typography>
+      <Typography
+        display={sx.mobileTitle.display}
+        variant="h4"
+        fontWeight="bold"
+        color="white"
+        mx={4}
+      >
+        Your module roadmap planner.
+      </Typography>
+    </ParallaxLayer>
   );
 }
 
