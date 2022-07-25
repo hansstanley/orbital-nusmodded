@@ -46,7 +46,7 @@ export default function ModGroupBox({
           setIsEmpty(true);
           const data = await getModArray();
           setMods(data);
-      }
+        }
       } catch (error) {
         console.error(error);
         pushSnack({
@@ -60,7 +60,7 @@ export default function ModGroupBox({
     }
 
     if (refreshMods && modGroup.id) loadMods();
-  }, [refreshMods, modGroup, getModGroupMods, pushSnack]);
+  }, [refreshMods, modGroup, getModArray, getModGroupMods, pushSnack]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -81,13 +81,15 @@ export default function ModGroupBox({
 
   const handleModChips = () =>
     !isEmpty ? (
-      mods.slice(0, 9).map((mod) => (
-        <Chip
-          key={mod.moduleCode}
-          label={mod.moduleCode}
-          sx={{ mr: 1, mb: 1 }}
-        />
-      ))
+      mods
+        .slice(0, 9)
+        .map((mod) => (
+          <Chip
+            key={mod.moduleCode}
+            label={mod.moduleCode}
+            sx={{ mr: 1, mb: 1 }}
+          />
+        ))
     ) : (
       <Typography variant="body2">Any module.</Typography>
     );

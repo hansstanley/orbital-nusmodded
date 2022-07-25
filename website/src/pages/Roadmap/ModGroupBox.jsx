@@ -57,8 +57,8 @@ export default function ModGroupBox({
         const data = await getModGroupMods(modGroup.id);
         setModGroupMods(data);
         if (data.length === 0) {
-            const data = await getModArray();
-            setModGroupMods(data);
+          const data = await getModArray();
+          setModGroupMods(data);
         }
         setModGroup(modGroup);
         if (modGroupData?.moduleCode) {
@@ -79,6 +79,7 @@ export default function ModGroupBox({
     init();
   }, [
     name,
+    getModArray,
     getModGroupMods,
     getModInfo,
     getModGroupArray,
@@ -145,12 +146,25 @@ export default function ModGroupBox({
               </DialogContentText>
               <Divider />
               <DialogContentText>
-                {loading ? <Skeleton /> : mod.prerequisite ? "Prerequisites: " + mod.prerequisite :  "No prerequisites."}
+                {loading ? (
+                  <Skeleton />
+                ) : mod.prerequisite ? (
+                  "Prerequisites: " + mod.prerequisite
+                ) : (
+                  "No prerequisites."
+                )}
               </DialogContentText>
               <Divider />
               <DialogContentText>
-                {loading ? <Skeleton /> : mod.preclusion.length !== 0 
-                ? "Preclusion" + (mod.preclusion.length > 1 ? "s: " : ": ") + mod.preclusion.join(", ") :  "No preclusions."}
+                {loading ? (
+                  <Skeleton />
+                ) : mod.preclusion.length !== 0 ? (
+                  "Preclusion" +
+                  (mod.preclusion.length > 1 ? "s: " : ": ") +
+                  mod.preclusion.join(", ")
+                ) : (
+                  "No preclusions."
+                )}
               </DialogContentText>
             </Stack>
           </DialogContent>

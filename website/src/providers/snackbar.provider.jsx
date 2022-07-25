@@ -34,7 +34,7 @@ function SnackbarProvider({ children, stacked = false }) {
     } else if (!stacked && snackPack.length && snack && open) {
       setOpen(false);
     }
-  }, [open, snack, snackPack]);
+  }, [stacked, open, snack, snackPack]);
 
   const pushSnack = useCallback(({ message, severity, action }) => {
     setSnackPack((prev) => [

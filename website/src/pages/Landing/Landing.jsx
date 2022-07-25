@@ -1,46 +1,198 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { useRef } from "react";
+import {
+  Avatar,
+  Button,
+  CircularProgress,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { LoadingGuard } from "../../components";
+import { Parallax, ParallaxLayer } from "@react-spring/parallax";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useAuthSession } from "../../providers";
+import background from "../../res/wallpaper.jpg";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const theme = useTheme();
   const { loading, isAuth } = useAuthSession();
+  const parallax = useRef(null);
 
   const handleStart = () => {
     navigate(isAuth() ? "/roadmap" : "/signup");
   };
 
+  const handleScrollUp = () => parallax.current.scrollTo(0);
+  const handleScrollDown = () => parallax.current.scrollTo(1);
+
   return (
-    <LoadingGuard loading={loading}>
-      <Stack spacing={2} sx={sx.main}>
-        <Typography variant="h1" sx={sx.desktopTitle} color="primary">
-          NUSMODDED
-        </Typography>
-        <Typography variant="h3" sx={sx.mobileTitle} color="primary">
-          NUSMODDED
-        </Typography>
-        <Button variant="contained" onClick={handleStart}>
-          {isAuth() ? "Continue" : "Get started"}
+    <Parallax
+      ref={parallax}
+      pages={2}
+      enabled={!loading}
+      style={{ top: 0, left: 0 }}
+    >
+      <ParallaxBackground />
+      <ParallaxTitle />
+      <ParallaxLayer offset={0} speed={0.5} style={styles.centered}>
+        <IconButton
+          disabled={loading}
+          onClick={handleScrollDown}
+          sx={{ mt: 20 }}
+        >
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <Avatar
+              sx={{
+                bgcolor: theme.palette.primary.main,
+                border: 2,
+                borderColor: theme.palette.primary[theme.palette.mode],
+              }}
+            >
+              <ArrowDownwardIcon sx={{ color: "white" }} />
+            </Avatar>
+          )}
+        </IconButton>
+      </ParallaxLayer>
+      <ParallaxSlogan />
+      <ParallaxLayer
+        offset={1}
+        speed={2}
+        onClick={handleScrollUp}
+        style={styles.centered}
+      >
+        <Button
+          variant="contained"
+          onClick={handleStart}
+          endIcon={<ArrowForwardIcon />}
+          sx={{ mt: 20 }}
+        >
+          {isAuth() ? "To roadmap" : "Get started"}
         </Button>
-      </Stack>
-    </LoadingGuard>
+      </ParallaxLayer>
+    </Parallax>
+  );
+}
+
+function ParallaxBackground() {
+  const theme = useTheme();
+
+  return (
+    <>
+      <ParallaxLayer
+        offset={0}
+        speed={0}
+        factor={2}
+        style={{ backgroundColor: "black" }}
+      />
+      <ParallaxLayer
+        offset={0}
+        speed={0}
+        factor={2}
+        style={{
+          opacity: theme.palette.mode === "light" ? "100%" : "90%",
+          backgroundImage: `url(${background})`,
+          backgroundSize: "cover",
+        }}
+      />
+    </>
+  );
+}
+
+function ParallaxTitle() {
+  const theme = useTheme();
+
+  return (
+    <>
+      <ParallaxLayer offset={0} speed={2.5} style={styles.centered}>
+        <Typography
+          position="absolute"
+          display={sx.desktopTitle.display}
+          variant="h1"
+          color="black"
+          fontWeight="bold"
+          ml={1}
+          mt={1}
+        >
+          NUSMODDED
+        </Typography>
+        <Typography
+          position="absolute"
+          display={sx.mobileTitle.display}
+          variant="h3"
+          color="black"
+          fontWeight="bold"
+          ml={1}
+          mt={1}
+        >
+          NUSMODDED
+        </Typography>
+      </ParallaxLayer>
+      <ParallaxLayer offset={0} speed={2} style={styles.centered}>
+        <Typography
+          position="absolute"
+          display={sx.desktopTitle.display}
+          variant="h1"
+          color="primary"
+          fontWeight="bold"
+        >
+          NUSMODDED
+        </Typography>
+        <Typography
+          position="absolute"
+          display={sx.mobileTitle.display}
+          variant="h3"
+          color="primary"
+          fontWeight="bold"
+        >
+          NUSMODDED
+        </Typography>
+      </ParallaxLayer>
+    </>
+  );
+}
+
+function ParallaxSlogan() {
+  return (
+    <ParallaxLayer offset={1} speed={0.5} style={styles.centered}>
+      <Typography
+        display={sx.desktopTitle.display}
+        variant="h3"
+        fontWeight="bold"
+        color="white"
+        mx={4}
+      >
+        Your module roadmap planner.
+      </Typography>
+      <Typography
+        display={sx.mobileTitle.display}
+        variant="h4"
+        fontWeight="bold"
+        color="white"
+        mx={4}
+      >
+        Your module roadmap planner.
+      </Typography>
+    </ParallaxLayer>
   );
 }
 
 const sx = {
-  main: {
-    display: "flex",
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   desktopTitle: {
     display: { sm: "block", xs: "none" },
-    fontWeight: "bold",
   },
   mobileTitle: {
     display: { sm: "none", xs: "block" },
-    fontWeight: "bold",
+  },
+};
+
+const styles = {
+  centered: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 };
