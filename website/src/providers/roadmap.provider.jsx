@@ -407,11 +407,13 @@ function RoadmapProvider({ children }) {
     async (roadmap = []) => {
       let issues = [];
 
-      for (let sem of roadmap) {
-        const mods = sem?.modules || [];
-        const moduleCodes = mods.map((mod) =>
-          isModGroupString(mod) ? parseModGroupString(mod)?.moduleCode : mod
-        );
+      // for (let sem of roadmap) {
+        // const mods = sem?.modules || [];
+        // const moduleCodes = mods.map((mod) =>
+        //   isModGroupString(mod) ? parseModGroupString(mod)?.moduleCode : mod
+        // );
+        const moduleCodes = getSemesters().reduce((prev, currSem) => prev.concat(currSem?.modules || []), [])
+          .map((mod) => parseModGroupString(mod)?.moduleCode || mod);
         let modInfos = await Promise.all(
           moduleCodes.map((code) => getModInfo(code))
         );
@@ -443,11 +445,11 @@ function RoadmapProvider({ children }) {
           }
           modInfos = otherMods;
         }
-      }
+      // }
 
       return issues;
     },
-    [getModInfo, isModGroupString, parseModGroupString]
+    [getModInfo, getAllMods]
   );
 
   const checkSemestersAvailability = useCallback(
