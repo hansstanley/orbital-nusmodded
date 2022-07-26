@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Avatar,
   Button,
@@ -8,14 +8,17 @@ import {
   Tooltip,
   Typography,
   useTheme,
+  Zoom,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import { useAuthSession } from "../../providers";
+import { useAuthSession, useMod } from "../../providers";
+import { ModuleBox } from "../../components/Mod";
 import background from "../../res/wallpaper.jpg";
+import { DIMENSIONS } from "../../utils/constants";
 
 const PAGE_COUNT = 2;
 
@@ -23,21 +26,12 @@ export default function Landing() {
   const navigate = useNavigate();
   const { loading, isAuth } = useAuthSession();
   const parallax = useRef(null);
-  const [page, setPage] = useState({ value: 0 });
-
-  useEffect(() => {
-    parallax.current?.scrollTo(page.value);
-  }, [page, parallax]);
 
   const handleStart = () => {
     navigate(isAuth() ? "/roadmap" : "/signup");
   };
 
-  const handleScrollUp = () =>
-    setPage(({ value }) => ({ value: Math.max(value - 1, 0) }));
-  const handleScrollDown = () =>
-    setPage(({ value }) => ({ value: Math.min(value + 1, PAGE_COUNT - 1) }));
-  const handleScrollToTop = () => setPage({ value: 0 });
+  const handleScrollToTop = () => parallax.current?.scrollTo(0);
 
   return (
     <>
@@ -48,8 +42,12 @@ export default function Landing() {
         style={{ top: 0, left: 0 }}
       >
         <ParallaxBackground />
+        <ParallaxMods />
         <ParallaxTitle />
-        <ParallaxDown loading={loading} onClick={handleScrollDown} />
+        <ParallaxDown
+          loading={loading}
+          onClick={() => parallax.current?.scrollTo(1)}
+        />
         <ParallaxSlogan />
         <ParallaxLayer offset={1} speed={2} style={styles.centered}>
           <Button
@@ -61,8 +59,8 @@ export default function Landing() {
             {isAuth() ? "To roadmap" : "Get started"}
           </Button>
         </ParallaxLayer>
-        <ParallaxFab onClick={handleScrollToTop} />
       </Parallax>
+      <BackToTop show={true} onClick={handleScrollToTop} />
     </>
   );
 }
@@ -173,7 +171,7 @@ function ParallaxDown({ onClick = () => {}, loading = false }) {
 
   return (
     <>
-      <ParallaxLayer offset={0} speed={1} style={styles.centered}>
+      <ParallaxLayer offset={0} speed={2} style={styles.centered}>
         <IconButton disabled sx={{ mt: 20.8, ml: 0.8 }}>
           {loading ? (
             <CircularProgress sx={{ color: "black" }} />
@@ -184,7 +182,7 @@ function ParallaxDown({ onClick = () => {}, loading = false }) {
           )}
         </IconButton>
       </ParallaxLayer>
-      <ParallaxLayer offset={0} speed={0.5} style={styles.centered}>
+      <ParallaxLayer offset={0} speed={1.5} style={styles.centered}>
         <IconButton disabled={loading} onClick={onClick} sx={{ mt: 20 }}>
           {loading ? (
             <CircularProgress />
@@ -199,23 +197,67 @@ function ParallaxDown({ onClick = () => {}, loading = false }) {
   );
 }
 
-function ParallaxFab({ onClick = () => {} }) {
+function ParallaxMods({ count = 10 }) {
+  const { getModArray, getModInfo } = useMod();
+  const [initial, setInitial] = useState(true);
+  const [mods, setMods] = useState([]);
+
+  const paddingTops = useMemo(
+    () => [...Array(count).keys()].map(() => `${Math.random() * 40 + 30}%`),
+    [count]
+  );
+
+  useEffect(() => {
+    async function init() {
+      setInitial(false);
+      try {
+        const allMods = await getModArray();
+        const chosenMods = [...Array(count).keys()].map(
+          () => allMods[Math.floor(Math.random() * allMods.length)]
+        );
+        setMods(chosenMods);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (initial) init();
+  }, [initial, count, getModArray, getModInfo]);
+
+  return mods.length
+    ? mods.map((mod, index) => (
+        <ParallaxLayer
+          key={index}
+          offset={0.5}
+          speed={Math.random() / 2 + 0.75}
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "flex-start",
+            paddingLeft: `calc(${(index * 100) / count}% - ${
+              DIMENSIONS.BOX_WIDTH / 2
+            }px)`,
+            paddingTop: paddingTops[index],
+          }}
+        >
+          <ModuleBox moduleCode={mod.moduleCode} />
+        </ParallaxLayer>
+      ))
+    : null;
+}
+
+function BackToTop({ show = false, onClick = () => {} }) {
   return (
-    <ParallaxLayer
-      offset={1.9}
-      factor={0.1}
-      speed={0.5}
-      style={{ display: "flex" }}
-    >
+    <Zoom in={show}>
       <Tooltip title="Back to top">
         <Fab
           onClick={onClick}
-          sx={{ position: "absolute", right: 32, bottom: 32 }}
+          sx={{ position: "fixed", right: 32, bottom: 32 }}
         >
           <ArrowUpwardIcon />
         </Fab>
       </Tooltip>
-    </ParallaxLayer>
+    </Zoom>
   );
 }
 
