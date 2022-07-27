@@ -408,48 +408,49 @@ function RoadmapProvider({ children }) {
       let issues = [];
 
       // for (let sem of roadmap) {
-        // const mods = sem?.modules || [];
-        // const moduleCodes = mods.map((mod) =>
-        //   isModGroupString(mod) ? parseModGroupString(mod)?.moduleCode : mod
-        // );
-        const moduleCodes = getSemesters().reduce((prev, currSem) => prev.concat(currSem?.modules || []), [])
-          .map((mod) => parseModGroupString(mod)?.moduleCode || mod);
-        let modInfos = await Promise.all(
-          moduleCodes.map((code) => getModInfo(code))
+      // const mods = sem?.modules || [];
+      // const moduleCodes = mods.map((mod) =>
+      //   isModGroupString(mod) ? parseModGroupString(mod)?.moduleCode : mod
+      // );
+      const moduleCodes = getSemesters()
+        .reduce((prev, currSem) => prev.concat(currSem?.modules || []), [])
+        .map((mod) => parseModGroupString(mod)?.moduleCode || mod);
+      let modInfos = await Promise.all(
+        moduleCodes.map((code) => getModInfo(code))
+      );
+
+      while (modInfos.length) {
+        const { precludedMods, otherMods } = modInfos.slice(1).reduce(
+          (prev, curr) => {
+            if (prev.preclusion.includes(curr.moduleCode)) {
+              prev.precludedMods.push(curr);
+            } else {
+              prev.otherMods.push(curr);
+            }
+            return prev;
+          },
+          {
+            precludedMods: [modInfos[0]],
+            otherMods: [],
+            preclusion: modInfos[0]?.preclusion || [],
+          }
         );
 
-        while (modInfos.length) {
-          const { precludedMods, otherMods } = modInfos.slice(1).reduce(
-            (prev, curr) => {
-              if (prev.preclusion.includes(curr.moduleCode)) {
-                prev.precludedMods.push(curr);
-              } else {
-                prev.otherMods.push(curr);
-              }
-              return prev;
-            },
-            {
-              precludedMods: [modInfos[0]],
-              otherMods: [],
-              preclusion: modInfos[0]?.preclusion || [],
-            }
-          );
-
-          if (precludedMods.length > 1) {
-            issues.push({
-              severity: "error",
-              message: `${precludedMods
-                .map((mod) => mod.moduleCode)
-                .join(", ")} are preclusions.`,
-            });
-          }
-          modInfos = otherMods;
+        if (precludedMods.length > 1) {
+          issues.push({
+            severity: "error",
+            message: `${precludedMods
+              .map((mod) => mod.moduleCode)
+              .join(", ")} are preclusions.`,
+          });
         }
+        modInfos = otherMods;
+      }
       // }
 
       return issues;
     },
-    [getModInfo, getAllMods]
+    [getModInfo, getSemesters, parseModGroupString]
   );
 
   const checkSemestersAvailability = useCallback(

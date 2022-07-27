@@ -1,3 +1,4 @@
 import useWindowDimensions from "./useWindowDimensions";
+import useInViewport from "./useInViewport";
 
-export { useWindowDimensions };
+export { useInViewport, useWindowDimensions };

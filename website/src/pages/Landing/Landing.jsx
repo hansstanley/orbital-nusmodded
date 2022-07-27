@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Avatar,
+  Box,
   Button,
   CircularProgress,
   Fab,
@@ -14,7 +15,8 @@ import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import { useAuthSession } from "../../providers";
+import { useAuthSession, useMod } from "../../providers";
+import { ModuleBox } from "../../components/Mod";
 import background from "../../res/wallpaper.jpg";
 
 const PAGE_COUNT = 2;
@@ -23,21 +25,12 @@ export default function Landing() {
   const navigate = useNavigate();
   const { loading, isAuth } = useAuthSession();
   const parallax = useRef(null);
-  const [page, setPage] = useState({ value: 0 });
-
-  useEffect(() => {
-    parallax.current?.scrollTo(page.value);
-  }, [page, parallax]);
 
   const handleStart = () => {
     navigate(isAuth() ? "/roadmap" : "/signup");
   };
 
-  const handleScrollUp = () =>
-    setPage(({ value }) => ({ value: Math.max(value - 1, 0) }));
-  const handleScrollDown = () =>
-    setPage(({ value }) => ({ value: Math.min(value + 1, PAGE_COUNT - 1) }));
-  const handleScrollToTop = () => setPage({ value: 0 });
+  const handleScrollToTop = () => parallax.current?.scrollTo(0);
 
   return (
     <>
@@ -47,9 +40,31 @@ export default function Landing() {
         enabled={!loading}
         style={{ top: 0, left: 0 }}
       >
+        <ParallaxLayer // Back-to-top FAB
+          sticky={{ start: 0.5, end: PAGE_COUNT - 1 }}
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "flex-end",
+            width: `${128}px`,
+            marginLeft: `calc(100% - ${128}px)`,
+            paddingRight: 32,
+            paddingBottom: 32,
+          }}
+        >
+          <Tooltip title="Back to top">
+            <Fab onClick={handleScrollToTop}>
+              <ArrowUpwardIcon />
+            </Fab>
+          </Tooltip>
+        </ParallaxLayer>
         <ParallaxBackground />
+        <ParallaxMods />
         <ParallaxTitle />
-        <ParallaxDown loading={loading} onClick={handleScrollDown} />
+        <ParallaxDown
+          loading={loading}
+          onClick={() => parallax.current?.scrollTo(1)}
+        />
         <ParallaxSlogan />
         <ParallaxLayer offset={1} speed={2} style={styles.centered}>
           <Button
@@ -61,7 +76,6 @@ export default function Landing() {
             {isAuth() ? "To roadmap" : "Get started"}
           </Button>
         </ParallaxLayer>
-        <ParallaxFab onClick={handleScrollToTop} />
       </Parallax>
     </>
   );
@@ -75,13 +89,13 @@ function ParallaxBackground() {
       <ParallaxLayer
         offset={0}
         speed={0}
-        factor={2}
+        factor={PAGE_COUNT}
         style={{ backgroundColor: "black" }}
       />
       <ParallaxLayer
         offset={0}
         speed={0}
-        factor={2}
+        factor={PAGE_COUNT}
         style={{
           opacity: theme.palette.mode === "light" ? "100%" : "90%",
           backgroundImage: `url(${background})`,
@@ -173,7 +187,7 @@ function ParallaxDown({ onClick = () => {}, loading = false }) {
 
   return (
     <>
-      <ParallaxLayer offset={0} speed={1} style={styles.centered}>
+      <ParallaxLayer offset={0} speed={2} style={styles.centered}>
         <IconButton disabled sx={{ mt: 20.8, ml: 0.8 }}>
           {loading ? (
             <CircularProgress sx={{ color: "black" }} />
@@ -184,7 +198,7 @@ function ParallaxDown({ onClick = () => {}, loading = false }) {
           )}
         </IconButton>
       </ParallaxLayer>
-      <ParallaxLayer offset={0} speed={0.5} style={styles.centered}>
+      <ParallaxLayer offset={0} speed={1.5} style={styles.centered}>
         <IconButton disabled={loading} onClick={onClick} sx={{ mt: 20 }}>
           {loading ? (
             <CircularProgress />
@@ -199,23 +213,65 @@ function ParallaxDown({ onClick = () => {}, loading = false }) {
   );
 }
 
-function ParallaxFab({ onClick = () => {} }) {
-  return (
-    <ParallaxLayer
-      offset={1.9}
-      factor={0.1}
-      speed={0.5}
-      style={{ display: "flex" }}
-    >
-      <Tooltip title="Back to top">
-        <Fab
-          onClick={onClick}
-          sx={{ position: "absolute", right: 32, bottom: 32 }}
-        >
-          <ArrowUpwardIcon />
-        </Fab>
-      </Tooltip>
-    </ParallaxLayer>
+function ParallaxMods() {
+  const { getModArray } = useMod();
+  const [allMods, setAllMods] = useState([]);
+
+  const MOD_COUNT = 10;
+
+  useEffect(() => {
+    async function init() {
+      try {
+        const data = await getModArray();
+        setAllMods(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    init();
+  }, [getModArray]);
+
+  const visibleMods = useMemo(
+    () =>
+      allMods.length
+        ? [...Array(MOD_COUNT).keys()].map(
+            () => allMods[Math.floor(Math.random() * allMods.length)]
+          )
+        : [],
+    [allMods]
+  );
+
+  const offsets = useMemo(
+    () => [...Array(MOD_COUNT).keys()].map(() => Math.random() * 0.4 + 0.6),
+    []
+  );
+
+  const speeds = useMemo(
+    () => [...Array(MOD_COUNT).keys()].map(() => Math.random() * 0.8 + 0.6),
+    []
+  );
+
+  const getML = (index) =>
+    index < MOD_COUNT / 2
+      ? 0
+      : `${(100 / MOD_COUNT) * (index - MOD_COUNT / 2) * 2}%`;
+  const getMR = (index) =>
+    index < MOD_COUNT / 2 ? `${(100 / MOD_COUNT) * index * 2}%` : 0;
+
+  return visibleMods.map((mod, index) =>
+    mod?.moduleCode ? (
+      <ParallaxLayer
+        key={index}
+        offset={offsets[index]}
+        speed={speeds[index]}
+        style={styles.centered}
+      >
+        <Box sx={{ ml: getML(index), mr: getMR(index) }}>
+          <ModuleBox moduleCode={mod.moduleCode} />
+        </Box>
+      </ParallaxLayer>
+    ) : null
   );
 }
 
