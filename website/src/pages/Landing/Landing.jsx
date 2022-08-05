@@ -3,9 +3,14 @@ import {
   Avatar,
   Box,
   Button,
+  ButtonGroup,
+  Card,
+  CardContent,
+  CardHeader,
   CircularProgress,
   Fab,
   IconButton,
+  Stack,
   Tooltip,
   Typography,
   useTheme,
@@ -15,11 +20,12 @@ import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ReactPlayer from "react-player/youtube";
 import { useAuthSession, useMod } from "../../providers";
 import { ModuleBox } from "../../components/Mod";
 import background from "../../res/wallpaper.jpg";
 
-const PAGE_COUNT = 2;
+const PAGE_COUNT = 3;
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -40,7 +46,7 @@ export default function Landing() {
         enabled={!loading}
         style={{ top: 0, left: 0 }}
       >
-        <ParallaxLayer // Back-to-top FAB
+        <ParallaxLayer // Sticky Back-to-top FAB
           sticky={{ start: 0.5, end: PAGE_COUNT - 1 }}
           style={{
             display: "flex",
@@ -61,21 +67,34 @@ export default function Landing() {
         <ParallaxBackground />
         <ParallaxMods />
         <ParallaxTitle />
+        <ParallaxDescription onNext={() => parallax.current?.scrollTo(2)} />
         <ParallaxDown
           loading={loading}
           onClick={() => parallax.current?.scrollTo(1)}
         />
         <ParallaxSlogan />
-        <ParallaxLayer offset={1} speed={2} style={styles.centered}>
-          <Button
-            variant="contained"
-            onClick={handleStart}
-            endIcon={<ArrowForwardIcon />}
-            sx={{ mt: 20 }}
-          >
-            {isAuth() ? "To roadmap" : "Get started"}
-          </Button>
+        <ParallaxLayer // Stick Get Started button
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-start",
+            height: 128,
+          }}
+          sticky={{ start: 1.5, end: 2 }}
+        >
+          <ButtonGroup variant="contained" sx={{ mt: 10 }}>
+            <Button
+              color="warning"
+              onClick={() => parallax.current?.scrollTo(1.5)}
+            >
+              Learn more
+            </Button>
+            <Button onClick={handleStart} endIcon={<ArrowForwardIcon />}>
+              {isAuth() ? "To roadmap" : "Get started"}
+            </Button>
+          </ButtonGroup>
         </ParallaxLayer>
+        <ParallaxVideo />
       </Parallax>
     </>
   );
@@ -159,7 +178,7 @@ function ParallaxTitle() {
 
 function ParallaxSlogan() {
   return (
-    <ParallaxLayer offset={1} speed={0.5} style={styles.centered}>
+    <ParallaxLayer offset={1} speed={1} style={styles.centered}>
       <Typography
         display={sx.desktopTitle.display}
         variant="h3"
@@ -171,7 +190,7 @@ function ParallaxSlogan() {
       </Typography>
       <Typography
         display={sx.mobileTitle.display}
-        variant="h4"
+        variant="h5"
         fontWeight="bold"
         color="white"
         mx={4}
@@ -272,6 +291,84 @@ function ParallaxMods() {
         </Box>
       </ParallaxLayer>
     ) : null
+  );
+}
+
+function ParallaxDescription({ onNext = () => {} }) {
+  const para1 =
+    "Entering university, a common issue " +
+    "faced by many freshmen is planning out their module selection. " +
+    "They may not know which modules their course requires them to take " +
+    "or the criteria for taking them.";
+
+  const para2 =
+    "Our web app aims to help these freshmen plan out their modules " +
+    "easier and better. They would be able to visualize a degree " +
+    "roadmap that suits them while not having to worry about course " +
+    "and module requirements.";
+
+  return (
+    <>
+      <ParallaxLayer offset={1.75} speed={0.5} style={styles.centered}>
+        <Stack spacing={2} alignItems="center" width="80%">
+          <Card sx={{ width: "80%", alignSelf: "flex-start" }}>
+            <CardContent>
+              <Typography display={{ md: "block", xs: "none" }} variant="h6">
+                {para1}
+              </Typography>
+              <Typography display={{ md: "none", xs: "block" }} variant="body1">
+                {para1}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card sx={{ width: "80%", alignSelf: "flex-end" }}>
+            <CardContent>
+              <Typography display={{ md: "block", xs: "none" }} variant="h6">
+                {para2}
+              </Typography>
+              <Typography display={{ md: "none", xs: "block" }} variant="body1">
+                {para2}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Stack>
+      </ParallaxLayer>
+      <ParallaxLayer
+        offset={1.95}
+        speed={1}
+        style={{ ...styles.centered, alignItems: "flex-end" }}
+      >
+        <Button
+          variant="contained"
+          endIcon={<ArrowDownwardIcon />}
+          onClick={onNext}
+        >
+          View video walkthrough
+        </Button>
+      </ParallaxLayer>
+    </>
+  );
+}
+
+function ParallaxVideo() {
+  return (
+    <ParallaxLayer offset={2} speed={1} style={styles.centered}>
+      <Card
+        sx={{
+          width: { xs: "80vw", md: "48vw" },
+          height: { xs: "60vw", md: "32vw" },
+        }}
+      >
+        <CardHeader subheader="NUSModded Walkthrough" />
+        <ReactPlayer
+          url={process.env.REACT_APP_WALKTHROUGH_URL}
+          width="100%"
+          height="100%"
+          light
+          controls
+        />
+      </Card>
+    </ParallaxLayer>
   );
 }
 
