@@ -14,6 +14,7 @@ import {
   Tooltip,
   Typography,
   useTheme,
+  Zoom,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Parallax, ParallaxLayer } from "@react-spring/parallax";
@@ -295,6 +296,8 @@ function ParallaxMods() {
 }
 
 function ParallaxDescription({ onNext = () => {} }) {
+  const [show, setShow] = useState(true);
+
   const para1 =
     "Entering university, a common issue " +
     "faced by many freshmen is planning out their module selection. " +
@@ -306,6 +309,12 @@ function ParallaxDescription({ onNext = () => {} }) {
     "easier and better. They would be able to visualize a degree " +
     "roadmap that suits them while not having to worry about course " +
     "and module requirements.";
+
+  const handleClick = () => {
+    onNext();
+    setShow(false);
+    setTimeout(() => setShow(true), 2000);
+  };
 
   return (
     <>
@@ -338,13 +347,15 @@ function ParallaxDescription({ onNext = () => {} }) {
         speed={1}
         style={{ ...styles.centered, alignItems: "flex-end" }}
       >
-        <Button
-          variant="contained"
-          endIcon={<ArrowDownwardIcon />}
-          onClick={onNext}
-        >
-          View video walkthrough
-        </Button>
+        <Zoom in={show}>
+          <Button
+            variant="contained"
+            endIcon={<ArrowDownwardIcon />}
+            onClick={handleClick}
+          >
+            Watch walkthrough
+          </Button>
+        </Zoom>
       </ParallaxLayer>
     </>
   );
@@ -356,7 +367,7 @@ function ParallaxVideo() {
       <Card
         sx={{
           width: { xs: "80vw", md: "48vw" },
-          height: { xs: "60vw", md: "32vw" },
+          height: { xs: "45vw", md: "27vw" },
         }}
       >
         <CardHeader subheader="NUSModded Walkthrough" />
