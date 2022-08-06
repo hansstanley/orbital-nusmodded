@@ -25,6 +25,7 @@ import ReactPlayer from "react-player/youtube";
 import { useAuthSession, useMod } from "../../providers";
 import { ModuleBox } from "../../components/Mod";
 import background from "../../res/wallpaper.jpg";
+import TransitionBall from "./TransitionBall";
 
 const PAGE_COUNT = 3;
 
@@ -32,10 +33,9 @@ export default function Landing() {
   const navigate = useNavigate();
   const { loading, isAuth } = useAuthSession();
   const parallax = useRef(null);
+  const [start, setStart] = useState(false);
 
-  const handleStart = () => {
-    navigate(isAuth() ? "/roadmap" : "/signup");
-  };
+  const handleStart = () => setStart(true);
 
   const handleScrollToTop = () => parallax.current?.scrollTo(0);
 
@@ -97,6 +97,10 @@ export default function Landing() {
         </ParallaxLayer>
         <ParallaxVideo />
       </Parallax>
+      <TransitionBall
+        enter={start}
+        onRest={() => navigate(isAuth() ? "/roadmap" : "/signup")}
+      />
     </>
   );
 }
