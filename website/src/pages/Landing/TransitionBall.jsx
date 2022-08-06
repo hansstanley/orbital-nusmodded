@@ -7,13 +7,13 @@ export default function TransitionBall({ enter = false, onRest = () => {} }) {
   const { x } = useSpring({
     from: { x: 0 },
     x: enter ? 1 : 0,
-    config: { duration: 1000, easing: easings.easeInOutCubic },
+    config: { duration: 1000, easing: easings.easeOutCubic },
     onRest,
   });
 
   const AnimatedBox = animated(Box);
 
-  return (
+  return enter ? (
     <AnimatedBox
       sx={{
         position: "absolute",
@@ -21,7 +21,7 @@ export default function TransitionBall({ enter = false, onRest = () => {} }) {
         height: "10vw",
         bottom: "40vh",
         right: "45vw",
-        border: 8,
+        border: 2,
         borderRadius: "5vw",
         borderColor: theme.palette.primary.light,
       }}
@@ -29,7 +29,7 @@ export default function TransitionBall({ enter = false, onRest = () => {} }) {
         transform: x.to({
           range: [0, 0.5, 1],
           output: [
-            "translateX(60vw) scale(1)",
+            "translateX(80vw) scale(1)",
             "translateX(0vw) scale(1)",
             "translateX(0vw) scale(16)",
           ],
@@ -44,5 +44,5 @@ export default function TransitionBall({ enter = false, onRest = () => {} }) {
         }),
       }}
     />
-  );
+  ) : null;
 }

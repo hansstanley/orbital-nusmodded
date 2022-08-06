@@ -26,6 +26,7 @@ import { useAuthSession, useMod } from "../../providers";
 import { ModuleBox } from "../../components/Mod";
 import background from "../../res/wallpaper.jpg";
 import TransitionBall from "./TransitionBall";
+import { animated, easings, useSpring } from "@react-spring/web";
 
 const PAGE_COUNT = 3;
 
@@ -108,20 +109,29 @@ export default function Landing() {
 function ParallaxBackground() {
   const theme = useTheme();
 
+  const isLight = theme.palette.mode === "light";
+
+  const { opacity, backgroundColor } = useSpring({
+    opacity: isLight ? "100%" : "80%",
+    backgroundColor: theme.palette.background.default,
+    from: { opacity: "0%" },
+    config: { duration: 5000, easing: easings.easeInOutCubic },
+  });
+
   return (
     <>
       <ParallaxLayer
         offset={0}
         speed={0}
         factor={PAGE_COUNT}
-        style={{ backgroundColor: "black" }}
+        style={{ backgroundColor }}
       />
       <ParallaxLayer
         offset={0}
         speed={0}
         factor={PAGE_COUNT}
         style={{
-          opacity: theme.palette.mode === "light" ? "100%" : "90%",
+          opacity,
           backgroundImage: `url(${background})`,
           backgroundSize: "cover",
         }}
@@ -209,10 +219,24 @@ function ParallaxSlogan() {
 function ParallaxDown({ onClick = () => {}, loading = false }) {
   const theme = useTheme();
 
+  const { transform } = useSpring({
+    loop: true,
+    delay: 2000,
+    to: [{ transform: "translateY(5px)" }, { transform: "translateY(0px)" }],
+    from: { transform: "translateY(0px)" },
+    config: { duration: 500, easing: easings.easeOutCubic },
+  });
+
+  const AnimatedIconButton = animated(IconButton);
+
   return (
     <>
       <ParallaxLayer offset={0} speed={2} style={styles.centered}>
-        <IconButton disabled sx={{ mt: 20.8, ml: 0.8 }}>
+        <AnimatedIconButton
+          disabled
+          sx={{ mt: 20.8, ml: 0.8 }}
+          style={{ transform }}
+        >
           {loading ? (
             <CircularProgress sx={{ color: "black" }} />
           ) : (
@@ -220,10 +244,15 @@ function ParallaxDown({ onClick = () => {}, loading = false }) {
               <ArrowDownwardIcon sx={{ color: "white" }} />
             </Avatar>
           )}
-        </IconButton>
+        </AnimatedIconButton>
       </ParallaxLayer>
       <ParallaxLayer offset={0} speed={1.5} style={styles.centered}>
-        <IconButton disabled={loading} onClick={onClick} sx={{ mt: 20 }}>
+        <AnimatedIconButton
+          disabled={loading}
+          onClick={onClick}
+          sx={{ mt: 20 }}
+          style={{ transform }}
+        >
           {loading ? (
             <CircularProgress />
           ) : (
@@ -231,7 +260,7 @@ function ParallaxDown({ onClick = () => {}, loading = false }) {
               <ArrowDownwardIcon sx={{ color: "white" }} />
             </Avatar>
           )}
-        </IconButton>
+        </AnimatedIconButton>
       </ParallaxLayer>
     </>
   );
