@@ -23,6 +23,7 @@ import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { COLORS, ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useModGroup, useRoadmap } from "../../providers";
+import { animated, useSpring } from "@react-spring/web";
 
 export default function SemesterOrderer() {
   const { loading, getSemesters, dragSemesters } = useRoadmap();
@@ -97,8 +98,9 @@ function SemesterBar({ sem = {}, index, isNew = false }) {
   const { id, year, semester, modules, bgColor } = sem;
   const { setBgColorById, setYearById, setSemesterById } = useRoadmap();
   const { isModGroupString, parseModGroupString } = useModGroup();
+  const theme = useTheme();
 
-  const isDarkTheme = useTheme().palette.mode === "dark";
+  const isDarkTheme = theme.palette.mode === "dark";
   const bgHex = COLORS[bgColor || "deepOrange"][isDarkTheme ? 900 : 200];
 
   const [open, setOpen] = useState(false);
@@ -144,6 +146,15 @@ function SemesterBar({ sem = {}, index, isNew = false }) {
       </Grid>
     );
   };
+
+  const { transform } = useSpring({
+    loop: { reverse: true },
+    from: { transform: "scale(1)" },
+    to: { transform: open ? "scale(1.1)" : "scale(1)" },
+    config: { duration: 250 },
+  });
+
+  const AnimatedAvatar = animated(Avatar);
 
   return (
     <>
@@ -197,9 +208,9 @@ function SemesterBar({ sem = {}, index, isNew = false }) {
             {...provided.dragHandleProps}
           >
             <Stack direction="row" alignItems="center" spacing={2}>
-              <Avatar sx={{ bgcolor: bgHex }}>
+              <AnimatedAvatar sx={{ bgcolor: bgHex }} style={{ transform }}>
                 <DragIndicatorIcon />
-              </Avatar>
+              </AnimatedAvatar>
               <Typography variant="overline" sx={{ flex: 1 }}>
                 {title}
               </Typography>
