@@ -9,8 +9,6 @@ import {
   Divider,
   Collapse,
   Button,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
@@ -20,8 +18,6 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import BookIcon from "@mui/icons-material/Book";
 import BackpackIcon from "@mui/icons-material/Backpack";
-import LockIcon from "@mui/icons-material/Lock";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
 import NotInterestedIcon from "@mui/icons-material/NotInterested";
 import SchoolIcon from "@mui/icons-material/School";
 import RightDrawer from "./RightDrawer";
@@ -41,6 +37,7 @@ import {
 } from "../../utils/constants";
 import SemesterOrderer from "./SemesterOrderer";
 import { useNavigate } from "react-router-dom";
+import LockButton from "./LockButton";
 // import RoadmapGenerator from "./RoadmapGenerator";
 
 export default function RoadmapStack() {
@@ -220,11 +217,7 @@ export default function RoadmapStack() {
       <Stack spacing={2} width="100%" alignItems="flex-start">
         <Stack direction="row" spacing={1}>
           <SemesterOrderer />
-          <Tooltip title={locked ? "Click to unlock" : "Click to lock"}>
-            <IconButton onClick={toggleLocked}>
-              {locked ? <LockIcon /> : <LockOpenIcon />}
-            </IconButton>
-          </Tooltip>
+          <LockButton locked={locked} onToggle={toggleLocked} />
         </Stack>
         <DragDropContext onDragEnd={onDragEnd}>
           {loading ? (

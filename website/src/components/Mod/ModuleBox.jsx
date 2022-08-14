@@ -73,7 +73,7 @@ export default function ModuleBox({
       <Typography variant="body2">Unknown module {moduleCode}</Typography>
     </CardContent>
   );
-  
+
   const nusmodsUrl = `${NUSMODS.MOD_PAGE_URL}/${moduleCode}`;
 
   const dialog = mod ? (
@@ -96,12 +96,25 @@ export default function ModuleBox({
           </DialogContentText>
           <Divider />
           <DialogContentText>
-            {loading ? <Skeleton /> : mod.prerequisite ? "Prerequisites: " + mod.prerequisite :  "No prerequisites."}
+            {loading ? (
+              <Skeleton />
+            ) : mod.prerequisite ? (
+              "Prerequisites: " + mod.prerequisite
+            ) : (
+              "No prerequisites."
+            )}
           </DialogContentText>
           <Divider />
           <DialogContentText>
-            {loading ? <Skeleton /> : mod.preclusion.length !== 0 
-            ? "Preclusion" + (mod.preclusion.length > 1 ? "s: " : ": ") + mod.preclusion.join(", ") :  "No preclusions."}
+            {loading ? (
+              <Skeleton />
+            ) : mod.preclusion.length !== 0 ? (
+              "Preclusion" +
+              (mod.preclusion.length > 1 ? "s: " : ": ") +
+              mod.preclusion.join(", ")
+            ) : (
+              "No preclusions."
+            )}
           </DialogContentText>
         </Stack>
       </DialogContent>

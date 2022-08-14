@@ -14,6 +14,7 @@ import {
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { AuthGuard, ResponsiveStack } from "../components";
 import { useAuthSession, useSnackbar } from "../providers";
+import { animated, easings, useSpring } from "@react-spring/web";
 
 export default function Account() {
   const { profile, updateProfile } = useAuthSession();
@@ -64,6 +65,15 @@ export default function Account() {
 
   const handleAvatarClick = () => setHighlight((prev) => !prev);
 
+  const { transform } = useSpring({
+    loop: { reverse: true },
+    from: { transform: highlight ? "translateX(1px)" : "translateX(0px)" },
+    to: highlight ? { transform: "translateX(-1px)" } : null,
+    config: { duration: 100, easing: easings.easeInOutQuad },
+  });
+
+  const AnimatedIconButton = animated(IconButton);
+
   return (
     <AuthGuard>
       <ResponsiveStack>
@@ -75,12 +85,15 @@ export default function Account() {
           }}
         >
           <Tooltip title="Change avatar">
-            <IconButton onClick={handleAvatarClick}>
+            <AnimatedIconButton
+              style={{ transform }}
+              onClick={handleAvatarClick}
+            >
               <Avatar
                 src={avatarUrl}
                 sx={{ height: 240, width: 240, bgcolor: "primary.main" }}
               />
-            </IconButton>
+            </AnimatedIconButton>
           </Tooltip>
         </Box>
         <Card sx={{ flex: 1 }}>
