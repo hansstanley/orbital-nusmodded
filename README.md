@@ -27,7 +27,7 @@ Alternatively, here are some of the main features of NUSModded.
     - Course of study 
     - Maximum MCs per semester
 
-  ![image](website\src\resources/images/account.png)
+  ![image](website/src/resources/images/account.png)
 
 ## Account differentiation
 - Users can only edit their roadmap and view courses.
@@ -36,26 +36,26 @@ Alternatively, here are some of the main features of NUSModded.
 ## Modules and Courses
 - View the courses offered by NUS and the list of modules available.
 
-  ![image](website\src\resources/images/courses1.png)
+  ![image](website/src/resources/images/courses1.png)
 
-  ![image](website\src\resources/images/courses2.png)
+  ![image](website/src/resources/images/courses2.png)
 
 - Search and filter through modules by module code.
 - Add the module directly to your roadmap from the module page.
-  ![image](website\src\resources/images/modules.png)
+  ![image](website/src/resources/images/modules.png)
 
 ## Roadmap
 - Add and remove modules.
-  ![image](website\src\resources/images/roadmap3.png)
+  ![image](website/src/resources/images/roadmap3.png)
 
 - View module details directly from the roadmap page.
-  ![image](website\src\resources/images/roadmap1.png)
+  ![image](website/src/resources/images/roadmap1.png)
 
 - Edit semesters to be taken (visually as well :relaxed:)
-  ![image](website\src\resources/images/roadmap2.png)
+  ![image](website/src/resources/images/roadmap2.png)
 
 - Exempt modules, select modules from your selected course, check roadmap for any issues (module requirements / settings of MC limit) and more!
-  ![image](website\src\resources/images/roadmap4.png)
+  ![image](website/src/resources/images/roadmap4.png)
 
 A full run through of the features can be found [here](https://docs.google.com/document/d/1foOU1kSgrwgTMGzBAYbM0iVod_GfRfPKN1_2mq-ZNCY/edit#).
 
