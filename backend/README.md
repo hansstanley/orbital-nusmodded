@@ -60,6 +60,17 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Deployment
+
+```bash
+# login to heroku
+$ npx heroku login
+
+# deploy to heroku
+$ cd ../
+$ npm run deploy
+```
+
 ## API
 
 **Note:** API routes that do not require authentication are flagged as "PUBLIC", e.g.
