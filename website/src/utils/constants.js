@@ -21,8 +21,7 @@ import {
   yellow,
 } from "@mui/material/colors";
 
-export const BACKEND_DOMAIN = "https://nusmodded.herokuapp.com";
-// export const BACKEND_DOMAIN = "http://localhost:3002";
+export const BACKEND_DOMAIN = "https://nusmodded-backend.onrender.com";
 
 export const NUSMODS = {
   MOD_PAGE_URL: "https://nusmods.com/modules",

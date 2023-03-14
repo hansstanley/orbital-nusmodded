@@ -60,7 +60,7 @@ function AuthSessionProvider({ children }) {
         username: username,
         password: authToken,
       },
-      { baseURL: BACKEND_DOMAIN }
+      { baseURL: process.env.REACT_APP_BACKEND_URL || BACKEND_DOMAIN }
     );
 
     if (status === 200 && data) {

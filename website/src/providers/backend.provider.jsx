@@ -27,7 +27,7 @@ function BackendProvider({ children }) {
       const res = await axios({
         url: route,
         method,
-        baseURL: BACKEND_DOMAIN,
+        baseURL: process.env.REACT_APP_BACKEND_URL || BACKEND_DOMAIN,
         headers: isPublic ? {} : { Authorization: `Bearer ${accessToken}` },
         data,
         params,
