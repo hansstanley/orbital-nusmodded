@@ -17,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useRoadmap, useMod, useSnackbar, useModGroup } from "../../providers";
-import { Draggable } from "react-beautiful-dnd";
+import { Draggable } from "@hello-pangea/dnd";
 import ResponsiveStack from "../../components/ResponsiveStack";
 import { ModuleStack } from "../../components/Mod";
 import { NUSMODS, DIMENSIONS } from "../../utils/constants";

@@ -28,7 +28,7 @@ import {
   useSnackbar,
 } from "../../providers";
 import ModuleBox from "./ModuleBox";
-import { Droppable } from "react-beautiful-dnd";
+import { Droppable } from "@hello-pangea/dnd";
 import ModGroupBox from "../../pages/Roadmap/ModGroupBox";
 import { DIMENSIONS } from "../../utils/constants";
 
@@ -125,9 +125,11 @@ export default function ModuleStack({
 
   const sortMods = useCallback(
     () =>
-      mods.filter((mod) =>
-        mod.moduleCode.includes((search || "").trim().toUpperCase())
-      ).slice(0, 20),
+      mods
+        .filter((mod) =>
+          mod.moduleCode.includes((search || "").trim().toUpperCase())
+        )
+        .slice(0, 20),
     [mods, search]
   );
 

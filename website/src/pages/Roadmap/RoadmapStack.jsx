@@ -14,7 +14,7 @@ import { grey } from "@mui/material/colors";
 import { ModuleBox, ModuleStack as ModStack } from "../../components/Mod";
 import { ModGroupStack } from "../../components/ModGroup";
 import ModGroupBox from "./ModGroupBox";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import BookIcon from "@mui/icons-material/Book";
 import BackpackIcon from "@mui/icons-material/Backpack";

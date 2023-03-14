@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
+    "@hello-pangea/dnd": "^16.2.0",
     "@mui/icons-material": "^5.8.0",
     "@mui/material": "^5.8.0",
     "@react-spring/parallax": "^9.5.2",
@@ -21,7 +22,6 @@
     "class-validator": "^0.13.2",
     "randombytes": "^2.1.0",
     "react": "^18.1.0",
-    "react-beautiful-dnd": "^13.1.0",
     "react-cookie": "^4.1.1",
     "react-dnd": "^16.0.1",
     "react-dom": "^18.1.0",
@@ -29,7 +29,6 @@
     "react-player": "^2.10.1",
     "react-router-dom": "^6.3.0",
     "react-scripts": "^5.0.1",
-    "react-sortable-hoc": "^2.0.0",
     "react-transition-group": "^4.4.2",
     "react-use-measure": "^2.1.1",
     "reflect-metadata": "^0.1.13",

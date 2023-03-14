@@ -13,7 +13,7 @@ import ModGroupBox from "./ModGroupBox";
 import ModGroupForm from "./ModGroupForm";
 import { stringToInt } from "../../utils/parsers";
 import EditModGroupButton from "./EditModGroupButton";
-import { Droppable } from "react-beautiful-dnd";
+import { Droppable } from "@hello-pangea/dnd";
 import { DIMENSIONS } from "../../utils/constants";
 
 export default function ModGroupStack({

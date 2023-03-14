@@ -21,7 +21,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DoneIcon from "@mui/icons-material/Done";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { COLORS, ROADMAP, SEMESTER_TITLE } from "../../utils/constants";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useModGroup, useRoadmap } from "../../providers";
 import { animated, useSpring } from "@react-spring/web";
 

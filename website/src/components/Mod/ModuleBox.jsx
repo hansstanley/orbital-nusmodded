@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { useMod, useSnackbar } from "../../providers";
-import { Draggable } from "react-beautiful-dnd";
+import { Draggable } from "@hello-pangea/dnd";
 import { NUSMODS, DIMENSIONS } from "../../utils/constants";
 
 /**

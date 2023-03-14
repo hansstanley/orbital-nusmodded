@@ -15,7 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Draggable } from "react-beautiful-dnd";
+import { Draggable } from "@hello-pangea/dnd";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ModGroup } from "../../models";
 import { useModGroup, useSnackbar, useMod } from "../../providers";
